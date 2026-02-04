@@ -134,16 +134,15 @@
             const data = await apiFetch('/cart/');
             const summaryContainer = document.getElementById('summary-items');
             
-            if (data.results && data.results.length > 0) {
-                summaryContainer.innerHTML = data.results.map(item => `
+            if (data.items && data.items.length > 0) {
+                summaryContainer.innerHTML = data.items.map(item => `
                     <div class="d-flex justify-content-between mb-2">
-                        <span>${item.product_variant.name} x ${item.quantity}</span>
-                        <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                        <span>${item.product_name} x ${item.quantity}</span>
+                        <span>$${(parseFloat(item.unit_price) * item.quantity).toFixed(2)}</span>
                     </div>
                 `).join('');
                 
-                const total = data.results.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                document.getElementById('order-total').textContent = `$${total.toFixed(2)}`;
+                document.getElementById('order-total').textContent = `$${data.total}`;
             }
         } catch (error) {
             console.error('Failed to load cart:', error);

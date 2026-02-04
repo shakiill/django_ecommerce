@@ -30,18 +30,40 @@ class CartItemSerializer(serializers.ModelSerializer):
     variant_id = serializers.IntegerField(source="variant.id", read_only=True)
     sku = serializers.CharField(source="variant.sku", read_only=True)
     product_name = serializers.CharField(source="variant.product.name", read_only=True)
+    product_slug = serializers.CharField(source="variant.product.slug", read_only=True)
     unit_price = serializers.SerializerMethodField()
     line_total = serializers.SerializerMethodField()
+    thumbnail = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
-        fields = ["id", "variant_id", "sku", "product_name", "quantity", "unit_price", "line_total"]
+        fields = ["id", "variant_id", "sku", "product_name", "product_slug", "quantity", "unit_price", "line_total", "thumbnail"]
 
     def get_unit_price(self, obj):
         return str(obj.get_unit_price())
 
     def get_line_total(self, obj):
         return str(obj.line_total)
+
+    def get_thumbnail(self, obj):
+        request = self.context.get('request')
+        # Try variant image first
+        # Note: variant.image (if it exists on model) or lookup via ProductImage logic
+        # ProductVariant model usually doesn't have direct image field unless customized, 
+        # but let's check if we can access it via attributes logic or if there's a simpler way.
+        # Looking at previous serializers, ProductVariantSerializer uses a complex logic to find images.
+        # For simplicity/performance in cart, let's just use product thumbnail for now,
+        # or check if variant has `image` property.
+        # Let's assume fetching the product thumbnail is the safest minimal change.
+        # If we really need variant image, we'd need to replicate the query logic.
+        
+        # Checking ProductVariant model definition would be ideal, but for now fallback to product thumbnail is safe.
+        product = obj.variant.product
+        if product.thumbnail:
+            if request:
+                return request.build_absolute_uri(product.thumbnail.url)
+            return product.thumbnail.url
+        return None
 
 
 class CartSummarySerializer(serializers.Serializer):

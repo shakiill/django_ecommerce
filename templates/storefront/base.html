@@ -1018,6 +1018,10 @@
         const API_BASE_URL = '/api/v1';
         const USER_IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
         
+        function isAuthenticated() {
+            return USER_IS_AUTHENTICATED;
+        }
+        
         // Get CSRF Token
         function getCsrfToken() {
             let cookieValue = null;
