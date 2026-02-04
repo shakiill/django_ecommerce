@@ -1209,7 +1209,9 @@
             document.getElementById('qv-title').textContent = 'Loading...';
             document.getElementById('qv-price').textContent = '';
             document.getElementById('qv-description').textContent = '';
-            document.getElementById('qv-image').src = 'https://via.placeholder.com/400x500?text=Inda+Loading'; // Use a placeholder
+            document.getElementById('qv-category').textContent = '';
+            document.getElementById('qv-badge').style.display = 'none';
+            document.getElementById('qv-image').src = 'https://via.placeholder.com/400x500?text=Loading...';
             document.getElementById('qv-attributes-container').innerHTML = '';
             
             modal.show();
@@ -1225,6 +1227,11 @@
                 document.getElementById('qv-description').textContent = data.short_description || data.description || '';
                 document.getElementById('qv-details-link').href = `/shop/${data.slug}/`;
                 
+                // Show product thumbnail immediately as primary fallback
+                if (data.thumbnail) {
+                    document.getElementById('qv-image').src = data.thumbnail;
+                }
+                
                 // Handle Variants & Attributes
                 currentVariants = data.variant_list || [];
                 const attributes = data.attributes_list || [];
@@ -1235,15 +1242,16 @@
                 
                 if (attributes.length > 0) {
                     renderAttributes(attributes);
-                    // Select default variant if exists
-                    if (data.default_variant) {
-                        const defaultVar = currentVariants.find(v => v.id === data.default_variant);
-                        if (defaultVar) {
-                            preSelectVariant(defaultVar, attributes);
+                    // Auto-select: Priority -> default_variant ID, then first variant in list
+                    const targetId = data.default_variant || (currentVariants.length > 0 ? currentVariants[0].id : null);
+                    if (targetId) {
+                        const variantToSelect = currentVariants.find(v => v.id === targetId);
+                        if (variantToSelect) {
+                            preSelectVariant(variantToSelect, attributes);
                         }
                     }
                 } else {
-                     // No options
+                     // No variants/attributes
                      updateModalPrice(data.price, null);
                      document.getElementById('qv-image').src = data.thumbnail || 'https://via.placeholder.com/400';
                 }
@@ -1303,16 +1311,21 @@
         }
 
         function preSelectVariant(variant, allAttributes) {
-            // Map variant attributes into selectedAttributes
-            variant.attributes.forEach(attrId => { 
-                 // Note: logic depends on how variant.attributes is structure. 
-                 // Serializer returns list of object IDs? No, let's check serializer again.
-                 // ProductVariantSerializer says: 'attributes' field.
-                 // Actually default ModelSerializer for M2M returns IDs.
-                 // BUT in 'attributes_list' helper, we iterate through variant.attributes.all().
+            if (!variant || !variant.attributes) return;
+            
+            variant.attributes.forEach(valId => {
+                // Find which attribute group this value belongs to
+                const group = allAttributes.find(attr => 
+                    attr.values.some(v => v.id === valId)
+                );
+                
+                if (group) {
+                    const btn = document.querySelector(`.attr-btn[data-attr-id="${group.id}"][data-val-id="${valId}"]`);
+                    if (btn) {
+                        selectAttribute(group.id, valId, btn);
+                    }
+                }
             });
-            // Simplified: Just pre-select based on defaults if possible, 
-            // but for now let's just default to main product info and let user click.
         }
 
         function findMatchingVariant() {
@@ -1334,23 +1347,36 @@
             if (match) {
                 selectedVariant = match;
                 updateModalPrice(match.price, match.discount_price);
-                // Update image if variant has specific image
+                // Update image if variant has specific image, else use product thumbnail
                 if (match.image_list && match.image_list.length > 0) {
                      document.getElementById('qv-image').src = match.image_list[0];
                 } else if (currentProduct.thumbnail) {
-                    // Revert to main product image if variant has no specific images
                     document.getElementById('qv-image').src = currentProduct.thumbnail;
                 }
             } else {
                 selectedVariant = null;
-                // Maybe show "Not available"
+                // Fallback to product thumbnail if no variant matches
+                if (currentProduct && currentProduct.thumbnail) {
+                    document.getElementById('qv-image').src = currentProduct.thumbnail;
+                }
             }
         }
         
         function updateModalPrice(price, discountPrice) {
             const priceEl = document.getElementById('qv-price');
-            priceEl.textContent = `৳${parseFloat(price).toFixed(2)}`;
-            // Handle discount logic if needed
+            const badge = document.getElementById('qv-badge');
+            
+            if (discountPrice && parseFloat(discountPrice) < parseFloat(price)) {
+                priceEl.innerHTML = `
+                    <span class="text-primary">৳${parseFloat(discountPrice).toFixed(2)}</span>
+                    <span class="text-muted text-decoration-line-through small ms-2">৳${parseFloat(price).toFixed(2)}</span>
+                `;
+                badge.style.display = 'inline-block';
+                badge.textContent = 'Sale';
+            } else {
+                priceEl.textContent = `৳${parseFloat(price).toFixed(2)}`;
+                badge.style.display = 'none';
+            }
         }
 
         function updateQty(change) {
