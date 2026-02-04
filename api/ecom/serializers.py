@@ -39,6 +39,8 @@ class ProductListSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     brand_name = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
+    old_price = serializers.SerializerMethodField()
+    on_sale = serializers.SerializerMethodField()
     thumbnail = serializers.ImageField(read_only=True)
     unit_name = serializers.CharField(source='unit.name', read_only=True)
 
@@ -47,11 +49,21 @@ class ProductListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'short_description', 'category', 'category_name', 'brand', 'brand_name',
             'product_type', 'is_featured', 'thumbnail', 'thumbnail_hover', 'unit', 'unit_name', 'price',
-            'default_variant', 'is_active'
+            'old_price', 'on_sale', 'default_variant', 'is_active'
         ]
 
     def get_price(self, obj):
+        if obj.default_variant and obj.default_variant.is_on_sale:
+            return obj.default_variant.discount_price
         return obj.get_price()
+
+    def get_old_price(self, obj):
+        if obj.default_variant and obj.default_variant.is_on_sale:
+            return obj.default_variant.price
+        return None
+
+    def get_on_sale(self, obj):
+        return obj.default_variant.is_on_sale if obj.default_variant else False
 
     def get_brand_name(self, obj):
         return obj.brand.name if obj.brand else None

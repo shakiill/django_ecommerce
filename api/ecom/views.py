@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from api.ecom.new_arrival import NewProductSerializer
 from api.ecom.serializers import ProductListSerializer, ProductDetailsSerializer
 from apps.ecom.models import Product
+from apps.master.models import Category, Brand
 
 
 # Helper to generate stable cache keys for list/retrieve
@@ -51,6 +52,20 @@ class CachedReadOnlyMixin:
         return Response(data)
 
 
+import django_filters
+
+
+class ProductFilter(django_filters.FilterSet):
+    min_price = django_filters.NumberFilter(field_name="default_variant__price", lookup_expr='gte')
+    max_price = django_filters.NumberFilter(field_name="default_variant__price", lookup_expr='lte')
+    category = django_filters.ModelMultipleChoiceFilter(queryset=Category.objects.all())
+    brand = django_filters.ModelMultipleChoiceFilter(queryset=Brand.objects.all())
+
+    class Meta:
+        model = Product
+        fields = ['is_active', 'is_featured', 'category', 'brand', 'product_type', 'unit']
+
+
 class ProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
     queryset = Product.objects.all()
     permission_classes = [AllowAny]
@@ -59,11 +74,9 @@ class ProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
     lookup_field = 'slug'
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'slug', 'short_description', 'description']
-    filterset_fields = [
-        'is_active', 'is_featured', 'category', 'brand', 'product_type', 'unit'
-    ]
+    filterset_class = ProductFilter
     ordering_fields = [
-        'id', 'name', 'created_at', 'is_active', 'is_featured'
+        'id', 'name', 'created_at', 'is_active', 'is_featured', 'default_variant__price'
     ]
 
     def get_serializer_class(self):
