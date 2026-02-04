@@ -59,17 +59,29 @@
             text-decoration: underline;
         }
         
-        /* Main Header - Glassmorphism */
+        /* Main Header - Sticky & Transparent */
         .main-header {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            padding: 20px 0;
-            position: sticky;
+            background: transparent; /* Initial transparent state */
+            backdrop-filter: blur(0px); /* No blur initially for clarity */
+            -webkit-backdrop-filter: blur(0px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px 0;
+            position: fixed; /* Sticky behavior */
             top: 0;
+            left: 0;
+            width: 100%;
             z-index: 1000;
+            transition: all 0.4s ease;
+        }
+
+        /* Scrolled State */
+        .main-header.header-scrolled {
+            background: rgba(255, 255, 255, 0.85); /* Milky glass on scroll */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 15px 0; /* Shrink on scroll */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .header-container {
@@ -85,13 +97,21 @@
         .logo {
             font-size: 28px;
             font-weight: 700;
-            color: var(--primary-color);
+            color: #ffffff; /* White initially for dark hero */
             text-decoration: none;
             letter-spacing: 1px;
             text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        
+        .main-header.header-scrolled .logo {
+            color: var(--primary-color); /* Dark on scroll */
         }
         
         .logo:hover {
+            color: #cccccc;
+        }
+        .main-header.header-scrolled .logo:hover {
             color: var(--primary-color);
         }
         
@@ -105,25 +125,34 @@
         }
         
         .main-nav a {
-            color: var(--text-primary);
+            color: #ffffff; /* White initially */
             text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 13px; /* Slightly refined size */
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 2px; /* Wider spacing like reference */
             transition: color 0.3s;
             position: relative;
+            padding: 5px 0;
+        }
+        
+        .main-header.header-scrolled .main-nav a {
+            color: var(--primary-color); /* Dark on scroll */
         }
         
         .main-nav a::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: 0px;
             left: 0;
             width: 0;
-            height: 1px;
-            background: var(--primary-color);
+            height: 2px;
+            background: #ffffff;
             transition: width 0.3s;
+        }
+
+        .main-header.header-scrolled .main-nav a::after {
+            background: var(--primary-color);
         }
         
         .main-nav a:hover::after {
@@ -147,16 +176,26 @@
         .header-search-form {
             display: flex;
             align-items: center;
-            border: 1px solid var(--border-color);
-            border-radius: 4px; /* Optional rounded */
-            padding: 5px 10px;
-            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 0; /* Squared connection */
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.1); /* Subtle fill */
             transition: all 0.3s;
+        }
+        
+        .main-header.header-scrolled .header-search-form {
+            border-color: #ddd;
+            background: #f5f5f5;
         }
 
         .header-search-form:focus-within {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .main-header.header-scrolled .header-search-form:focus-within {
             border-color: var(--primary-color);
-            background: var(--white);
+            background: #fff;
         }
 
         .header-search-input {
@@ -164,33 +203,57 @@
             background: transparent;
             outline: none;
             font-size: 14px;
-            color: var(--text-primary);
+            color: #ffffff;
             width: 200px;
             padding: 5px;
+        }
+        
+        .header-search-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .main-header.header-scrolled .header-search-input {
+            color: var(--text-primary);
+        }
+        
+        .main-header.header-scrolled .header-search-input::placeholder {
+            color: #999;
         }
 
         .header-search-btn {
             border: none;
             background: transparent;
-            color: var(--text-secondary);
+            color: #ffffff;
             cursor: pointer;
             padding: 5px;
         }
+        
+        .main-header.header-scrolled .header-search-btn {
+            color: var(--text-secondary);
+        }
 
         .header-search-btn:hover {
-            color: var(--primary-color);
+            opacity: 0.8;
         }
         
         .header-icon {
-            color: var(--text-primary);
-            font-size: 20px;
+            color: #ffffff;
+            font-size: 18px;
             text-decoration: none;
             position: relative;
             transition: color 0.3s;
         }
         
+        .main-header.header-scrolled .header-icon {
+            color: var(--text-primary);
+        }
+        
         .header-icon:hover {
-            color: var(--text-secondary);
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .main-header.header-scrolled .header-icon:hover {
+            color: var(--primary-color);
         }
         
         .cart-count {
@@ -230,11 +293,10 @@
         
         /* Footer - Infrastructure Design */
         .footer {
-            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-            padding: 80px 0 0;
+            background: #222222; /* Pure dark */
+            padding: 60px 0 30px; /* Reduced vertical padding */
             margin-top: 0;
-            border-top: 2px solid rgba(6, 182, 212, 0.2);
-            color: #cbd5e1;
+            color: #999;
         }
         
         .footer-heading {
@@ -875,120 +937,71 @@
     </main>
     
     <!-- Footer - High Density Infrastructure Design -->
+    <!-- Footer - Compact Minimal Design -->
     <footer class="footer">
         <div class="container">
-            <!-- Main Footer Content -->
             <div class="row">
-                <!-- Column 1: Company & About -->
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="footer-heading">INFRASTRUCTURE</h5>
-                    <p class="footer-about">
-                        Enterprise-grade e-commerce platform built for scale. 
-                        Trusted by 500K+ users worldwide.
+                <!-- Brand & About -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="footer-heading" style="color: #fff;">UOMO</h5>
+                    <p class="footer-about" style="max-width: 300px;">
+                        Your premier destination for luxury fashion and modern style. 
+                        Redefining elegance for the contemporary era.
                     </p>
-                    
-                    <!-- Social Proof Badges -->
-                    <div class="footer-badges">
-                        <div class="trust-badge">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>SSL Secured</span>
-                        </div>
-                        <div class="trust-badge">
-                            <i class="fas fa-award"></i>
-                            <span>ISO Certified</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Social Links -->
-                    <div class="footer-social">
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <div class="footer-social mt-4">
                         <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
                         <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-pinterest"></i></a>
                     </div>
                 </div>
                 
-                <!-- Column 2: Products & Categories -->
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="footer-heading">PRODUCTS</h5>
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-3 col-6 mb-4">
+                    <h5 class="footer-heading">SHOP</h5>
                     <ul class="footer-links">
                         <li><a href="{% url 'shop' %}">All Products</a></li>
                         <li><a href="#">New Arrivals</a></li>
                         <li><a href="#">Best Sellers</a></li>
-                        <li><a href="#">Featured Items</a></li>
-                        <li><a href="#">Sale & Offers</a></li>
-                        <li><a href="#">Gift Cards</a></li>
-                        <li><a href="#">Bundles</a></li>
-                        <li><a href="#">Pre-Orders</a></li>
+                        <li><a href="#">Sale</a></li>
                     </ul>
                 </div>
                 
-                <!-- Column 3: Support & Resources -->
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="footer-heading">SUPPORT</h5>
-                    <ul class="footer-links">
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Track Order</a></li>
-                        <li><a href="#">Returns & Refunds</a></li>
-                        <li><a href="#">Shipping Info</a></li>
-                        <li><a href="#">Size Guide</a></li>
-                        <li><a href="#">FAQs</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Live Chat</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Column 4: Company & Legal -->
-                <div class="col-lg-3 col-md-6 mb-4">
+                <!-- Company -->
+                <div class="col-lg-2 col-md-3 col-6 mb-4">
                     <h5 class="footer-heading">COMPANY</h5>
                     <ul class="footer-links">
                         <li><a href="#">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Press Kit</a></li>
-                        <li><a href="#">Sustainability</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
-                        <li><a href="#">Accessibility</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Terms</a></li>
                     </ul>
                 </div>
-            </div>
-            
-            <!-- Newsletter Section -->
-            <div class="footer-newsletter">
-                <div class="row align-items-center">
-                    <div class="col-lg-6 mb-3 mb-lg-0">
-                        <h6 class="newsletter-title">SUBSCRIBE TO UPDATES</h6>
-                        <p class="newsletter-desc">Get the latest product releases, exclusive offers, and infrastructure updates.</p>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="newsletter-form">
-                            <input type="email" class="newsletter-input" placeholder="Enter your email address">
-                            <button class="newsletter-btn" type="button">
-                                <span>SUBSCRIBE</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
+                
+                <!-- Newsletter -->
+                <div class="col-lg-4 col-md-12 mb-4">
+                    <h5 class="footer-heading">SUBSCRIBE</h5>
+                    <p class="footer-about">Get the latest updates and exclusive offers.</p>
+                    <form class="mt-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter your email" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 0;">
+                            <button class="btn btn-primary" type="button" style="border-radius: 0;">JOIN</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             
-            <!-- Footer Bottom -->
-            <div class="footer-bottom">
+            <div class="footer-bottom mt-4 pt-4 border-top border-secondary">
                 <div class="row align-items-center">
-                    <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
-                        <p class="footer-copyright">
-                            © 2026 Infrastructure E-Commerce. All rights reserved.
-                        </p>
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="footer-copyright">&copy; 2024 UOMO. All rights reserved.</p>
                     </div>
                     <div class="col-md-6 text-center text-md-end">
                         <div class="payment-methods">
                             <i class="fab fa-cc-visa"></i>
                             <i class="fab fa-cc-mastercard"></i>
-                            <i class="fab fa-cc-amex"></i>
                             <i class="fab fa-cc-paypal"></i>
-                            <i class="fab fa-cc-stripe"></i>
+                            <i class="fab fa-cc-amex"></i>
                         </div>
                     </div>
                 </div>
@@ -1126,6 +1139,16 @@
             }
             
             updateCartCount();
+
+            // Sticky Header Script
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('.main-header');
+                if (window.scrollY > 50) {
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                }
+            });
         });
         
         // Close mobile menu on resize to desktop
