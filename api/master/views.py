@@ -58,6 +58,7 @@ class BrandViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['is_active']
     ordering_fields = ['id', 'name', 'is_active']
+    pagination_class = None
 
 
 class TagViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -70,6 +71,7 @@ class TagViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['is_active']
     ordering_fields = ['id', 'name', 'is_active']
+    pagination_class = None
 
 
 class SupplierViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -82,6 +84,7 @@ class SupplierViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name', 'email', 'phone']
     filterset_fields = ['is_active']
     ordering_fields = ['id', 'name', 'email', 'phone', 'is_active']
+    pagination_class = None
 
 
 class CategoryViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -94,6 +97,7 @@ class CategoryViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['is_active', 'is_featured', 'parent']
     ordering_fields = ['id', 'name', 'is_active',  'is_featured', 'parent']
+    pagination_class = None
 
 
 class WarehouseViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -106,6 +110,7 @@ class WarehouseViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name', 'location']
     filterset_fields = ['is_active']
     ordering_fields = ['id', 'name', 'location', 'is_active']
+    pagination_class = None
 
 
 class CurrencyViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -118,6 +123,7 @@ class CurrencyViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name', 'code', 'symbol']
     filterset_fields = ['is_active']
     ordering_fields = ['id',  'code', 'symbol', 'is_active']
+    pagination_class = None
 
 
 class PaymentMethodViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -130,6 +136,7 @@ class PaymentMethodViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['is_active']
     ordering_fields = ['id', 'name', 'is_active']
+    pagination_class = None
 
 
 class ShippingMethodViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -142,6 +149,7 @@ class ShippingMethodViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['is_active']
     ordering_fields = ['id', 'name', 'is_active']
+    pagination_class = None
 
 
 class TaxViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -154,6 +162,7 @@ class TaxViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['is_active']
     ordering_fields = ['id', 'name', 'rate', 'is_active']
+    pagination_class = None
 
 
 class AttributeViewSet(MasterCachedMixin, viewsets.ModelViewSet):
@@ -166,3 +175,4 @@ class AttributeViewSet(MasterCachedMixin, viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['is_active']
     ordering_fields = ['id', 'name', 'is_active']
+    pagination_class = None

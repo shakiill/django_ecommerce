@@ -14,6 +14,7 @@ class MainSliderViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     authentication_classes = []
     http_method_names = ['get']
+    pagination_class = None
 
 
 class MegaMenuView(views.APIView):

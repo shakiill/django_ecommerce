@@ -28,6 +28,7 @@ class AttributeViewSet(viewsets.ModelViewSet):
     serializer_class = AttributeSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class AttributeValueViewSet(viewsets.ModelViewSet):
@@ -35,6 +36,7 @@ class AttributeValueViewSet(viewsets.ModelViewSet):
     serializer_class = AttributeValueSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -47,6 +49,7 @@ class BrandViewSet(viewsets.ModelViewSet):
     serializer_class = BrandSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -59,6 +62,7 @@ class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class SupplierSerializer(serializers.ModelSerializer):
@@ -71,6 +75,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
     serializer_class = SupplierSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class TaxSerializer(serializers.ModelSerializer):
@@ -83,6 +88,7 @@ class TaxViewSet(viewsets.ModelViewSet):
     serializer_class = TaxSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class UnitSerializer(serializers.ModelSerializer):
@@ -95,6 +101,7 @@ class UnitViewSet(viewsets.ModelViewSet):
     serializer_class = UnitSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -129,6 +136,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
     parser_classes = [MultiPartParser, FormParser]  # <-- fix here
+    pagination_class = None
 
 
 class WarehouseSerializer(serializers.ModelSerializer):
@@ -141,6 +149,7 @@ class WarehouseViewSet(viewsets.ModelViewSet):
     serializer_class = WarehouseSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class CurrencySerializer(serializers.ModelSerializer):
@@ -153,6 +162,7 @@ class CurrencyViewSet(viewsets.ModelViewSet):
     serializer_class = CurrencySerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class PaymentMethodSerializer(serializers.ModelSerializer):
@@ -165,6 +175,7 @@ class PaymentMethodViewSet(viewsets.ModelViewSet):
     serializer_class = PaymentMethodSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
 
 
 class ShippingMethodSerializer(serializers.ModelSerializer):
@@ -177,3 +188,4 @@ class ShippingMethodViewSet(viewsets.ModelViewSet):
     serializer_class = ShippingMethodSerializer
     permission_classes = [IsStaffUser]
     authentication_classes = [SessionAuthentication]
+    pagination_class = None
