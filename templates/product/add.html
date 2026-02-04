@@ -1,0 +1,335 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                        {% if product %} Update {% else %}Create {% endif %}Product
+                    </h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a href="/" class="text-muted text-hover-primary">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">product</li>
+                    </ul>
+                </div>
+                <div class="d-flex align-items-center gap-2 gap-lg-3">
+                    <a href="{% url 'product_list' %}" class="btn btn-sm fw-bold btn-primary"> Back to list</a>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <form id="productForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <!-- Main Content -->
+                        <div class="col-lg-8">
+                            <!-- Basic Information -->
+
+                            <div class="card card-flush py-4">
+                                <!--begin::Card header-->
+                                <div class="card-header">
+                                    <div class="card-title">
+                                      <h2><i class="fas fa-info-circle text-primary me-2"></i> Basic Information</h2>
+                                    </div>
+                                </div>
+                                <!--end::Card header-->
+                                <!--begin::Card body-->
+                                <div class="card-body p-4">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="productName" class="form-label fw-medium">Product Name <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control form-control-lg" id="productName"
+                                                       name="name" placeholder="Enter product name" required
+                                                       value="{{ product.name|default_if_none:'' }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="productSlug" class="form-label fw-medium">URL Slug</label>
+                                                <input type="text" class="form-control bg-light" id="productSlug"
+                                                       name="slug" readonly
+                                                       value="{{ product.slug|default_if_none:'' }}">
+                                                <small class="text-muted">Auto-generated</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label fw-medium">Category <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-control form-select" id="category" name="category"
+                                                        required>
+                                                    <option value="">Select Category</option>
+                                                    {% for category in categories %}
+                                                        <option value="{{ category.id }}"
+                                                                {% if product and product.category_id == category.id %}selected{% endif %}>
+                                                            {{ category.name }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="brand" class="form-label fw-medium">Brand</label>
+                                                <select class="form-control form-select" id="brand" name="brand">
+                                                    <option value="">Select Brand</option>
+                                                    {% for brand in brands %}
+                                                        <option value="{{ brand.id }}"
+                                                                {% if product and product.brand_id == brand.id %}selected{% endif %}>
+                                                            {{ brand.name }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="warranty" class="form-label fw-medium">Warranty</label>
+                                                <input type="text" class="form-control" id="warranty" name="warranty"
+                                                       placeholder="e.g., 1 Year Warranty"
+                                                       value="{{ product.warranty|default_if_none:'' }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="unit" class="form-label fw-medium">Unit</label>
+                                                <select class="form-control form-select" id="unit" name="unit">
+                                                    <option value="">Select Unit</option>
+                                                    {% for unit in units %}
+                                                        <option value="{{ unit.id }}"
+                                                            {% if product and product.unit_id == unit.id %}selected{% endif %}>
+                                                            {{ unit.name }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="min_order_quantity" class="form-label fw-medium">Min Order Quantity</label>
+                                                <input type="number" class="form-control" id="min_order_quantity" name="min_order_quantity"
+                                                       min="1"
+                                                       value="{{ product.min_order_quantity|default_if_none:1 }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="max_order_quantity" class="form-label fw-medium">Max Order Quantity</label>
+                                                <input type="number" class="form-control" id="max_order_quantity" name="max_order_quantity"
+                                                       min="1"
+                                                       value="{{ product.max_order_quantity|default_if_none:100 }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label fw-medium">Description <span
+                                                class="text-danger">*</span></label>
+                                        {{ form.description }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="key_features" class="form-label fw-medium">Key Features</label>
+                                        {{ form.key_features }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tags" class="form-label fw-medium">Tags</label>
+                                        {{ form.tags }}
+                                    </div>
+                                </div>
+                                <!--end::Card header-->
+                            </div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="col-lg-4">
+                            <!-- Product Options (renamed and moved checkboxes here) -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <div class="card-title">
+                                        <h2><i class="fas fa-sliders-h text-warning me-1 mr-2"></i> Product Options</h2>
+                                    </div>
+                                </div>
+
+
+                                <div class="card-body p-4">
+                                    <div class="form-check mt-3 mb-2">
+                                        <input class="form-check-input" type="checkbox" id="isFeatured"
+                                               name="is_featured"
+                                               {% if product and product.is_featured %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium" for="isFeatured">
+                                            Featured Product
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="trackInventory"
+                                               name="track_inventory"
+                                               {% if product and product.track_inventory %}checked{% endif %}
+                                               {% if not product %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium" for="trackInventory">
+                                            Track Inventory
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="allowBackorder"
+                                               name="allow_backorder"
+                                               {% if product and product.allow_backorder %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium" for="allowBackorder">
+                                            Allow Backorder
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="isActive"
+                                               name="is_active"
+                                               {% if product and product.is_active %}checked{% endif %}
+                                               {% if not product %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium" for="isActive">
+                                            Active
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Product Image (thumbnail only) -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <div class="card-title">
+                                        <h2><i class="fas fa-image text-info me-2 mr-2"></i>Product Main Image</h2>
+                                    </div>
+                                </div>
+
+                                <div class="card-body p-4">
+                                    <div class="mb-3">
+                                        <input type="file" class="form-control" id="thumbImage" name="thumbnail"
+                                               accept="image/*"
+                                               {% if not product or not product.thumbnail %}required{% endif %}>
+                                        <small class="text-muted">Upload the main product image (JPG, PNG).</small>
+                                    </div>
+                                    <div id="thumbImagePreview" class="mt-3">
+                                        {% if product and product.thumbnail %}
+                                            <img src="{{ product.thumbnail.url }}" class="img-fluid rounded shadow-sm"
+                                                 style="height: 120px; width: auto; object-fit: cover;">
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="card-body p-4">
+                                    <div class="mb-3">
+                                        <input type="file" class="form-control" id="thumbHoverImage" name="thumbnail_hover"
+                                               accept="image/*"
+                                               {% if not product or not product.thumbnail_hover %}required{% endif %}>
+                                        <small class="text-muted">Upload the main product image (JPG, PNG).</small>
+                                    </div>
+                                    <div id="thumbHoverImagePreview" class="mt-3">
+                                        {% if product and product.thumbnail_hover %}
+                                            <img src="{{ product.thumbnail_hover.url }}" class="img-fluid rounded shadow-sm"
+                                                 style="height: 120px; width: auto; object-fit: cover;">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEO Settings -->
+                            <div class="card shadow-sm mb-4">
+                                 <div class="card-header">
+                                    <div class="card-title">
+                                        <h2> <i class="fas fa-search text-info me-2 mr-2"></i>SEO Settings</h2>
+                                    </div>
+                                </div>
+
+
+                                <div class="card-body p-4">
+                                    <div class="mb-3">
+                                        <label for="metaTitle" class="form-label fw-medium">Meta Title</label>
+                                        <input type="text" class="form-control" id="metaTitle" name="meta_title"
+                                               maxlength="60"
+                                               value="{{ product.meta_title|default_if_none:'' }}">
+                                        <small class="form-text text-muted">
+                                            <span id="metaTitleCount">{{ product.meta_title|default_if_none:''|length }}</span>/60
+                                            characters
+                                        </small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="metaDescription" class="form-label fw-medium">Meta
+                                            Description</label>
+                                        <textarea class="form-control" id="metaDescription" name="meta_description"
+                                                  rows="3"
+                                                  maxlength="160">{{ product.meta_description|default_if_none:'' }}</textarea>
+                                        <small class="form-text text-muted">
+                                            <span id="metaDescCount">{{ product.meta_description|default_if_none:''|length }}</span>/160
+                                            characters
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Progress Checklist -->
+                            <div class="card shadow-sm">
+                                 <div class="card-header">
+                                    <div class="card-title">
+                                        <h2>  <i class="fas fa-tasks text-success me-2"></i>Progress</h2>
+                                    </div>
+                                </div>
+
+
+                                <div class="card-body p-4">
+                                    <div class="checklist">
+                                        <div class="checklist-item d-flex align-items-center py-2">
+                                            <i class="fas fa-circle text-muted me-3"></i>
+                                            <span>Product name & description</span>
+                                        </div>
+                                        <div class="checklist-item d-flex align-items-center py-2">
+                                            <i class="fas fa-circle text-muted me-3"></i>
+                                            <span>Product images</span>
+                                        </div>
+                                        <!-- Variants will be in Step 2 -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="card shadow-sm mt-4">
+
+                                 <div class="card-header">
+                                    <div class="card-title">
+                                        <h2>    <i class="fas fa-rocket text-warning me-2 mr-2"></i>Quick Actions</h2>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-outline-secondary" id="saveAsDraft">
+                                            <i class="fas fa-save me-2"></i>Save as Draft
+                                        </button>
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="fas fa-arrow-right me-2"></i>Save & Continue to Variants
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block title %} List page | demo ste {% endblock %}

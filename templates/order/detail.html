@@ -1,0 +1,248 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 my-0">
+                    Order {{ order.order_number }}
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a href="/" class="text-muted text-hover-primary">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{% url 'order:order_list' %}" class="text-muted text-hover-primary">Orders</a>
+                    </li>
+                    <li class="breadcrumb-item text-muted">Detail</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+
+            <div class="row g-5">
+                <div class="col-xl-8">
+                    <div class="card mb-5">
+                        <div class="card-header border-0 pt-6">
+                            <div class="card-title">
+                                <h3 class="fw-bold m-0">Summary</h3>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="row mb-6">
+                                <div class="col-md-6">
+                                    <div class="fw-semibold text-gray-600">Status</div>
+                                    <div class="fw-bold">{{ order.get_status_display }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fw-semibold text-gray-600">Payment</div>
+                                    <div class="fw-bold">{{ order.get_payment_status_display }}</div>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <div class="col-md-4">
+                                    <div class="fw-semibold text-gray-600">Subtotal</div>
+                                    <div class="fw-bold">{{ order.subtotal_amount }} {{ order.currency }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="fw-semibold text-gray-600">Discount</div>
+                                    <div class="fw-bold text-danger">-{{ order.discount_amount }} {{ order.currency }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="fw-semibold text-gray-600">Total</div>
+                                    <div class="fw-bold text-primary fs-4">{{ order.total_amount }} {{ order.currency }}</div>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <div class="col-md-6">
+                                    <div class="fw-semibold text-gray-600">Created</div>
+                                    <div class="fw-bold">{{ order.created_at|date:"Y-m-d H:i" }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fw-semibold text-gray-600">Updated</div>
+                                    <div class="fw-bold">{{ order.updated_at|date:"Y-m-d H:i" }}</div>
+                                </div>
+                            </div>
+                            {% if order.notes %}
+                                <div class="mb-6">
+                                    <div class="fw-semibold text-gray-600">Notes</div>
+                                    <div class="fw-bold">{{ order.notes|linebreaksbr }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header border-0 pt-6">
+                            <div class="card-title">
+                                <h3 class="fw-bold m-0">Items</h3>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table class="table align-middle table-row-dashed fs-6 gy-5">
+                                    <thead>
+                                    <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                        <th>Product</th>
+                                        <th>SKU</th>
+                                        <th class="text-end">Qty</th>
+                                        <th class="text-end">Unit Price</th>
+                                        <th class="text-end">Line Total</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="text-gray-600 fw-semibold">
+                                    {% for item in order.items.all %}
+                                        <tr>
+                                            <td>{{ item.product_name }}</td>
+                                            <td>{{ item.sku }}</td>
+                                            <td class="text-end">{{ item.quantity }}</td>
+                                            <td class="text-end">{{ item.unit_price }}</td>
+                                            <td class="text-end">{{ item.line_total }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr><td colspan="5" class="text-center py-10">No items.</td></tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="card mb-5">
+                        <div class="card-header border-0 pt-6">
+                            <div class="card-title"><h3 class="fw-bold m-0">Customer</h3></div>
+                        </div>
+                        <div class="card-body pt-0">
+                            {% if order.user %}
+                                <div class="mb-4">
+                                    <div class="fw-semibold text-gray-600">Name</div>
+                                    <div class="fw-bold">{{ order.user.get_display_name }}</div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="fw-semibold text-gray-600">Email</div>
+                                    <div class="fw-bold">{{ order.user.email }}</div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="fw-semibold text-gray-600">Phone</div>
+                                    <div class="fw-bold">{{ order.user.username }}</div>
+                                </div>
+                            {% else %}
+                                <div class="mb-4">
+                                    <div class="fw-semibold text-gray-600">Guest Email</div>
+                                    <div class="fw-bold">{{ order.guest_email }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card mb-5">
+                        <div class="card-header border-0 pt-6">
+                            <div class="card-title"><h3 class="fw-bold m-0">Addresses</h3></div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="mb-6">
+                                <div class="fw-semibold text-gray-600">Shipping</div>
+                                {% if order.shipping_address %}
+                                    <div class="fw-bold">
+                                        {{ order.shipping_address.full_name }}<br>
+                                        {{ order.shipping_address.line1 }}{% if order.shipping_address.line2 %}, {{ order.shipping_address.line2 }}{% endif %}<br>
+                                        {{ order.shipping_address.city }} {{ order.shipping_address.postal_code }}<br>
+                                        {{ order.shipping_address.country }}
+                                    </div>
+                                {% else %}<div class="text-muted">Not set</div>{% endif %}
+                            </div>
+                            <div>
+                                <div class="fw-semibold text-gray-600">Billing</div>
+                                {% if order.billing_address %}
+                                    <div class="fw-bold">
+                                        {{ order.billing_address.full_name }}<br>
+                                        {{ order.billing_address.line1 }}{% if order.billing_address.line2 %}, {{ order.billing_address.line2 }}{% endif %}<br>
+                                        {{ order.billing_address.city }} {{ order.billing_address.postal_code }}<br>
+                                        {{ order.billing_address.country }}
+                                    </div>
+                                {% else %}<div class="text-muted">Not set</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header border-0 pt-6">
+                            <div class="card-title"><h3 class="fw-bold m-0">Update Status</h3></div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <form method="post" action="{% url 'order:order_status_update' order.pk %}">
+                                {% csrf_token %}
+                                <div class="mb-5">
+                                    <label class="form-label required">Order Status</label>
+                                    <select name="status" class="form-select">
+                                        {% for value, label in order_status_choices %}
+                                            <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100" type="submit">Save</button>
+                            </form>
+
+                            <!-- Invoice actions -->
+                            <div class="mt-4 d-flex gap-2">
+                                <a class="btn btn-secondary" href="{% url 'order:order_invoice' order.pk %}">
+                                    Download PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New: Status History -->
+                    <div class="card mt-5">
+                        <div class="card-header border-0 pt-6">
+                            <div class="card-title"><h3 class="fw-bold m-0">Status History</h3></div>
+                        </div>
+                        <div class="card-body pt-0">
+                            {% if order.status_logs.exists %}
+                                <div class="timeline timeline-vertical">
+                                    {% for log in order.status_logs.all %}
+                                        <div class="timeline-item d-flex align-items-start py-4">
+                                            <div class="timeline-line me-3"></div>
+                                            <div class="timeline-icon symbol symbol-35px me-4">
+                                                <span class="symbol-label bg-primary"></span>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold">
+                                                    {{ log.get_change_type_display }}:
+                                                    <span class="text-muted">{{ log.old_value }}</span>
+                                                    <i class="mx-1">→</i>
+                                                    <span class="text-primary">{{ log.new_value }}</span>
+                                                </div>
+                                                {% if log.note %}
+                                                    <div class="text-muted small">{{ log.note }}</div>
+                                                {% endif %}
+                                                <div class="text-muted small mt-1">
+                                                    By:
+                                                    {% if log.changed_by %}
+                                                        {{ log.changed_by.get_display_name }}
+                                                    {% else %}
+                                                        System
+                                                    {% endif %}
+                                                    &nbsp;·&nbsp; {{ log.created_at|date:"Y-m-d H:i" }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-muted">No status history.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block title %} Order {{ order.order_number }} | Admin {% endblock %}

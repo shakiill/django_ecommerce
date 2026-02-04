@@ -1,0 +1,350 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                        User Listing
+                    </h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a href="/" class="text-muted text-hover-primary">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">users</li>
+                    </ul>
+                </div>
+                <div class="d-flex align-items-center gap-2 gap-lg-3">
+                    <div id="dt-export-buttons" class="me-2"></div>
+                    <input type="text" id="dt_search_input" class="form-control form-control-sm me-2" placeholder="Search...">
+                    <a href="#" class="btn btn-sm fw-bold btn-primary" data-bs-toggle="modal"
+                       data-bs-target="#userModal" id="openUserModalBtn">Create</a>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+{#            <div id="kt_app_content_container" class="app-container container-xxl">#}
+            <div id="kt_app_content_container" class="app-container container-fluid">
+                <div class="card">
+                    <div class="card-body pt-0">
+                        <!-- Top filter bar -->
+                        <div class="mb-3">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-2">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" id="search_name" class="form-control form-control-sm" placeholder="Search Name">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" id="search_username" class="form-control form-control-sm" placeholder="Search Username">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Email</label>
+                                    <input type="text" id="search_email" class="form-control form-control-sm" placeholder="Search Email">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Designation</label>
+                                    <input type="text" id="search_designation" class="form-control form-control-sm" placeholder="Search Designation">
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label">Employee ID</label>
+                                    <input type="text" id="search_employee_id" class="form-control form-control-sm" placeholder="Search Employee ID">
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label">Status</label>
+                                    <select id="search_is_active" class="form-select form-select-sm">
+                                        <option value="">All</option>
+                                        <option value="True">Active</option>
+                                        <option value="False">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <button type="button" id="filters_apply" class="btn btn-sm btn-primary">Apply </button>
+                                    <button type="button" id="filters_reset" class="btn btn-sm btn-light">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="users_table">
+                            <thead>
+                            <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                <th class="min-w-125px">Name</th>
+                                <th class="min-w-125px">Username</th>
+                                <th class="min-w-125px">Email</th>
+                                <th class="min-w-125px">Designation</th>
+                                <th class="min-w-125px">Employee ID</th>
+                                <th class="min-w-125px">Status</th>
+                                <th class="min-w-125px">Created Date</th>
+                                <th class="text-end min-w-70px">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+                            <!-- Data will be loaded by DataTables AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="userForm">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="userModalLabel">Add/Edit User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="userId">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="designation" class="form-label">Designation</label>
+                            <input type="text" class="form-control" id="designation" name="designation" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="employee_id" class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" id="employee_id" name="employee_id" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="is_active" class="form-label">Status</label>
+                            <select class="form-control" id="is_active" name="is_active">
+                                <option value="True">Active</option>
+                                <option value="False">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep unchanged">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block title %} Users | demo ste {% endblock %}
+
+{% block extra_js %}
+    <script>
+        // CSRF setup for AJAX
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken') || (document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '');
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+                    if (csrftoken) {
+                        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                    }
+                }
+            }
+        });
+
+        $(document).ready(function () {
+            var table = $('#users_table').DataTable({
+                serverSide: true,
+                processing: true,
+                responsive: false,
+                scrollY: '60vh',
+                scrollCollapse: true,
+                autoWidth: false,
+                dom: 'rtip',
+                ajax: {
+                    url: '/api/users/datatable/',
+                    dataSrc: 'data',
+                    data: function (d) {
+                        d.search_name = $('#search_name').val();
+                        d.search_username = $('#search_username').val();
+                        d.search_email = $('#search_email').val();
+                        d.search_designation = $('#search_designation').val();
+                        d.search_employee_id = $('#search_employee_id').val();
+                        d.search_is_active = $('#search_is_active').val();
+                    }
+                },
+                columns: [
+                    { data: 'name' },
+                    { data: 'username' },
+                    { data: 'email' },
+                    { data: 'designation' },
+                    { data: 'employee_id' },
+                    { data: 'is_active', render: function (data) {
+                        return data ? '<div class="badge badge-light-success">Active</div>' : '<div class="badge badge-light-danger">Inactive</div>';
+                    }},
+                    { data: 'created_at' },
+                    { data: null, render: function (data, type, row) {
+                        return `
+                            <button class="btn btn-sm btn-light edit-user" data-id="${row.id}">Edit</button>
+                            <button class="btn btn-sm btn-danger delete-user" data-id="${row.id}">Delete</button>
+                        `;
+                    }, orderable: false }
+                ],
+                pageLength: 10,
+                lengthMenu: [10, 25, 50, 100],
+                order: [[0, 'asc']],
+                initComplete: function() {
+                    var api = this.api();
+                    // Export buttons in toolbar
+                    new $.fn.dataTable.Buttons(api, {
+                        buttons: [
+                            { extend: 'csvHtml5', text: 'CSV', className: 'btn btn-sm btn-light-primary me-2', exportOptions: { columns: [0,1,2,3,4,5,6] } },
+                            { extend: 'excelHtml5', text: 'Excel', className: 'btn btn-sm btn-light-success', exportOptions: { columns: [0,1,2,3,4,5,6] } }
+                        ]
+                    });
+                    $(api.buttons().container()).appendTo('#dt-export-buttons');
+                    // Global search input
+                    $('#dt_search_input').on('keyup change', function(){
+                        api.search(this.value).draw();
+                    });
+                }
+            });
+
+            // Apply/Reset filter buttons
+            $('#filters_apply').on('click', function(){ table.ajax.reload(); });
+            $('#filters_reset').on('click', function(){
+                $('#search_name, #search_username, #search_email, #search_designation, #search_employee_id').val('');
+                $('#search_is_active').val('');
+                table.ajax.reload();
+            });
+
+            // Also trigger on change/keyup for immediacy
+            $('#search_name, #search_username, #search_email, #search_designation, #search_employee_id, #search_is_active').on('keyup change', function () {
+                table.ajax.reload();
+            });
+
+            // Edit
+            $('#users_table').on('click', '.edit-user', function () {
+                var id = $(this).data('id');
+                $.get('/api/users/' + id + '/', function (user) {
+                    $('#userId').val(user.id);
+                    $('#username').val(user.username);
+                    $('#name').val(user.name);
+                    $('#email').val(user.email);
+                    $('#designation').val(user.designation);
+                    $('#employee_id').val(user.employee_id);
+                    $('#is_active').val(user.is_active ? 'True' : 'False');
+                    $('#userModal').modal('show');
+                }).fail(function () {
+                    Swal.fire('Error', 'Failed to load user details.', 'error');
+                });
+            });
+
+            // Reset form for create
+            $('#openUserModalBtn').on('click', function () {
+                $('#userForm')[0].reset();
+                $('#userId').val('');
+                $('#userModalLabel').text('Add User');
+            });
+
+            // Add/Edit submit
+            $('#userForm').on('submit', function (e) {
+                e.preventDefault();
+                var id = $('#userId').val();
+                var isEdit = !!id;
+                var url = isEdit ? ('/api/users/' + id + '/') : '/api/users/';
+                var method = isEdit ? 'PUT' : 'POST';
+
+                var payload = {
+                    username: $('#username').val(),
+                    name: $('#name').val(),
+                    email: $('#email').val(),
+                    designation: $('#designation').val(),
+                    employee_id: $('#employee_id').val(),
+                    is_active: $('#is_active').val() === 'True'
+                };
+                var password = $('#password').val();
+                if (password) payload.password = password;
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        Swal.fire('Success', 'User saved successfully!', 'success');
+                        $('#userModal').modal('hide');
+                        table.ajax.reload(null, false);
+                    },
+                    error: function (xhr) {
+                        let msg = 'Failed to save user.';
+                        try {
+                            if (xhr.responseJSON) {
+                                const errors = xhr.responseJSON;
+                                const parts = [];
+                                for (const k in errors) {
+                                    if (Array.isArray(errors[k])) { parts.push(k + ': ' + errors[k].join(', ')); }
+                                    else if (typeof errors[k] === 'string') { parts.push(k + ': ' + errors[k]); }
+                                }
+                                if (parts.length) msg = parts.join('\n');
+                            } else if (xhr.responseText) {
+                                msg = xhr.responseText;
+                            }
+                        } catch (e) {}
+                        Swal.fire('Error', msg, 'error');
+                    }
+                });
+            });
+
+            // Delete
+            $('#users_table').on('click', '.delete-user', function () {
+                var id = $(this).data('id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This will delete the user.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/api/users/' + id + '/',
+                            type: 'DELETE',
+                            success: function () {
+                                Swal.fire('Deleted!', 'User has been deleted.', 'success');
+                                table.ajax.reload(null, false);
+                            },
+                            error: function () {
+                                Swal.fire('Error', 'Failed to delete user.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

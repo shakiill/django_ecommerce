@@ -1,0 +1,259 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                    Taxes
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted"><a href="/" class="text-muted text-hover-primary">Home</a></li>
+                    <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+                    <li class="breadcrumb-item text-muted">Masters</li>
+                </ul>
+            </div>
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+                <button id="btn-create-tax" class="btn btn-sm fw-bold btn-primary">Create Tax</button>
+            </div>
+        </div>
+    </div>
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Taxes</h3></div>
+                <div class="card-body">
+                    <table class="table table-striped align-middle" id="tax-table">
+                        <thead>
+                        <tr>
+                            <th class="align-middle text-center">ID</th>
+                            <th class="align-middle text-center">Name</th>
+                            <th class="align-middle text-center">Code</th>
+                            <th class="align-middle text-center">Rate (%)</th>
+                            <th class="align-middle text-center">Inclusive</th>
+                            <th class="align-middle text-center">Compound</th>
+                            <th class="align-middle text-center">Active</th>
+                            <th class="align-middle text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="tax-table-loading" style="display:none;">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="taxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="tax-form" class="modal-content" autocomplete="off">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taxModalLabel">Create/Edit Tax</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Code</label>
+                    <input type="text" name="code" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Rate (%)</label>
+                    <input type="number" step="0.001" name="rate" class="form-control" autocomplete="off">
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_inclusive" id="tax_is_inclusive">
+                    <label class="form-check-label" for="tax_is_inclusive">Inclusive</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_compound" id="tax_is_compound">
+                    <label class="form-check-label" for="tax_is_compound">Compound</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_active" id="tax_is_active" checked>
+                    <label class="form-check-label" for="tax_is_active">Active</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-tax" type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block title %} Taxes | Admin {% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+(() => {
+    const taxApi = '/master/api/taxes/';
+    const tableBody = document.querySelector('#tax-table tbody');
+    const tableLoading = document.getElementById('tax-table-loading');
+    const taxModalEl = document.getElementById('taxModal');
+    const taxForm = document.getElementById('tax-form');
+    let bsModal = null;
+    let editingId = null;
+
+    function getModalInstance() {
+        if (!bsModal) {
+            bsModal = new bootstrap.Modal(taxModalEl);
+        }
+        return bsModal;
+    }
+
+    function swalMsg(msg, icon = "success") {
+        Swal.fire({
+            text: msg,
+            icon: icon,
+            confirmButtonText: 'OK',
+            customClass: {popup: 'swal2-border-radius'}
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    async function fetchWithCsrf(url, options = {}) {
+        options.headers = options.headers || {};
+        options.credentials = 'same-origin';
+        if (!('X-CSRFToken' in options.headers)) {
+            options.headers['X-CSRFToken'] = csrftoken;
+        }
+        return fetch(url, options);
+    }
+
+    async function fetchAndRenderTable() {
+        tableLoading.style.display = '';
+        tableBody.innerHTML = '';
+        try {
+            const res = await fetchWithCsrf(taxApi);
+            if (!res.ok) {
+                tableBody.innerHTML = '<tr><td colspan="8">Error loading data</td></tr>';
+                tableLoading.style.display = 'none';
+                return;
+            }
+            const taxes = await res.json();
+            if (taxes.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8">No taxes found.</td></tr>';
+                tableLoading.style.display = 'none';
+                return;
+            }
+            tableBody.innerHTML = '';
+            taxes.forEach(tax => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="align-middle text-center">${tax.id}</td>
+                    <td class="align-middle">${tax.name}</td>
+                    <td class="align-middle">${tax.code || ''}</td>
+                    <td class="align-middle text-center">${tax.rate}</td>
+                    <td class="align-middle text-center">${tax.is_inclusive ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">${tax.is_compound ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">${tax.is_active ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">
+                        <button type="button" class="btn btn-sm btn-secondary btn-edit-tax" data-id="${tax.id}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger btn-del-tax" data-id="${tax.id}">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        } catch (err) {
+            tableBody.innerHTML = '<tr><td colspan="8">Error loading data</td></tr>';
+        }
+        tableLoading.style.display = 'none';
+    }
+
+    function showTaxModal(data) {
+        editingId = data && data.id ? data.id : null;
+        taxForm.reset();
+        taxForm.name.value = data?.name || '';
+        taxForm.code.value = data?.code || '';
+        taxForm.rate.value = data?.rate || '';
+        taxForm.is_inclusive.checked = !!data?.is_inclusive;
+        taxForm.is_compound.checked = !!data?.is_compound;
+        taxForm.is_active.checked = data?.is_active !== false;
+        document.getElementById('taxModalLabel').textContent = editingId ? 'Edit Tax' : 'Create Tax';
+        Swal.close();
+        getModalInstance().show();
+    }
+
+    document.getElementById('btn-create-tax').addEventListener('click', () => showTaxModal());
+
+    tableBody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        if (btn.classList.contains('btn-edit-tax')) {
+            const r = await fetchWithCsrf(taxApi + id + '/');
+            if (!r.ok) return swalMsg('Failed to load', 'error');
+            const data = await r.json();
+            showTaxModal(data);
+        } else if (btn.classList.contains('btn-del-tax')) {
+            const result = await Swal.fire({
+                text: `Delete tax #${id}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            });
+            if (!result.isConfirmed) return;
+            const r = await fetchWithCsrf(taxApi + id + '/', {method: 'DELETE'});
+            if (r.status === 204) {
+                swalMsg('Deleted');
+                fetchAndRenderTable();
+            } else swalMsg('Delete failed', 'error');
+        }
+    });
+
+    taxForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        let payload = {
+            name: taxForm.name.value,
+            code: taxForm.code.value,
+            rate: taxForm.rate.value,
+            is_inclusive: taxForm.is_inclusive.checked,
+            is_compound: taxForm.is_compound.checked,
+            is_active: taxForm.is_active.checked
+        };
+        let url = editingId ? (taxApi + editingId + '/') : taxApi;
+        let method = editingId ? 'PUT' : 'POST';
+        const r = await fetchWithCsrf(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (r.ok) {
+            getModalInstance().hide();
+            swalMsg(editingId ? 'Updated' : 'Created');
+            fetchAndRenderTable();
+        } else {
+            const text = await r.text();
+            swalMsg('Error: ' + (text || r.status), 'error');
+        }
+    });
+
+    fetchAndRenderTable();
+})();
+</script>
+{% endblock %}
+

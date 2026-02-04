@@ -1,0 +1,259 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                    Warehouses
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted"><a href="/" class="text-muted text-hover-primary">Home</a></li>
+                    <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+                    <li class="breadcrumb-item text-muted">Masters</li>
+                </ul>
+            </div>
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+                <button id="btn-create-warehouse" class="btn btn-sm fw-bold btn-primary">Create Warehouse</button>
+            </div>
+        </div>
+    </div>
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Warehouses</h3></div>
+                <div class="card-body">
+                    <table class="table table-striped align-middle" id="warehouse-table">
+                        <thead>
+                        <tr>
+                            <th class="align-middle text-center">ID</th>
+                            <th class="align-middle text-center">Name</th>
+                            <th class="align-middle text-center">Code</th>
+                            <th class="align-middle text-center">City</th>
+                            <th class="align-middle text-center">Country</th>
+                            <th class="align-middle text-center">Active</th>
+                            <th class="align-middle text-center">Default</th>
+                            <th class="align-middle text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="warehouse-table-loading" style="display:none;">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="warehouseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="warehouse-form" class="modal-content" autocomplete="off">
+            <div class="modal-header">
+                <h5 class="modal-title" id="warehouseModalLabel">Create/Edit Warehouse</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Code</label>
+                    <input type="text" name="code" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">City</label>
+                    <input type="text" name="city" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Country</label>
+                    <input type="text" name="country" class="form-control" autocomplete="off">
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_active" id="warehouse_is_active" checked>
+                    <label class="form-check-label" for="warehouse_is_active">Active</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_default" id="warehouse_is_default">
+                    <label class="form-check-label" for="warehouse_is_default">Default</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-warehouse" type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block title %} Warehouses | Admin {% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+(() => {
+    const warehouseApi = '/master/api/warehouses/';
+    const tableBody = document.querySelector('#warehouse-table tbody');
+    const tableLoading = document.getElementById('warehouse-table-loading');
+    const warehouseModalEl = document.getElementById('warehouseModal');
+    const warehouseForm = document.getElementById('warehouse-form');
+    let bsModal = null;
+    let editingId = null;
+
+    function getModalInstance() {
+        if (!bsModal) {
+            bsModal = new bootstrap.Modal(warehouseModalEl);
+        }
+        return bsModal;
+    }
+
+    function swalMsg(msg, icon = "success") {
+        Swal.fire({
+            text: msg,
+            icon: icon,
+            confirmButtonText: 'OK',
+            customClass: {popup: 'swal2-border-radius'}
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    async function fetchWithCsrf(url, options = {}) {
+        options.headers = options.headers || {};
+        options.credentials = 'same-origin';
+        if (!('X-CSRFToken' in options.headers)) {
+            options.headers['X-CSRFToken'] = csrftoken;
+        }
+        return fetch(url, options);
+    }
+
+    async function fetchAndRenderTable() {
+        tableLoading.style.display = '';
+        tableBody.innerHTML = '';
+        try {
+            const res = await fetchWithCsrf(warehouseApi);
+            if (!res.ok) {
+                tableBody.innerHTML = '<tr><td colspan="8">Error loading data</td></tr>';
+                tableLoading.style.display = 'none';
+                return;
+            }
+            const warehouses = await res.json();
+            if (warehouses.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8">No warehouses found.</td></tr>';
+                tableLoading.style.display = 'none';
+                return;
+            }
+            tableBody.innerHTML = '';
+            warehouses.forEach(wh => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="align-middle text-center">${wh.id}</td>
+                    <td class="align-middle">${wh.name}</td>
+                    <td class="align-middle">${wh.code || ''}</td>
+                    <td class="align-middle">${wh.city || ''}</td>
+                    <td class="align-middle">${wh.country || ''}</td>
+                    <td class="align-middle text-center">${wh.is_active ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">${wh.is_default ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">
+                        <button type="button" class="btn btn-sm btn-secondary btn-edit-warehouse" data-id="${wh.id}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger btn-del-warehouse" data-id="${wh.id}">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        } catch (err) {
+            tableBody.innerHTML = '<tr><td colspan="8">Error loading data</td></tr>';
+        }
+        tableLoading.style.display = 'none';
+    }
+
+    function showWarehouseModal(data) {
+        editingId = data && data.id ? data.id : null;
+        warehouseForm.reset();
+        warehouseForm.name.value = data?.name || '';
+        warehouseForm.code.value = data?.code || '';
+        warehouseForm.city.value = data?.city || '';
+        warehouseForm.country.value = data?.country || '';
+        warehouseForm.is_active.checked = data?.is_active !== false;
+        warehouseForm.is_default.checked = !!data?.is_default;
+        document.getElementById('warehouseModalLabel').textContent = editingId ? 'Edit Warehouse' : 'Create Warehouse';
+        Swal.close();
+        getModalInstance().show();
+    }
+
+    document.getElementById('btn-create-warehouse').addEventListener('click', () => showWarehouseModal());
+
+    tableBody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        if (btn.classList.contains('btn-edit-warehouse')) {
+            const r = await fetchWithCsrf(warehouseApi + id + '/');
+            if (!r.ok) return swalMsg('Failed to load', 'error');
+            const data = await r.json();
+            showWarehouseModal(data);
+        } else if (btn.classList.contains('btn-del-warehouse')) {
+            const result = await Swal.fire({
+                text: `Delete warehouse #${id}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            });
+            if (!result.isConfirmed) return;
+            const r = await fetchWithCsrf(warehouseApi + id + '/', {method: 'DELETE'});
+            if (r.status === 204) {
+                swalMsg('Deleted');
+                fetchAndRenderTable();
+            } else swalMsg('Delete failed', 'error');
+        }
+    });
+
+    warehouseForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        let payload = {
+            name: warehouseForm.name.value,
+            code: warehouseForm.code.value,
+            city: warehouseForm.city.value,
+            country: warehouseForm.country.value,
+            is_active: warehouseForm.is_active.checked,
+            is_default: warehouseForm.is_default.checked
+        };
+        let url = editingId ? (warehouseApi + editingId + '/') : warehouseApi;
+        let method = editingId ? 'PUT' : 'POST';
+        const r = await fetchWithCsrf(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (r.ok) {
+            getModalInstance().hide();
+            swalMsg(editingId ? 'Updated' : 'Created');
+            fetchAndRenderTable();
+        } else {
+            const text = await r.text();
+            swalMsg('Error: ' + (text || r.status), 'error');
+        }
+    });
+
+    fetchAndRenderTable();
+})();
+</script>
+{% endblock %}
+

@@ -1,0 +1,683 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                {% if messages %}
+                <div class="col-12 col-lg-10 mx-auto">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'danger' }} alert-dismissible fade show"
+                             role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-fluid">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-10">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h3 class="mb-1 fw-bold">Variants - Step 2/2</h3>
+                                <p class="text-muted mb-0">Configure product variants</p>
+                            </div>
+                            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Products
+                            </a>
+                        </div>
+
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ product.name }}</h5>
+                                        <div class="text-muted small">
+                                            {% if product.category %}Category: {{ product.category.name }} · {% endif %}
+                                            {% if product.brand %}Brand: {{ product.brand.name }}{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="variantForm" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="card shadow-sm mb-4">
+
+
+
+                                <div class="card-header">
+                                <h3 class="card-title">
+                                  <i class="fas fa-cogs text-primary me-2"></i>Pricing & Tax Settings
+                                </h3>
+
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium">Profit Margin (%)</label>
+                                            <input type="number" class="form-control" id="profitMargin" name="profit_margin" step="0.01" value="{{ product.profit_margin|default:'0.00' }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium">Selling Tax</label>
+                                            <select class="form-select" id="sellingTax" name="selling_tax">
+                                                <option value="">None</option>
+                                                {% for tax in taxes %}
+                                                    <option value="{{ tax.id }}" data-rate="{{ tax.rate }}" {% if product.selling_tax_id == tax.id %}selected{% endif %}>{{ tax.name }} ({{ tax.rate }}%)</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium">Tax Type</label>
+                                            <select class="form-select" id="taxType" name="tax_type">
+                                                <option value="exclusive" {% if product.tax_type == 'exclusive' %}selected{% endif %}>Exclusive</option>
+                                                <option value="inclusive" {% if product.tax_type == 'inclusive' %}selected{% endif %}>Inclusive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 fw-semibold">
+                                        <i class="fas fa-layer-group text-success me-2"></i>Product Variants
+                                    </h5>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="hasVariants"
+                                               name="has_variants" {% if product.is_variant %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium" for="hasVariants">Enable
+                                            Variants</label>
+                                    </div>
+                                </div>
+
+                                <div class="card-body p-4">
+                                    <!-- Single Product Section -->
+                                    <div id="singleProductSection"
+                                         {% if product.is_variant %}style="display:none"{% endif %}>
+                                        <div class="alert alert-light border">
+                                            <i class="fas fa-info-circle text-info me-2"></i>
+                                            This product will have no variations and will be set as the default variant
+                                            automatically.
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-medium">SKU <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="singleSku"
+                                                           name="single_sku" placeholder="Product SKU"
+                                                           value="{{ product.default_variant.sku|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-medium">Purchase Price</label>
+                                                    <input type="number" class="form-control" id="singlePurchasePrice"
+                                                           name="single_purchase_price" step="0.01" min="0" placeholder="0.00"
+                                                           value="{{ product.default_variant.purchase_price|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-medium">Price <span class="text-danger">*</span></label>
+                                                    <input type="number" class="form-control" id="singlePrice"
+                                                           name="single_price" step="0.01" min="0" placeholder="0.00"
+                                                           value="{{ product.default_variant.price|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-medium">Variant Image (optional)</label>
+                                                    <input type="file" class="form-control" id="singleImage"
+                                                           name="single_image" accept="image/*">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Variant Configuration -->
+                                    <div id="variantSection"
+                                         {% if not product.is_variant %}style="display:none"{% endif %}>
+                                        <div class="alert alert-info border-0">
+                                            <i class="fas fa-lightbulb me-2"></i>
+                                            Select two attributes to create product variants (e.g., Color + Size)
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-medium">First Attribute (e.g.,
+                                                    Color)</label>
+                                                <select class="form-select mb-3" id="firstAttribute">
+                                                    <option value="">Select First Attribute</option>
+                                                    {% for attr in attributes %}
+                                                        <option value="{{ attr.id }}">{{ attr.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <div id="firstAttributeValues" class="attribute-values-container">
+                                                    <div class="text-muted">Select an attribute first</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-medium">Second Attribute (e.g.,
+                                                    Size)</label>
+                                                <select class="form-select mb-3" id="secondAttribute">
+                                                    <option value="">Select Second Attribute</option>
+                                                    {% for attr in attributes %}
+                                                        <option value="{{ attr.id }}">{{ attr.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <div id="secondAttributeValues" class="attribute-values-container">
+                                                    <div class="text-muted">Select an attribute first</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-center mb-4">
+                                            <button type="button" class="btn btn-primary btn-lg" id="generateVariants">
+                                                <i class="fas fa-magic me-2"></i>Generate Variants
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger ms-2"
+                                                    id="clearVariants">
+                                                <i class="fas fa-trash me-1"></i>Clear Generated
+                                            </button>
+                                        </div>
+
+                                        <!-- Variants Table -->
+                                        <div id="variantsContainer"
+                                             {% if not existing_variants %}style="display:none"{% endif %}>
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="mb-0 fw-semibold">Generated Variants</h6>
+                                                <button type="button" class="btn btn-sm btn-outline-info ms-2" id="bulkPurchasePriceBtn">
+                                                    <i class="fas fa-shopping-cart me-1"></i>Set Purchase Prices
+                                                </button>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead class="table-light">
+                                                    <tr>
+                                                        <th>SKU</th>
+                                                        <th>Combination</th>
+                                                        <th>Purchase Price</th>
+                                                        <th>Price ($)</th>
+                                                        <th>Active</th>
+                                                        <th>Default</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="variantsTableBody">
+                                                    {% for v in existing_variants %}
+                                                        <tr data-variant-index="{{ forloop.counter0 }}">
+                                                            <td>
+                                                                <input type="hidden"
+                                                                       name="variants[{{ forloop.counter0 }}][id]"
+                                                                       value="{{ v.id }}">
+                                                                <input type="text" class="form-control form-control-sm"
+                                                                       name="variants[{{ forloop.counter0 }}][sku]"
+                                                                       value="{{ v.sku }}" required>
+                                                                <input type="hidden"
+                                                                       name="variants[{{ forloop.counter0 }}][first_attr_id]"
+                                                                       value="{{ v.first_attr_id }}">
+                                                                <input type="hidden"
+                                                                       name="variants[{{ forloop.counter0 }}][second_attr_id]"
+                                                                       value="{{ v.second_attr_id }}">
+                                                            </td>
+                                                            <td><span
+                                                                    class="badge bg-light text-dark border">{{ v.combination }}</span>
+                                                            </td>
+                                                            <td><input type="number"
+                                                                       class="form-control form-control-sm variant-purchase-price"
+                                                                       name="variants[{{ forloop.counter0 }}][purchase_price]"
+                                                                       step="0.01" min="0" value="{{ v.purchase_price }}">
+                                                            </td>
+                                                            <td><input type="number"
+                                                                       class="form-control form-control-sm variant-price"
+                                                                       name="variants[{{ forloop.counter0 }}][price]"
+                                                                       step="0.01" min="0" value="{{ v.price }}"
+                                                                       required></td>
+                                                            <td>
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                           name="variants[{{ forloop.counter0 }}][is_active]"
+                                                                           {% if v.is_active %}checked{% endif %}>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <input type="radio"
+                                                                       class="form-check-input default-radio"
+                                                                       name="default_variant"
+                                                                       value="{{ forloop.counter0 }}"
+                                                                       {% if v.is_default %}checked{% endif %}
+                                                                       title="Set as default">
+                                                            </td>
+                                                            <td>
+                                                                <button type="button"
+                                                                        class="btn btn-sm btn-outline-danger remove-variant">
+                                                                    <i class="fas fa-trash"></i></button>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-end mt-4">
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="fas fa-check me-2"></i>Save Variants
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bulk Purchase Price Modal -->
+    <div class="modal fade" id="bulkPurchasePriceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Set Purchase Price for All Variants</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Purchase Price</label>
+                        <input type="number" class="form-control" id="bulkPurchasePriceValue" step="0.01"
+                               placeholder="Enter purchase price for all variants">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="applyBulkPurchasePrice">Apply to All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+{% block extra_js %}
+
+    <script>
+        // NEW: Server-provided preselected data (0 means none)
+        const PRE_FIRST_ATTR_ID = {{ preselected_first_attribute_id|default:"0" }};
+        const PRE_SECOND_ATTR_ID = {{ preselected_second_attribute_id|default:"0" }};
+        const PRE_FIRST_VALUE_IDS = {{ preselected_first_value_ids|default:"[]"|safe }};
+        const PRE_SECOND_VALUE_IDS = {{ preselected_second_value_ids|default:"[]"|safe }};
+
+        $(document).ready(function () {
+            // Toggle variant section on change
+            $('#hasVariants').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#variantSection').slideDown();
+                    $('#singleProductSection').slideUp();
+                    if ($('#variantsTableBody tr').length > 0) $('#variantsContainer').show();
+                } else {
+                    $('#variantSection').slideUp();
+                    $('#singleProductSection').slideDown();
+                    $('#variantsContainer').hide();
+                }
+            });
+
+            // Initialize sections based on current state
+            if ($('#hasVariants').is(':checked')) {
+                $('#variantSection').show();
+                $('#singleProductSection').hide();
+                if ($('#variantsTableBody tr').length > 0) $('#variantsContainer').show();
+            } else {
+                $('#variantSection').hide();
+                $('#singleProductSection').show();
+            }
+
+            // NEW: Preselect attributes if variants exist
+            if (PRE_FIRST_ATTR_ID) {
+                $('#firstAttribute').val(PRE_FIRST_ATTR_ID);
+            }
+            if (PRE_SECOND_ATTR_ID) {
+                $('#secondAttribute').val(PRE_SECOND_ATTR_ID);
+            }
+
+            // Load attribute values (with auto-check for existing)
+            $('#firstAttribute, #secondAttribute').change(function () {
+                let attributeId = $(this).val();
+                let inputId = $(this).attr('id'); // NEW: capture which select triggered
+                let targetContainer = inputId === 'firstAttribute' ? '#firstAttributeValues' : '#secondAttributeValues';
+
+                if (attributeId) {
+                    $.get('{% url "get_attribute_values" %}', {attribute_ids: attributeId}, function (data) {
+                        if (data.length > 0) {
+                            let html = '';
+                            // values for this attribute
+                            const values = data[0].values || [];
+                            values.forEach(function (value) {
+                                const checked = (inputId === 'firstAttribute'
+                                    ? PRE_FIRST_VALUE_IDS.includes(value.id)
+                                    : PRE_SECOND_VALUE_IDS.includes(value.id)) ? 'checked' : '';
+                                const colorSwatch = value.color_code ? `<span class="color-swatch" style="background-color: ${value.color_code}"></span>` : '';
+                                html += `
+                <div class="attribute-value-item">
+                  <div class="form-check">
+                    <input class="form-check-input attribute-value" type="checkbox" value="${value.id}" id="${inputId}_${value.id}" ${checked}>
+                    <label class="form-check-label" for="${inputId}_${value.id}">${colorSwatch}${value.value}</label>
+                  </div>
+                </div>`;
+                            });
+                            $(targetContainer).html(html);
+                        } else {
+                            $(targetContainer).html('<div class="text-muted">No values found</div>');
+                        }
+                    });
+                } else {
+                    $(targetContainer).html('<div class="text-muted">Select an attribute first</div>');
+                }
+            });
+
+            // NEW: Trigger initial load of values to reflect existing variants
+            if ($('#hasVariants').is(':checked')) {
+                if (PRE_FIRST_ATTR_ID) $('#firstAttribute').trigger('change');
+                if (PRE_SECOND_ATTR_ID) $('#secondAttribute').trigger('change');
+            }
+
+            // Helper: build key using attribute value IDs to detect duplicates
+            function comboKey(firstId, secondId) {
+                return `${firstId}-${secondId}`;
+            }
+
+            // Helper: collect existing combination keys from table
+            function getExistingKeys() {
+                const keys = new Set();
+                $('#variantsTableBody tr').each(function () {
+                    const firstId = $(this).find('input[name*="[first_attr_id]"]').val();
+                    const secondId = $(this).find('input[name*="[second_attr_id]"]').val();
+                    if (firstId && secondId) keys.add(comboKey(firstId, secondId));
+                });
+                return keys;
+            }
+
+            // Helper: append a single variant row at a given index
+            function appendVariantRow(variant, index) {
+                const profitMargin = $('#profitMargin').val();
+                const taxType = $('#taxType').val();
+                const sellingTaxId = $('#sellingTax').val();
+
+                const row = `
+        <tr data-variant-index="${index}">
+          <td>
+            <input type="text" class="form-control form-control-sm" name="variants[${index}][sku]" value="${variant.sku}" required>
+            <input type="hidden" name="variants[${index}][first_attr_id]" value="${variant.firstAttr.id}">
+            <input type="hidden" name="variants[${index}][second_attr_id]" value="${variant.secondAttr.id}">
+          </td>
+          <td><span class="badge bg-light text-dark border">${variant.combination}</span></td>
+          <td><input type="number" class="form-control form-control-sm variant-purchase-price" name="variants[${index}][purchase_price]" step="0.01" min="0"></td>
+          <td><input type="number" class="form-control form-control-sm variant-price" name="variants[${index}][price]" step="0.01" min="0" required></td>
+          <td>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="variants[${index}][is_active]" checked>
+            </div>
+          </td>
+          <td class="text-center">
+            <input type="radio" class="form-check-input default-radio" name="default_variant" value="${index}" title="Set as default">
+          </td>
+          <td><button type="button" class="btn btn-sm btn-outline-danger remove-variant"><i class="fas fa-trash"></i></button></td>
+        </tr>`;
+                $('#variantsTableBody').append(row);
+            }
+
+            // Helper: re-index rows (keeps hidden ids aligned)
+            function reindexVariantRows() {
+                $('#variantsTableBody tr').each(function (i) {
+                    $(this).attr('data-variant-index', i);
+                    $(this).find('input, select').each(function () {
+                        const name = $(this).attr('name');
+                        if (name && name.startsWith('variants[')) {
+                            const newName = name.replace(/variants\[\d+]/, `variants[${i}]`);
+                            $(this).attr('name', newName);
+                        }
+                    });
+                    $(this).find('.default-radio').val(i);
+                });
+            }
+
+            // Generate variants (append-only, dedupe)
+            $('#generateVariants').click(function () {
+                let firstAttrValues = [];
+                let secondAttrValues = [];
+
+                $('#firstAttributeValues .attribute-value:checked').each(function () {
+                    const valueId = $(this).val();
+                    const valueName = $(this).next('label').text().trim();
+                    firstAttrValues.push({id: valueId, name: valueName});
+                });
+
+                $('#secondAttributeValues .attribute-value:checked').each(function () {
+                    const valueId = $(this).val();
+                    const valueName = $(this).next('label').text().trim();
+                    secondAttrValues.push({id: valueId, name: valueName});
+                });
+
+                if (firstAttrValues.length === 0 || secondAttrValues.length === 0) {
+                    alert('Please select values for both attributes to generate variants.');
+                    return;
+                }
+
+                const existingKeys = getExistingKeys();
+                let addedCount = 0;
+                let nextIndex = $('#variantsTableBody tr').length;
+                const baseSlug = '{{ product.name|default:"PRODUCT" }}'.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+
+                firstAttrValues.forEach(function (firstAttr) {
+                    secondAttrValues.forEach(function (secondAttr) {
+                        const key = comboKey(firstAttr.id, secondAttr.id);
+                        if (existingKeys.has(key)) return; // skip duplicates
+
+                        const sku = `${baseSlug.toUpperCase()}-${firstAttr.name.toUpperCase()}-${secondAttr.name.toUpperCase()}`;
+                        const variant = {
+                            sku,
+                            firstAttr,
+                            secondAttr,
+                            combination: `${firstAttr.name} / ${secondAttr.name}`
+                        };
+                        appendVariantRow(variant, nextIndex++);
+                        existingKeys.add(key);
+                        addedCount++;
+                    });
+                });
+
+                if (addedCount === 0) {
+                    alert('No new variants to add. All selected combinations already exist.');
+                } else {
+                    $('#variantsContainer').slideDown();
+                }
+            });
+
+            // Clear generated variants
+            $('#clearVariants').on('click', function () {
+                $('#variantsTableBody').empty();
+                $('#variantsContainer').hide();
+            });
+
+            // Remove variant row + reindex
+            $(document).on('click', '.remove-variant', function () {
+                $(this).closest('tr').remove();
+                reindexVariantRows();
+                if ($('#variantsTableBody tr').length === 0) {
+                    $('#variantsContainer').hide();
+                }
+            });
+
+
+            // NEW: Bulk purchase price update
+            $('#bulkPurchasePriceBtn').click(function () {
+                $('#bulkPurchasePriceModal').modal('show');
+            });
+
+            $('#applyBulkPurchasePrice').click(function () {
+                let price = $('#bulkPurchasePriceValue').val();
+                if (price) {
+                    $('#variantsTableBody .variant-purchase-price').val(price).trigger('change');
+                    $('#bulkPurchasePriceModal').modal('hide');
+                }
+            });
+
+            // --- Price Calculation Logic ---
+            function calculatePrice($row) {
+                const purchasePrice = parseFloat($row.find('.variant-purchase-price').val()) || 0;
+                const profitMargin = parseFloat($('#profitMargin').val()) || 0;
+                const taxType = $('#taxType').val();
+                const sellingTaxId = $('#sellingTax').val();
+                const taxRate = parseFloat($(`#sellingTax option[value="${sellingTaxId}"]`).data('rate')) || 0;
+
+                if (purchasePrice > 0) {
+                    let priceBeforeTax = purchasePrice * (1 + profitMargin / 100);
+                    let finalPrice;
+
+                    if (taxType === 'inclusive' && taxRate > 0) {
+                        finalPrice = priceBeforeTax * (1 + taxRate / 100);
+                    } else {
+                        finalPrice = priceBeforeTax;
+                    }
+                    $row.find('.variant-price').val(finalPrice.toFixed(2));
+                }
+            }
+
+            function calculateSinglePrice() {
+                const purchasePrice = parseFloat($('#singlePurchasePrice').val()) || 0;
+                const profitMargin = parseFloat($('#profitMargin').val()) || 0;
+                const taxType = $('#taxType').val();
+                const sellingTaxId = $('#sellingTax').val();
+                const taxRate = parseFloat($(`#sellingTax option[value="${sellingTaxId}"]`).data('rate')) || 0;
+
+                if (purchasePrice > 0) {
+                    let priceBeforeTax = purchasePrice * (1 + profitMargin / 100);
+                    let finalPrice;
+
+                    if (taxType === 'inclusive' && taxRate > 0) {
+                        finalPrice = priceBeforeTax * (1 + taxRate / 100);
+                    } else {
+                        finalPrice = priceBeforeTax;
+                    }
+                    $('#singlePrice').val(finalPrice.toFixed(2));
+                }
+            }
+
+            // Event listeners for price calculation
+            $(document).on('change keyup', '.variant-purchase-price', function () {
+                calculatePrice($(this).closest('tr'));
+            });
+
+            $('#profitMargin, #sellingTax, #taxType').on('change', function() {
+                // Recalculate for all rows
+                $('#variantsTableBody tr').each(function() {
+                    calculatePrice($(this));
+                });
+                // Recalculate for single product
+                calculateSinglePrice();
+            });
+
+            $('#singlePurchasePrice').on('change keyup', function() {
+                calculateSinglePrice();
+            });
+
+
+            // Simple validation on submit
+            $('#variantForm').on('submit', function (e) {
+                reindexVariantRows();
+                let errors = [];
+
+                if (!$('#hasVariants').is(':checked')) {
+                    const sku = $('#singleSku').val().trim();
+                    const price = $('#singlePrice').val();
+                    if (!sku) errors.push('SKU is required for single product');
+                    if (!price) errors.push('Price is required for single product');
+                } else {
+                    const rows = $('#variantsTableBody tr');
+                    if (rows.length === 0) {
+                        errors.push('Please generate at least one variant');
+                    } else {
+                        const skus = new Set();
+                        let dup = null;
+                        rows.each(function (idx) {
+                            const sku = ($(this).find('input[name*="[sku]"]').val() || '').trim();
+                            const price = $(this).find('input[name*="[price]"]').val();
+                            if (!sku || !price) {
+                                errors.push(`Row ${idx + 1}: SKU and Price are required`);
+                                return false;
+                            }
+                            if (skus.has(sku)) dup = sku; else skus.add(sku);
+                        });
+                        if (dup) errors.push(`Duplicate SKU "${dup}"`);
+                    }
+                    if (!$('input[name="default_variant"]:checked').length) {
+                        errors.push('Please select a default variant');
+                    }
+                }
+
+                if (errors.length) {
+                    e.preventDefault();
+                    alert('Please fix the following errors:\n' + errors.join('\n'));
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+        .attribute-values-container {
+
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 120px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .attribute-value-item {
+            display: inline-block;
+            margin: 0.85rem;
+        }
+
+        .attribute-value-item .form-check {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            margin-left: 2rem;
+            transition: all 0.2s ease;
+        }
+
+        .attribute-value-item .form-check:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .attribute-value-item input:checked + label {
+            color: #007bff;
+            font-weight: 500;
+        }
+
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #dee2e6;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        .form-check .form-check-input {
+            margin-left: -2.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block title %} List page | demo ste {% endblock %}

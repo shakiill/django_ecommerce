@@ -1,0 +1,383 @@
+<!--begin::sidebar menu-->
+<div class="app-sidebar-menu overflow-hidden flex-column-fluid">
+    <!--begin::Menu wrapper-->
+    <div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper">
+        <!--begin::Scroll wrapper-->
+        <div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true"
+             data-kt-scroll-activate="true" data-kt-scroll-height="auto"
+             data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
+             data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px"
+             data-kt-scroll-save-state="true">
+            <!--begin::Menu-->
+            <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6"
+                 id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
+                <!--begin:Menu item-->
+                <div class="menu-item">
+                    <!--begin:Menu link-->
+                    <a class="menu-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                       href="{% url 'dashboard:home' %}">
+                            <span class="menu-icon">
+                                <i class="ki-duotone ki-element-11 fs-2"><span class="path1"></span><span
+                                        class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                            </span>
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                    <!--end:Menu link-->
+                </div>
+                <!--end:Menu item-->
+
+
+                <div data-kt-menu-trigger="click"
+                     class="menu-item menu-accordion {% if request.resolver_match.url_name == 'paymentmethod_list' or request.resolver_match.url_name == 'currency_list' or request.resolver_match.url_name == 'unit_list' or request.resolver_match.url_name == 'tax_list' or request.resolver_match.url_name == 'tag_list' or request.resolver_match.url_name == 'shippingmethod_list' or request.resolver_match.url_name == 'warehouse_list' or request.resolver_match.url_name == 'brand_list' or request.resolver_match.url_name == 'supplier_list' or request.resolver_match.url_name == 'attribute_list' %}here show{% endif %}">
+                    <!--begin:Menu link-->
+                    <span class="menu-link">
+                       <span class="menu-icon">
+                        <i class="ki-duotone ki-setting-2 fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                            <span class="path5"></span>
+                        </i>
+                    </span>
+                        <span class="menu-title">Settings</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <!--end:Menu link-->
+                    <!--begin:Menu sub-->
+                    <div class="menu-sub menu-sub-accordion">
+
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'attribute_list' %}active{% endif %}"
+                               href="{% url 'attribute_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Attributes</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'tag_list' %}active{% endif %}"
+                               href="{% url 'tag_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Tags</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'supplier_list' %}active{% endif %}"
+                               href="{% url 'supplier_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Suppliers</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'tax_list' %}active{% endif %}"
+                               href="{% url 'tax_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Taxes</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'unit_list' %}active{% endif %}"
+                               href="{% url 'unit_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Units</span>
+                            </a>
+                        </div>
+                        <!--end:Menu item-->
+                        <!--begin:Menu item - Brands-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'brand_list' %}active{% endif %}"
+                               href="{% url 'brand_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Brands</span>
+                            </a>
+                        </div>
+                        <!--end:Menu item-->
+
+                        <!--begin:Menu item - Taxes-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'warehouse_list' %}active{% endif %}"
+                               href="{% url 'warehouse_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Warehouses</span>
+                            </a>
+                        </div>
+                        <!--end:Menu item-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'shippingmethod_list' %}active{% endif %}"
+                               href="{% url 'shippingmethod_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Shippingmethods</span>
+                            </a>
+                        </div>
+                        <!--end:Menu item-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'paymentmethod_list' %}active{% endif %}"
+                               href="{% url 'paymentmethod_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Paymentmethods</span>
+                            </a>
+                        </div>
+                        <!--end:Menu item-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'currency_list' %}active{% endif %}"
+                               href="{% url 'currency_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Currency</span>
+                            </a>
+                        </div>
+                        <!--end:Menu item-->
+
+
+                    </div>
+                    <!--end:Menu sub-->
+                </div>
+                <!--end:Menu item-->
+
+
+                <div data-kt-menu-trigger="click"
+                     class="menu-item menu-accordion {% if request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'product_list' %}here show{% endif %}">
+                    <!--begin:Menu link-->
+                    <span class="menu-link">
+                       <span class="menu-icon">
+                        <i class="ki-duotone ki-setting-2 fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                            <span class="path5"></span>
+                        </i>
+                    </span>
+                        <span class="menu-title">Products</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <!--end:Menu link-->
+                    <!--begin:Menu sub-->
+                    <div class="menu-sub menu-sub-accordion">
+
+
+                        <!--begin:Menu item - Categories-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}"
+                               href="{% url 'category_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Categories</span>
+                            </a>
+                        </div>
+
+
+                        <!--begin:Menu item - Categories-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
+                               href="{% url 'product_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Products</span>
+                            </a>
+                        </div>
+
+
+                    </div>
+                    <!--end:Menu sub-->
+                </div>
+                <!--end:Menu item-->
+
+
+                <div data-kt-menu-trigger="click"
+                     class="menu-item menu-accordion {% if request.resolver_match.url_name == 'requisition_list' or request.resolver_match.url_name == 'po_list' %}here show{% endif %}">
+                    <!--begin:Menu link-->
+                    <span class="menu-link">
+                       <span class="menu-icon">
+                        <i class="ki-duotone ki-setting-2 fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                            <span class="path5"></span>
+                        </i>
+                    </span>
+                        <span class="menu-title">Inventory</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <!--end:Menu link-->
+                    <!--begin:Menu sub-->
+                    <div class="menu-sub menu-sub-accordion">
+
+
+                        <!--begin:Menu item - Categories-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'requisition_list' %}active{% endif %}"
+                               href="{% url 'inventory:requisition_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Requisition</span>
+                            </a>
+                        </div>
+
+
+                        <!--begin:Menu item - Categories-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'po_list' %}active{% endif %}"
+                               href="{% url 'inventory:po_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Purchase Order</span>
+                            </a>
+                        </div>
+
+
+                    </div>
+                    <!--end:Menu sub-->
+                </div>
+                <!--end:Menu item-->
+
+                <div data-kt-menu-trigger="click"
+                     class="menu-item menu-accordion {% if request.resolver_match.url_name == 'order_list' or  request.resolver_match.url_name == 'order_detail' %}here show{% endif %}">
+                    <!--begin:Menu link-->
+                    <span class="menu-link">
+                       <span class="menu-icon">
+                        <i class="ki-duotone ki-setting-2 fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                            <span class="path5"></span>
+                        </i>
+                    </span>
+                        <span class="menu-title">Orders</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <!--end:Menu link-->
+                    <!--begin:Menu sub-->
+                    <div class="menu-sub menu-sub-accordion">
+
+
+                        <!--begin:Menu item - Categories-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}"
+                               href="{% url 'order:order_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Orders</span>
+                            </a>
+                        </div>
+
+
+                    </div>
+                    <!--end:Menu sub-->
+                </div>
+                <!--end:Menu item-->
+
+
+                <div data-kt-menu-trigger="click"
+                     class="menu-item menu-accordion {% if request.resolver_match.url_name == 'slider_list' %}here show{% endif %}">
+                    <!--begin:Menu link-->
+                    <span class="menu-link">
+                       <span class="menu-icon">
+                        <i class="ki-duotone ki-setting-2 fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                            <span class="path5"></span>
+                        </i>
+                    </span>
+                        <span class="menu-title">CMS</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <!--end:Menu link-->
+                    <!--begin:Menu sub-->
+                    <div class="menu-sub menu-sub-accordion">
+
+
+                        <!--begin:Menu item - Categories-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'mega_menu' %}active{% endif %}"
+                               href="{% url 'cms:mega_menu' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Main Menu</span>
+                            </a>
+                        </div>
+
+
+                        <!--begin:Menu item - Categories-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'slider_list' %}active{% endif %}"
+                               href="{% url 'cms:slider_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Main Slider</span>
+                            </a>
+                        </div>
+
+
+                    </div>
+                    <!--end:Menu sub-->
+                </div>
+                <!--end:Menu item-->
+
+
+            </div>
+            <!--end::Menu-->
+        </div>
+        <!--end::Scroll wrapper-->
+    </div>
+    <!--end::Menu wrapper-->
+</div>
+<!--end::sidebar menu-->
+
+<div class="app-sidebar-footer flex-column-auto pt-2 pb-6 px-6" id="kt_app_sidebar_footer">
+    <a href="{% url 'staff_logout' %}"
+       class="btn btn-flex flex-center btn-custom btn-primary overflow-hidden text-nowrap px-0 h-40px w-100"
+       data-bs-toggle="tooltip" data-bs-trigger="hover">
+        <span class="btn-label">Sign out</span>
+        <i class="ki-duotone ki-document btn-icon fs-2 m-0">
+            <span class="path1"></span>
+            <span class="path2"></span>
+        </i>
+    </a>
+</div>
+
+
+{##}
+{##}
+{#<script>#}
+{#    (function () {#}
+{#        function normalize(p) {#}
+{#            if (!p) return '/';#}
+{#            try {#}
+{#                p = decodeURI(p);#}
+{#            } catch (e) {#}
+{#            }#}
+{#            if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);#}
+{#            return p || '/';#}
+{#        }#}
+{##}
+{#        const current = normalize(window.location.pathname);#}
+{#        const links = document.querySelectorAll('#kt_aside a[data-menu-url]');#}
+{#        let best = null;#}
+{#        links.forEach(a => {#}
+{#            const target = normalize(a.getAttribute('data-menu-url'));#}
+{#            if (current === target || current.startsWith(target + '/')) {#}
+{#                if (!best || target.length > normalize(best.getAttribute('data-menu-url')).length) {#}
+{#                    best = a;#}
+{#                }#}
+{#            }#}
+{#        });#}
+{#        if (best) {#}
+{#            const li = best.closest('li.menu-item');#}
+{#            if (li) {#}
+{#                li.classList.add('menu-item-active');#}
+{#                // Walk up to open parent submenus#}
+{#                let parent = li.parentElement;#}
+{#                while (parent) {#}
+{#                    if (parent.classList.contains('menu-subnav')) {#}
+{#                        const holder = parent.closest('li.menu-item-submenu');#}
+{#                        if (holder) {#}
+{#                            holder.classList.add('menu-item-open', 'menu-item-active');#}
+{#                            const toggle = holder.querySelector('> .menu-link.menu-toggle');#}
+{#                            if (toggle) {#}
+{#                                toggle.setAttribute('aria-expanded', 'true');#}
+{#                            }#}
+{#                        }#}
+{#                    }#}
+{#                    parent = parent.parentElement;#}
+{#                }#}
+{#            }#}
+{#        }#}
+{#    })();#}
+{#</script>#}

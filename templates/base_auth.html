@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Auth{% endblock %} | Back Admin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-alt: #1e293b;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --accent: #D4EC29 ;
+      --accent-hover: #4f46e5;
+      --danger: #ef4444;
+      --radius: 14px;
+      --gradient: linear-gradient(135deg, #ffffff, #171717 55%, #000000);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+      background: var(--gradient);
+      min-height:100dvh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: clamp(1rem,2vw,2.5rem);
+      color: var(--text);
+    }
+    .card {
+      width:100%;
+      max-width:420px;
+      background:rgba(255,255,255,0.04);
+      backdrop-filter: blur(18px) saturate(160%);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: clamp(1.75rem,2.5vw,2.5rem);
+      position:relative;
+      box-shadow: 0 18px 40px -12px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.04);
+      animation: fadeIn .6s ease;
+    }
+    @keyframes fadeIn {
+      from { transform: translateY(18px); opacity:0; }
+      to { transform: translateY(0); opacity:1; }
+    }
+    h1 {
+      margin:0 0 0.35rem;
+      font-size: clamp(1.6rem,2.2vw,2rem);
+      font-weight:600;
+      letter-spacing:.5px;
+    }
+    p.sub {
+      margin:0 0 1.75rem;
+      font-size:.95rem;
+      opacity:.7;
+    }
+    form { display:grid; gap:1rem; }
+    label { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; opacity:.75; }
+    .field { display:grid; gap:.35rem; }
+    .input-wrapper {
+      position:relative;
+      display:flex;
+      align-items:center;
+    }
+    .input-field {
+      width:100%;
+      background: var(--bg-alt);
+      border:1px solid rgba(255,255,255,0.12);
+      color: var(--text);
+      font-size:.95rem;
+      padding:.85rem .95rem;
+      border-radius: 10px;
+      outline:none;
+      transition:.25s border, .25s background;
+    }
+    .input-field:focus {
+      border-color: var(--accent);
+      background:#243353;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+    }
+    button.primary {
+      appearance:none;
+      border:none;
+      background: linear-gradient(90deg,var(--accent),#818cf8);
+      color:#fff;
+      padding:.95rem 1.1rem;
+      font-size:.95rem;
+      font-weight:600;
+      border-radius: 10px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      transition:.25s;
+      position:relative;
+      overflow:hidden;
+    }
+    button.primary:hover {
+      background: linear-gradient(90deg,var(--accent-hover),#6366f1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -8px rgba(99,102,241,0.6);
+    }
+    button.primary:active { transform: translateY(0); box-shadow:none; }
+    .messages { list-style:none; margin:0 0 1rem; padding:0; display:grid; gap:.5rem; }
+    .messages li {
+      padding:.65rem .75rem;
+      border-radius: 10px;
+      font-size:.8rem;
+      line-height:1.2;
+      background:#334155;
+      border:1px solid rgba(255,255,255,0.12);
+    }
+    .messages li.error { background:#450a0a; border-color:#991b1b; color:#fecaca; }
+    .messages li.success { background:#022c22; border-color:#0d9488; color:#99f6e4; }
+    .non-field-errors {
+      background:#450a0a;
+      border:1px solid #991b1b;
+      padding:.75rem .9rem;
+      border-radius:10px;
+      font-size:.75rem;
+      line-height:1.25;
+      display:grid;
+      gap:.35rem;
+      margin-bottom:.5rem;
+    }
+    .field-errors {
+      font-size:.65rem;
+      color:#fecaca;
+      margin-top:.35rem;
+      background:#450a0a;
+      border:1px solid #991b1b;
+      padding:.4rem .55rem;
+      border-radius:8px;
+      line-height:1.15;
+    }
+    .top-link {
+      position:absolute;
+      top:.9rem;
+      right:1rem;
+      font-size:.65rem;
+      opacity:.55;
+      text-decoration:none;
+      color:var(--text);
+      transition:.25s;
+    }
+    .top-link:hover { opacity:1; }
+    .divider {
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
+      margin:1.25rem 0 .25rem;
+      border:none;
+    }
+    .foot {
+      margin-top:1.35rem;
+      font-size:.7rem;
+      opacity:.55;
+      text-align:center;
+    }
+    .toggle-pass {
+      position:absolute;
+      right:.85rem;
+      top:50%;
+      transform:translateY(-50%);
+      background:none;
+      border:none;
+      color:#94a3b8;
+      cursor:pointer;
+      font-size:.7rem;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      padding:.25rem .35rem;
+      border-radius:6px;
+      transition:.2s;
+    }
+    .toggle-pass:hover { color:#fff; background:#334155; }
+    a { color:#a5b4fc; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    @media (max-width:540px) {
+      body { padding:1.25rem; }
+      .card { padding:1.65rem 1.4rem 1.9rem; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <main class="card">
+      <img src="{% static 'assets/images/logo-10.png' %}" style="width: 200px" alt="">
+    {% block content %}{% endblock %}
+    <div class="foot">&copy; {{ now|date:"Y" }} AMPEDUP. All rights reserved.</div>
+  </main>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
+

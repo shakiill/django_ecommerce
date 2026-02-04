@@ -1,0 +1,740 @@
+{% extends 'storefront/base.html' %}
+
+{% block title %}Shop - ShopHub{% endblock %}
+
+{% block content %}
+<div class="shop-page py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <div class="col-lg-3 col-md-4 mb-4">
+                <div class="filters-sidebar">
+                    <h5 class="mb-4">
+                        <i class="fas fa-filter me-2"></i>Filters
+                        <button class="btn btn-sm btn-outline-danger float-end" id="clear-filters">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </h5>
+                    
+                    <!-- Search -->
+                    <div class="filter-group mb-4">
+                        <label class="filter-label">Search</label>
+                        <input type="text" class="form-control" id="filter-search" placeholder="Search products...">
+                    </div>
+                    
+                    <!-- Categories -->
+                    <div class="filter-group mb-4">
+                        <label class="filter-label">Categories</label>
+                        <div id="category-filters">
+                            <div class="spinner-border spinner-border-sm"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Brands -->
+                    <div class="filter-group mb-4">
+                        <label class="filter-label">Brands</label>
+                        <div id="brand-filters">
+                            <div class="spinner-border spinner-border-sm"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div class="filter-group mb-4">
+                        <label class="filter-label">Price Range</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" id="price-min" placeholder="Min">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" id="price-max" placeholder="Max">
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-primary w-100 mt-2" id="apply-price">Apply</button>
+                    </div>
+                    
+                    <!-- Active Filters -->
+                    <div class="filter-group" id="active-filters-container" style="display: none;">
+                        <label class="filter-label">Active Filters</label>
+                        <div id="active-filters"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products Grid -->
+            <div class="col-lg-9 col-md-8">
+                <!-- Toolbar -->
+                <div class="products-toolbar mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="results-info">
+                                <span id="results-count">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end align-items-center gap-3">
+                                <label class="mb-0">Sort by:</label>
+                                <select class="form-select form-select-sm" id="sort-select" style="width: auto;">
+                                    <option value="">Default</option>
+                                    <option value="name">Name (A-Z)</option>
+                                    <option value="-name">Name (Z-A)</option>
+                                    <option value="created_at">Oldest First</option>
+                                    <option value="-created_at">Newest First</option>
+                                </select>
+                                
+                                <div class="view-toggle">
+                                    <button class="btn btn-sm btn-outline-secondary active" id="grid-view">
+                                        <i class="fas fa-th"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" id="list-view">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Container -->
+                <div class="row g-4" id="products-container">
+                    <!-- Loaded via AJAX -->
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-3">Loading products...</p>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination-container mt-5" id="pagination-container">
+                    <!-- Loaded via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filters-sidebar {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        position: sticky;
+        top: 100px;
+    }
+    
+    .filter-label {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: block;
+        color: var(--text-primary);
+    }
+    
+    .filter-checkbox {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-checkbox input {
+        margin-right: 0.5rem;
+    }
+    
+    .filter-checkbox label {
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    
+    .filter-checkbox:hover label {
+        color: var(--primary-color);
+    }
+    
+    .active-filter-tag {
+        display: inline-block;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        margin: 0.25rem;
+    }
+    
+    .active-filter-tag button {
+        background: none;
+        border: none;
+        color: white;
+        margin-left: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .products-toolbar {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .results-info {
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+    
+    .view-toggle button {
+        border-radius: 4px;
+    }
+    
+    .view-toggle button.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    /* Product Card - Base Styles */
+    .product-card {
+        position: relative;
+        margin-bottom: 30px;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: box-shadow 0.3s, transform 0.3s;
+    }
+    
+    .product-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transform: translateY(-5px);
+    }
+    
+    .product-image {
+        position: relative;
+        overflow: hidden;
+        background: var(--bg-light);
+    }
+    
+    .product-image img {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+    
+    .product-card:hover .product-image img {
+        transform: scale(1.05);
+    }
+    
+    .product-body {
+        padding: 1rem;
+    }
+    
+    .product-category {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+    
+    .product-title {
+        font-size: 15px;
+        font-weight: 500;
+        margin-bottom: 10px;
+        color: var(--text-primary);
+    }
+    
+    .product-title a {
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+    
+    .product-title a:hover {
+        color: var(--text-secondary);
+    }
+    
+    .product-price {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+    
+    .product-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: var(--primary-color);
+        color: white;
+        padding: 5px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 4px;
+    }
+    
+    .product-footer {
+        padding: 0 1rem 1rem;
+    }
+    
+    .btn-add-cart {
+        display: inline-block;
+        width: 100%;
+        padding: 10px 20px;
+        background: var(--primary-color);
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: background 0.3s;
+    }
+    
+    .btn-add-cart:hover {
+        background: var(--secondary-color);
+        color: white;
+    }
+    
+    /* List View Styles */
+    .product-card.list-view {
+        flex-direction: row;
+        display: flex;
+    }
+    
+    .product-card.list-view .product-image {
+        width: 200px;
+        padding-top: 0;
+        height: 200px;
+    }
+    
+    .product-card.list-view .product-body {
+        flex: 1;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+    }
+    
+    .pagination {
+        gap: 0.5rem;
+    }
+    
+    .page-link {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.5rem 1rem;
+    }
+    
+    .page-link:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .page-item.active .page-link {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .no-products {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .no-products i {
+        font-size: 4rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter state
+    let filters = {
+        search: '',
+        category: [],
+        brand: [],
+        priceMin: null,
+        priceMax: null,
+        ordering: '',
+        page: 1
+    };
+    
+    let viewMode = 'grid'; // grid or list
+    
+    // Load categories for filter
+    async function loadCategoryFilters() {
+        try {
+            const data = await apiFetch('/categories/?is_active=true');
+            const container = document.getElementById('category-filters');
+            
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = data.results.map(cat => `
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="cat-${cat.id}" value="${cat.id}" class="category-filter">
+                        <label for="cat-${cat.id}">${cat.name}</label>
+                    </div>
+                `).join('');
+                
+                // Add event listeners
+                document.querySelectorAll('.category-filter').forEach(cb => {
+                    cb.addEventListener('change', handleFilterChange);
+                });
+            } else {
+                container.innerHTML = '<p class="text-muted small">No categories</p>';
+            }
+        } catch (error) {
+            console.error('Failed to load categories:', error);
+        }
+    }
+    
+    // Load brands for filter
+    async function loadBrandFilters() {
+        try {
+            const data = await apiFetch('/brands/?is_active=true');
+            const container = document.getElementById('brand-filters');
+            
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = data.results.map(brand => `
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="brand-${brand.id}" value="${brand.id}" class="brand-filter">
+                        <label for="brand-${brand.id}">${brand.name}</label>
+                    </div>
+                `).join('');
+                
+                // Add event listeners
+                document.querySelectorAll('.brand-filter').forEach(cb => {
+                    cb.addEventListener('change', handleFilterChange);
+                });
+            } else {
+                container.innerHTML = '<p class="text-muted small">No brands</p>';
+            }
+        } catch (error) {
+            console.error('Failed to load brands:', error);
+        }
+    }
+    
+    // Handle filter changes
+    function handleFilterChange() {
+        // Get selected categories
+        filters.category = Array.from(document.querySelectorAll('.category-filter:checked'))
+            .map(cb => cb.value);
+        
+        // Get selected brands
+        filters.brand = Array.from(document.querySelectorAll('.brand-filter:checked'))
+            .map(cb => cb.value);
+        
+        // Reset to page 1
+        filters.page = 1;
+        
+        // Update active filters display
+        updateActiveFilters();
+        
+        // Load products
+        loadProducts();
+    }
+    
+    // Update active filters display
+    function updateActiveFilters() {
+        const container = document.getElementById('active-filters');
+        const containerDiv = document.getElementById('active-filters-container');
+        let tags = [];
+        
+        // Search tag
+        if (filters.search) {
+            tags.push(`
+                <span class="active-filter-tag">
+                    Search: ${filters.search}
+                    <button onclick="removeFilter('search')">×</button>
+                </span>
+            `);
+        }
+        
+        // Category tags
+        filters.category.forEach(catId => {
+            const checkbox = document.getElementById(`cat-${catId}`);
+            if (checkbox) {
+                tags.push(`
+                    <span class="active-filter-tag">
+                        ${checkbox.nextElementSibling.textContent}
+                        <button onclick="removeFilter('category', '${catId}')">×</button>
+                    </span>
+                `);
+            }
+        });
+        
+        // Brand tags
+        filters.brand.forEach(brandId => {
+            const checkbox = document.getElementById(`brand-${brandId}`);
+            if (checkbox) {
+                tags.push(`
+                    <span class="active-filter-tag">
+                        ${checkbox.nextElementSibling.textContent}
+                        <button onclick="removeFilter('brand', '${brandId}')">×</button>
+                    </span>
+                `);
+            }
+        });
+        
+        // Price tag
+        if (filters.priceMin || filters.priceMax) {
+            const min = filters.priceMin || '0';
+            const max = filters.priceMax || '∞';
+            tags.push(`
+                <span class="active-filter-tag">
+                    Price: $${min} - $${max}
+                    <button onclick="removeFilter('price')">×</button>
+                </span>
+            `);
+        }
+        
+        if (tags.length > 0) {
+            container.innerHTML = tags.join('');
+            containerDiv.style.display = 'block';
+        } else {
+            containerDiv.style.display = 'none';
+        }
+    }
+    
+    // Remove filter
+    window.removeFilter = function(type, value) {
+        if (type === 'search') {
+            filters.search = '';
+            document.getElementById('filter-search').value = '';
+        } else if (type === 'category') {
+            filters.category = filters.category.filter(id => id !== value);
+            document.getElementById(`cat-${value}`).checked = false;
+        } else if (type === 'brand') {
+            filters.brand = filters.brand.filter(id => id !== value);
+            document.getElementById(`brand-${value}`).checked = false;
+        } else if (type === 'price') {
+            filters.priceMin = null;
+            filters.priceMax = null;
+            document.getElementById('price-min').value = '';
+            document.getElementById('price-max').value = '';
+        }
+        
+        updateActiveFilters();
+        loadProducts();
+    };
+    
+    // Clear all filters
+    document.getElementById('clear-filters').addEventListener('click', () => {
+        filters = {
+            search: '',
+            category: [],
+            brand: [],
+            priceMin: null,
+            priceMax: null,
+            ordering: '',
+            page: 1
+        };
+        
+        document.getElementById('filter-search').value = '';
+        document.querySelectorAll('.category-filter, .brand-filter').forEach(cb => cb.checked = false);
+        document.getElementById('price-min').value = '';
+        document.getElementById('price-max').value = '';
+        document.getElementById('sort-select').value = '';
+        
+        updateActiveFilters();
+        loadProducts();
+    });
+    
+    // Load products with filters
+    async function loadProducts() {
+        const container = document.getElementById('products-container');
+        showLoading(container);
+        
+        try {
+            // Build query params
+            const params = new URLSearchParams();
+            params.append('is_active', 'true');
+            
+            if (filters.search) params.append('search', filters.search);
+            if (filters.ordering) params.append('ordering', filters.ordering);
+            params.append('page', filters.page);
+            
+            filters.category.forEach(id => params.append('category', id));
+            filters.brand.forEach(id => params.append('brand', id));
+            
+            const data = await apiFetch(`/products/?${params}`);
+            
+            // Update results count
+            document.getElementById('results-count').textContent = 
+                `Showing ${data.results.length} of ${data.count} products`;
+            
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = data.results.map(product => 
+                    createProductCard(product, viewMode)
+                ).join('');
+                
+                // Update pagination
+                updatePagination(data);
+            } else {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="no-products">
+                            <i class="fas fa-box-open"></i>
+                            <h4>No products found</h4>
+                            <p class="text-muted">Try adjusting your filters</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('pagination-container').innerHTML = '';
+            }
+        } catch (error) {
+            console.error('Failed to load products:', error);
+            showError('Failed to load products. Please try again.', container);
+        }
+    }
+    
+    // Create product card
+    function createProductCard(product, mode = 'grid') {
+        const imageUrl = product.thumbnail || product.image || '/static/images/placeholder.png';
+        const price = product.price || '0.00';
+        const category = product.category_name || 'Uncategorized';
+        const colClass = mode === 'grid' ? 'col-lg-4 col-md-6' : 'col-12';
+        const cardClass = mode === 'list' ? 'product-card list-view' : 'product-card';
+        
+        return `
+            <div class="${colClass}">
+                <div class="${cardClass}">
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.name}" loading="lazy">
+                        ${product.is_featured ? '<span class="product-badge">Featured</span>' : ''}
+                    </div>
+                    <div class="product-body">
+                        <div class="product-category">${category}</div>
+                        <h6 class="product-title">${product.name}</h6>
+                        ${product.short_description ? `<p class="text-muted small">${product.short_description}</p>` : ''}
+                        <div class="product-price">$${price}</div>
+                        <div class="product-footer">
+                            <a href="/shop/${product.slug}/" class="btn btn-add-cart">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Update pagination
+    function updatePagination(data) {
+        const container = document.getElementById('pagination-container');
+        
+        if (!data.next && !data.previous) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        const totalPages = Math.ceil(data.count / 20); // Assuming 20 per page
+        const currentPage = filters.page;
+        
+        let html = '<ul class="pagination">';
+        
+        // Previous button
+        if (data.previous) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Previous</a></li>`;
+        }
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === currentPage) {
+                html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+            } else if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+        
+        // Next button
+        if (data.next) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a></li>`;
+        }
+        
+        html += '</ul>';
+        container.innerHTML = html;
+    }
+    
+    // Change page
+    window.changePage = function(page) {
+        filters.page = page;
+        loadProducts();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    
+    // Search with debounce
+    let searchTimeout;
+    document.getElementById('filter-search').addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filters.search = e.target.value.trim();
+            filters.page = 1;
+            updateActiveFilters();
+            loadProducts();
+        }, 500);
+    });
+    
+    // Price filter
+    document.getElementById('apply-price').addEventListener('click', () => {
+        filters.priceMin = document.getElementById('price-min').value || null;
+        filters.priceMax = document.getElementById('price-max').value || null;
+        filters.page = 1;
+        updateActiveFilters();
+        loadProducts();
+    });
+    
+    // Sort
+    document.getElementById('sort-select').addEventListener('change', (e) => {
+        filters.ordering = e.target.value;
+        filters.page = 1;
+        loadProducts();
+    });
+    
+    // View toggle
+    document.getElementById('grid-view').addEventListener('click', () => {
+        viewMode = 'grid';
+        document.getElementById('grid-view').classList.add('active');
+        document.getElementById('list-view').classList.remove('active');
+        loadProducts();
+    });
+    
+    document.getElementById('list-view').addEventListener('click', () => {
+        viewMode = 'list';
+        document.getElementById('list-view').classList.add('active');
+        document.getElementById('grid-view').classList.remove('active');
+        loadProducts();
+    });
+    
+    // Check URL params on load
+    function checkUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (urlParams.has('search')) {
+            filters.search = urlParams.get('search');
+            document.getElementById('filter-search').value = filters.search;
+        }
+        
+        if (urlParams.has('category')) {
+            const catId = urlParams.get('category');
+            filters.category = [catId];
+            setTimeout(() => {
+                const checkbox = document.getElementById(`cat-${catId}`);
+                if (checkbox) checkbox.checked = true;
+            }, 500);
+        }
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        checkUrlParams();
+        loadCategoryFilters();
+        loadBrandFilters();
+        loadProducts();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,285 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                    Payment Methods
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted"><a href="/" class="text-muted text-hover-primary">Home</a></li>
+                    <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+                    <li class="breadcrumb-item text-muted">Masters</li>
+                </ul>
+            </div>
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+                <button id="btn-create-paymentmethod" class="btn btn-sm fw-bold btn-primary">Create Payment Method</button>
+            </div>
+        </div>
+    </div>
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Payment Methods</h3></div>
+                <div class="card-body">
+                    <table class="table table-striped align-middle" id="paymentmethod-table">
+                        <thead>
+                        <tr>
+                            <th class="align-middle text-center">ID</th>
+                            <th class="align-middle text-center">Name</th>
+                            <th class="align-middle text-center">Code</th>
+                            <th class="align-middle text-center">Type</th>
+                            <th class="align-middle text-center">Online</th>
+                            <th class="align-middle text-center">Active</th>
+                            <th class="align-middle text-center">Order</th>
+                            <th class="align-middle text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="paymentmethod-table-loading" style="display:none;">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="paymentmethodModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="paymentmethod-form" class="modal-content" autocomplete="off">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentmethodModalLabel">Create/Edit Payment Method</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Code</label>
+                    <input type="text" name="code" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Type</label>
+                    <select name="payment_type" class="form-select">
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="mobile_payment">Mobile Payment</option>
+                        <option value="wallet">Wallet</option>
+                        <option value="cod">Cash on Delivery</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control"></textarea>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_online" id="paymentmethod_is_online">
+                    <label class="form-check-label" for="paymentmethod_is_online">Online</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_active" id="paymentmethod_is_active" checked>
+                    <label class="form-check-label" for="paymentmethod_is_active">Active</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Order</label>
+                    <input type="number" name="display_order" class="form-control" value="0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Fee (%)</label>
+                    <input type="number" step="0.01" name="processing_fee_percentage" class="form-control" value="0.00">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Fee Fixed</label>
+                    <input type="number" step="0.01" name="processing_fee_fixed" class="form-control" value="0.00">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-paymentmethod" type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block title %} Payment Methods | Admin {% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+(() => {
+    const paymentmethodApi = '/master/api/paymentmethods/';
+    const tableBody = document.querySelector('#paymentmethod-table tbody');
+    const tableLoading = document.getElementById('paymentmethod-table-loading');
+    const paymentmethodModalEl = document.getElementById('paymentmethodModal');
+    const paymentmethodForm = document.getElementById('paymentmethod-form');
+    let bsModal = null;
+    let editingId = null;
+
+    function getModalInstance() {
+        if (!bsModal) {
+            bsModal = new bootstrap.Modal(paymentmethodModalEl);
+        }
+        return bsModal;
+    }
+
+    function swalMsg(msg, icon = "success") {
+        Swal.fire({
+            text: msg,
+            icon: icon,
+            confirmButtonText: 'OK',
+            customClass: {popup: 'swal2-border-radius'}
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    async function fetchWithCsrf(url, options = {}) {
+        options.headers = options.headers || {};
+        options.credentials = 'same-origin';
+        if (!('X-CSRFToken' in options.headers)) {
+            options.headers['X-CSRFToken'] = csrftoken;
+        }
+        return fetch(url, options);
+    }
+
+    async function fetchAndRenderTable() {
+        tableLoading.style.display = '';
+        tableBody.innerHTML = '';
+        try {
+            const res = await fetchWithCsrf(paymentmethodApi);
+            if (!res.ok) {
+                tableBody.innerHTML = '<tr><td colspan="8">Error loading data</td></tr>';
+                tableLoading.style.display = 'none';
+                return;
+            }
+            const methods = await res.json();
+            if (methods.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8">No payment methods found.</td></tr>';
+                tableLoading.style.display = 'none';
+                return;
+            }
+            tableBody.innerHTML = '';
+            methods.forEach(pm => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="align-middle text-center">${pm.id}</td>
+                    <td class="align-middle">${pm.name}</td>
+                    <td class="align-middle">${pm.code}</td>
+                    <td class="align-middle">${pm.payment_type}</td>
+                    <td class="align-middle text-center">${pm.is_online ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">${pm.is_active ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">${pm.display_order}</td>
+                    <td class="align-middle text-center">
+                        <button type="button" class="btn btn-sm btn-secondary btn-edit-paymentmethod" data-id="${pm.id}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger btn-del-paymentmethod" data-id="${pm.id}">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        } catch (err) {
+            tableBody.innerHTML = '<tr><td colspan="8">Error loading data</td></tr>';
+        }
+        tableLoading.style.display = 'none';
+    }
+
+    function showPaymentMethodModal(data) {
+        editingId = data && data.id ? data.id : null;
+        paymentmethodForm.reset();
+        paymentmethodForm.name.value = data?.name || '';
+        paymentmethodForm.code.value = data?.code || '';
+        paymentmethodForm.payment_type.value = data?.payment_type || 'cash';
+        paymentmethodForm.description.value = data?.description || '';
+        paymentmethodForm.is_online.checked = !!data?.is_online;
+        paymentmethodForm.is_active.checked = data?.is_active !== false;
+        paymentmethodForm.display_order.value = data?.display_order || 0;
+        paymentmethodForm.processing_fee_percentage.value = data?.processing_fee_percentage || 0.00;
+        paymentmethodForm.processing_fee_fixed.value = data?.processing_fee_fixed || 0.00;
+        document.getElementById('paymentmethodModalLabel').textContent = editingId ? 'Edit Payment Method' : 'Create Payment Method';
+        Swal.close();
+        getModalInstance().show();
+    }
+
+    document.getElementById('btn-create-paymentmethod').addEventListener('click', () => showPaymentMethodModal());
+
+    tableBody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        if (btn.classList.contains('btn-edit-paymentmethod')) {
+            const r = await fetchWithCsrf(paymentmethodApi + id + '/');
+            if (!r.ok) return swalMsg('Failed to load', 'error');
+            const data = await r.json();
+            showPaymentMethodModal(data);
+        } else if (btn.classList.contains('btn-del-paymentmethod')) {
+            const result = await Swal.fire({
+                text: `Delete payment method #${id}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            });
+            if (!result.isConfirmed) return;
+            const r = await fetchWithCsrf(paymentmethodApi + id + '/', {method: 'DELETE'});
+            if (r.status === 204) {
+                swalMsg('Deleted');
+                fetchAndRenderTable();
+            } else swalMsg('Delete failed', 'error');
+        }
+    });
+
+    paymentmethodForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        let payload = {
+            name: paymentmethodForm.name.value,
+            code: paymentmethodForm.code.value,
+            payment_type: paymentmethodForm.payment_type.value,
+            description: paymentmethodForm.description.value,
+            is_online: paymentmethodForm.is_online.checked,
+            is_active: paymentmethodForm.is_active.checked,
+            display_order: Number(paymentmethodForm.display_order.value) || 0,
+            processing_fee_percentage: paymentmethodForm.processing_fee_percentage.value,
+            processing_fee_fixed: paymentmethodForm.processing_fee_fixed.value
+        };
+        let url = editingId ? (paymentmethodApi + editingId + '/') : paymentmethodApi;
+        let method = editingId ? 'PUT' : 'POST';
+        const r = await fetchWithCsrf(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        if (r.ok) {
+            getModalInstance().hide();
+            swalMsg(editingId ? 'Updated' : 'Created');
+            fetchAndRenderTable();
+        } else {
+            const text = await r.text();
+            swalMsg('Error: ' + (text || r.status), 'error');
+        }
+    });
+
+    fetchAndRenderTable();
+})();
+</script>
+{% endblock %}
+

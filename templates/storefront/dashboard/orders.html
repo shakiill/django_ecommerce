@@ -1,0 +1,433 @@
+{% extends 'storefront/base.html' %}
+
+{% block title %}My Orders - ShopHub{% endblock %}
+
+{% block content %}
+<div class="customer-dashboard py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 col-md-4 mb-4">
+                <div class="dashboard-sidebar">
+                    <div class="user-info mb-4">
+                        <div class="user-avatar">
+                            <i class="fas fa-user-circle fa-4x text-primary"></i>
+                        </div>
+                        <h5 class="mt-3 mb-0" id="user-name">Loading...</h5>
+                        <p class="text-muted small" id="user-email">Loading...</p>
+                    </div>
+                    
+                    <nav class="dashboard-nav">
+                        <a href="{% url 'customer_dashboard' %}" class="nav-item">
+                            <i class="fas fa-th-large me-2"></i> Dashboard
+                        </a>
+                        <a href="{% url 'order_history' %}" class="nav-item active">
+                            <i class="fas fa-shopping-bag me-2"></i> Orders
+                        </a>
+                        <a href="{% url 'addresses' %}" class="nav-item">
+                            <i class="fas fa-map-marker-alt me-2"></i> Addresses
+                        </a>
+                        <a href="{% url 'profile' %}" class="nav-item">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
+                        <a href="#" class="nav-item" id="logout-btn">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9 col-md-8">
+                <div class="dashboard-header mb-4">
+                    <h2>Order History</h2>
+                    <p class="text-muted">View and track all your orders</p>
+                </div>
+                
+                <!-- Filters -->
+                <div class="orders-filters mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <select class="form-select" id="status-filter">
+                                <option value="">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="date" class="form-control" id="date-from" placeholder="From Date">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="date" class="form-control" id="date-to" placeholder="To Date">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Orders List -->
+                <div class="orders-container" id="orders-container">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination-container mt-4" id="pagination-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-sidebar {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        position: sticky;
+        top: 100px;
+    }
+    
+    .user-info {
+        text-align: center;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .dashboard-nav {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .dashboard-nav .nav-item {
+        padding: 0.75rem 1rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+    }
+    
+    .dashboard-nav .nav-item:hover {
+        background: var(--light-color);
+        color: var(--primary-color);
+    }
+    
+    .dashboard-nav .nav-item.active {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .dashboard-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .orders-filters {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .order-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s;
+    }
+    
+    .order-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    
+    .order-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 1rem;
+    }
+    
+    .order-number {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .order-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .order-status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .order-status.processing {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .order-status.shipped {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+    
+    .order-status.delivered {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .order-status.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+    }
+    
+    .info-item i {
+        color: var(--primary-color);
+    }
+    
+    .order-total {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+    
+    .order-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Check authentication
+    if (!isAuthenticated()) {
+        window.location.href = '/user/login/?next=/my-account/orders/';
+    }
+    
+    let currentPage = 1;
+    let filters = {
+        status: '',
+        dateFrom: '',
+        dateTo: ''
+    };
+    
+    // Load user profile
+    async function loadUserProfile() {
+        try {
+            const data = await apiFetch('/auth/user/');
+            document.getElementById('user-name').textContent = data.username || 'User';
+            document.getElementById('user-email').textContent = data.email || '';
+        } catch (error) {
+            console.error('Failed to load profile:', error);
+        }
+    }
+    
+    // Load orders
+    async function loadOrders() {
+        const container = document.getElementById('orders-container');
+        showLoading(container);
+        
+        try {
+            const params = new URLSearchParams();
+            params.append('page', currentPage);
+            
+            if (filters.status) params.append('status', filters.status);
+            if (filters.dateFrom) params.append('created_at__gte', filters.dateFrom);
+            if (filters.dateTo) params.append('created_at__lte', filters.dateTo);
+            
+            const data = await apiFetch(`/orders/?${params}`);
+            
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = data.results.map(order => createOrderCard(order)).join('');
+                updatePagination(data);
+            } else {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
+                        <h4>No orders found</h4>
+                        <p class="text-muted">You haven't placed any orders yet</p>
+                        <a href="/shop/" class="btn btn-primary mt-3">Start Shopping</a>
+                    </div>
+                `;
+                document.getElementById('pagination-container').innerHTML = '';
+            }
+        } catch (error) {
+            console.error('Failed to load orders:', error);
+            showError('Failed to load orders. Please try again.', container);
+        }
+    }
+    
+    // Create order card HTML
+    function createOrderCard(order) {
+        const orderDate = new Date(order.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        return `
+            <div class="order-card">
+                <div class="order-card-header">
+                    <div class="order-number">Order #${order.order_number || order.id}</div>
+                    <div class="order-status ${order.status}">${order.status}</div>
+                </div>
+                
+                <div class="order-info">
+                    <div class="info-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>${orderDate}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-box"></i>
+                        <span>${order.items_count || 0} Items</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span class="order-total">$${order.total_amount || '0.00'}</span>
+                    </div>
+                </div>
+                
+                <div class="order-actions">
+                    <a href="/my-account/orders/${order.id}/" class="btn btn-primary">
+                        <i class="fas fa-eye me-2"></i>View Details
+                    </a>
+                    ${order.status === 'delivered' ? `
+                        <button class="btn btn-outline-primary">
+                            <i class="fas fa-redo me-2"></i>Reorder
+                        </button>
+                    ` : ''}
+                    ${order.status === 'pending' ? `
+                        <button class="btn btn-outline-danger" onclick="cancelOrder(${order.id})">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Update pagination
+    function updatePagination(data) {
+        const container = document.getElementById('pagination-container');
+        
+        if (!data.next && !data.previous) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        const totalPages = Math.ceil(data.count / 10);
+        
+        let html = '<ul class="pagination justify-content-center">';
+        
+        if (data.previous) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Previous</a></li>`;
+        }
+        
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === currentPage) {
+                html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+            } else if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
+            }
+        }
+        
+        if (data.next) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a></li>`;
+        }
+        
+        html += '</ul>';
+        container.innerHTML = html;
+    }
+    
+    // Change page
+    window.changePage = function(page) {
+        currentPage = page;
+        loadOrders();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    
+    // Cancel order
+    window.cancelOrder = async function(orderId) {
+        if (!confirm('Are you sure you want to cancel this order?')) return;
+        
+        try {
+            await apiFetch(`/orders/${orderId}/`, {
+                method: 'PATCH',
+                body: JSON.stringify({ status: 'cancelled' })
+            });
+            
+            alert('Order cancelled successfully');
+            loadOrders();
+        } catch (error) {
+            console.error('Failed to cancel order:', error);
+            alert('Failed to cancel order. Please try again.');
+        }
+    };
+    
+    // Filter handlers
+    document.getElementById('status-filter').addEventListener('change', (e) => {
+        filters.status = e.target.value;
+        currentPage = 1;
+        loadOrders();
+    });
+    
+    document.getElementById('date-from').addEventListener('change', (e) => {
+        filters.dateFrom = e.target.value;
+        currentPage = 1;
+        loadOrders();
+    });
+    
+    document.getElementById('date-to').addEventListener('change', (e) => {
+        filters.dateTo = e.target.value;
+        currentPage = 1;
+        loadOrders();
+    });
+    
+    // Logout handler
+    document.getElementById('logout-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        removeAuthToken();
+        window.location.href = '/';
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUserProfile();
+        loadOrders();
+    });
+</script>
+{% endblock %}

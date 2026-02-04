@@ -1,0 +1,152 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex flex-column flex-column-fluid">
+  <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+    <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+      <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+        <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Requisition {{ requisition.pr_number }}</h1>
+      </div>
+      <div class="d-flex align-items-center gap-2 gap-lg-3">
+        <a href="{% url 'inventory:requisition_edit' requisition.id %}" class="btn btn-sm btn-light-warning">Edit</a>
+        <a href="{% url 'inventory:requisition_pdf' requisition.id %}" class="btn btn-sm btn-light-primary" target="_blank">PDF</a>
+        <a href="{% url 'inventory:requisition_list' %}" class="btn btn-sm btn-light">Back</a>
+      </div>
+    </div>
+  </div>
+  <div id="kt_app_content" class="app-content flex-column-fluid">
+    <div id="kt_app_content_container" class="app-container container-xxl">
+      <div class="card mb-5">
+        <div class="card-body">
+          <div class="row g-5">
+            <div class="col-md-4"><strong>Warehouse:</strong> {{ requisition.warehouse.name }}</div>
+            <div class="col-md-4"><strong>Requisition Date:</strong> {{ requisition.requisition_date }}</div>
+            <div class="col-md-4"><strong>Required Date:</strong> {{ requisition.required_date }}</div>
+            <div class="col-md-4"><strong>Status:</strong> <span id="status-text">{{ requisition.get_status_display }}</span></div>
+            <div class="col-md-4"><strong>Priority:</strong> {{ requisition.get_priority_display }}</div>
+            <div class="col-md-4"><strong>Requested By:</strong> {{ requisition.requested_by }}</div>
+            <div class="col-md-12"><strong>Purpose:</strong> {{ requisition.purpose }}</div>
+            {% if requisition.notes %}
+            <div class="col-md-12"><strong>Notes:</strong> {{ requisition.notes }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-5">
+        <div class="card-header">
+          <div class="card-title">Status Change</div>
+        </div>
+        <div class="card-body">
+          <form id="status-form" method="post" action="{% url 'inventory:requisition_status_change' requisition.id %}">
+            {% csrf_token %}
+            <div class="row g-3 align-items-end">
+              <div class="col-md-4">
+                <label for="status-select" class="form-label">New Status</label>
+                <select id="status-select" name="status" class="form-select">
+                  {% for key, label in requisition.STATUS_CHOICES %}
+                  <option value="{{ key }}" {% if requisition.status == key %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary">Change</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Items</div>
+        </div>
+        <div class="card-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Variant</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in requisition.items.all %}
+              <tr>
+                <td>{{ item.product_variant.sku }}</td>
+                <td>{{ item.product_variant.variant_name }}</td>
+                <td>{{ item.quantity_requested }}</td>
+                <td>{{ item.estimated_unit_price }}</td>
+                <td>{{ item.estimated_total }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5" class="text-center text-muted">No items</td></tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr>
+                <th colspan="4" class="text-end">Total</th>
+                <th>{{ requisition.total_amount }}</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <div class="card-title">Status History</div>
+        </div>
+        <div class="card-body">
+          <ul id="status-history-list" class="list-group">
+            {% for h in requisition.status_history %}
+              <li>
+                <small class="text-muted">{{ h.timestamp|default:h.timestamp }}</small><br/>
+                <strong>{{ h.from_display }}</strong> → <strong>{{ h.to_display }}</strong>
+                {% if h.changed_by %}<br/><em>By: {{ h.changed_by }}</em>{% endif %}
+                {% if h.note %}<div class="mt-1">{{ h.note }}</div>{% endif %}
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">No status changes yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block title %}Requisition {{ requisition.pr_number }}{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('status-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const form = e.target;
+    const res = await fetch(form.action, {method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: {'X-Requested-With':'XMLHttpRequest'}});
+    const data = await res.json();
+    if(data.ok){
+      document.getElementById('status-text').innerText = data.status;
+      if(data.history){
+        const list = document.getElementById('status-history-list');
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        const ts = data.history.timestamp || '';
+        const from = data.history.from_display || data.history.from || '';
+        const to = data.history.to_display || data.history.to || '';
+        const by = data.history.changed_by ? `<br/><em>By: ${data.history.changed_by}</em>` : '';
+        const note = data.history.note ? `<div class="mt-1">${data.history.note}</div>` : '';
+        li.innerHTML = `<small class="text-muted">${ts}</small><br/><strong>${from}</strong> → <strong>${to}</strong>${by}${note}`;
+        // prepend
+        list.insertBefore(li, list.firstChild);
+      }
+    }else{
+      alert(data.error || 'Failed to change status');
+    }
+  });
+</script>
+{% endblock %}

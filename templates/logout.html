@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logged Out</title>
+</head>
+<body>
+  {% extends "base_auth.html" %}
+  {% block title %}Logged Out{% endblock %}
+  {% block content %}
+  <a class="top-link" href="/">Home</a>
+  <h1>Signed out</h1>
+  <p class="sub">You have been securely logged out.</p>
+  <form action="{% url 'staff_login' %}">
+    <button class="primary" type="submit">Return to Login</button>
+  </form>
+  <hr class="divider">
+  <p style="text-align:center;font-size:.75rem;opacity:.65;">Need help? <a href="mailto:support@django_ecommerce.com">Contact support</a></p>
+  {% endblock %}
+</body>
+</html>

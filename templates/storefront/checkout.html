@@ -1,0 +1,265 @@
+{% extends 'storefront/base.html' %}
+
+{% block title %}Checkout - ShopHub{% endblock %}
+
+{% block content %}
+<div class="checkout-page py-5">
+    <div class="container">
+        <h2 class="mb-4">Checkout</h2>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Checkout Steps -->
+                <div class="checkout-steps mb-4">
+                    <div class="step active" data-step="1">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Shipping Address</span>
+                    </div>
+                    <div class="step" data-step="2">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Shipping Method</span>
+                    </div>
+                    <div class="step" data-step="3">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Payment</span>
+                    </div>
+                    <div class="step" data-step="4">
+                        <span class="step-number">4</span>
+                        <span class="step-label">Review</span>
+                    </div>
+                </div>
+                
+                <!-- Step Content -->
+                <div id="checkout-content">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h4 class="mb-3">Order Summary</h4>
+                    <div id="summary-items"></div>
+                    <div class="summary-total mt-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Total:</span>
+                            <span id="order-total">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-steps {
+        display: flex;
+        justify-content: space-between;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        position: relative;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--light-color);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+    
+    .step.active .step-number {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .step-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+    
+    .step.active .step-label {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .order-summary {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        position: sticky;
+        top: 100px;
+    }
+    
+    .summary-total {
+        padding-top: 1rem;
+        border-top: 2px solid var(--border-color);
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    if (!isAuthenticated()) {
+        window.location.href = '/user/login/?next=/checkout/';
+    }
+    
+    let currentStep = 1;
+    
+    async function loadCheckout() {
+        // Load cart summary
+        try {
+            const data = await apiFetch('/cart/');
+            const summaryContainer = document.getElementById('summary-items');
+            
+            if (data.results && data.results.length > 0) {
+                summaryContainer.innerHTML = data.results.map(item => `
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>${item.product_variant.name} x ${item.quantity}</span>
+                        <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `).join('');
+                
+                const total = data.results.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                document.getElementById('order-total').textContent = `$${total.toFixed(2)}`;
+            }
+        } catch (error) {
+            console.error('Failed to load cart:', error);
+        }
+        
+        // Load step content
+        loadStepContent(currentStep);
+    }
+    
+    function loadStepContent(step) {
+        const content = document.getElementById('checkout-content');
+        
+        switch(step) {
+            case 1:
+                content.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Shipping Address</h4>
+                            <p>Select or add a shipping address</p>
+                            <div id="addresses-list"></div>
+                            <button class="btn btn-primary mt-3" onclick="nextStep()">Continue</button>
+                        </div>
+                    </div>
+                `;
+                loadAddresses();
+                break;
+            case 2:
+                content.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Shipping Method</h4>
+                            <p>Choose your shipping method</p>
+                            <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                        </div>
+                    </div>
+                `;
+                break;
+            case 3:
+                content.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Payment Method</h4>
+                            <p>Select payment method</p>
+                            <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                        </div>
+                    </div>
+                `;
+                break;
+            case 4:
+                content.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Review Order</h4>
+                            <p>Review and place your order</p>
+                            <button class="btn btn-success" onclick="placeOrder()">Place Order</button>
+                        </div>
+                    </div>
+                `;
+                break;
+        }
+    }
+    
+    async function loadAddresses() {
+        try {
+            const data = await apiFetch('/addresses/');
+            const container = document.getElementById('addresses-list');
+            
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = data.results.map(addr => `
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="address" value="${addr.id}">
+                        <label class="form-check-label">
+                            ${addr.address_line1}, ${addr.city}
+                        </label>
+                    </div>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Failed to load addresses:', error);
+        }
+    }
+    
+    window.nextStep = function() {
+        if (currentStep < 4) {
+            currentStep++;
+            updateStepIndicator();
+            loadStepContent(currentStep);
+        }
+    };
+    
+    function updateStepIndicator() {
+        document.querySelectorAll('.step').forEach((step, index) => {
+            if (index + 1 <= currentStep) {
+                step.classList.add('active');
+            } else {
+                step.classList.remove('active');
+            }
+        });
+    }
+    
+    window.placeOrder = async function() {
+        try {
+            const order = await apiFetch('/orders/', {
+                method: 'POST',
+                body: JSON.stringify({
+                    // Order data
+                })
+            });
+            
+            alert('Order placed successfully!');
+            window.location.href = `/my-account/orders/${order.id}/`;
+        } catch (error) {
+            alert('Failed to place order');
+        }
+    };
+    
+    document.addEventListener('DOMContentLoaded', loadCheckout);
+</script>
+{% endblock %}

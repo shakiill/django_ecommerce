@@ -1,0 +1,93 @@
+{% extends 'storefront/base.html' %}
+
+{% block title %}My Addresses - ShopHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">My Addresses</h2>
+    
+    <div class="mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addressModal">
+            <i class="fas fa-plus me-2"></i>Add New Address
+        </button>
+    </div>
+    
+    <div id="addresses-container">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Address Modal -->
+<div class="modal fade" id="addressModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="address-form">
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 1</label>
+                        <input type="text" class="form-control" name="address_line1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-control" name="city" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Postal Code</label>
+                        <input type="text" class="form-control" name="postal_code" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    if (!isAuthenticated()) {
+        window.location.href = '/user/login/?next=/my-account/addresses/';
+    }
+    
+    async function loadAddresses() {
+        const container = document.getElementById('addresses-container');
+        
+        try {
+            const data = await apiFetch('/addresses/');
+            
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = data.results.map(addr => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5>${addr.address_line1}</h5>
+                            <p>${addr.city}, ${addr.postal_code}</p>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAddress(${addr.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="text-muted">No addresses saved</p>';
+            }
+        } catch (error) {
+            showError('Failed to load addresses', container);
+        }
+    }
+    
+    window.deleteAddress = async function(id) {
+        if (!confirm('Delete this address?')) return;
+        
+        try {
+            await apiFetch(`/addresses/${id}/`, { method: 'DELETE' });
+            loadAddresses();
+        } catch (error) {
+            alert('Failed to delete address');
+        }
+    };
+    
+    document.addEventListener('DOMContentLoaded', loadAddresses);
+</script>
+{% endblock %}

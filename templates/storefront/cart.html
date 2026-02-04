@@ -1,0 +1,209 @@
+{% extends 'storefront/base.html' %}
+
+{% block title %}Shopping Cart - ShopHub{% endblock %}
+
+{% block content %}
+<div class="cart-page py-5">
+    <div class="container">
+        <h2 class="mb-4">Shopping Cart</h2>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div id="cart-items-container">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="cart-summary">
+                    <h4 class="mb-3">Order Summary</h4>
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span id="shipping">$0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="total">$0.00</span>
+                    </div>
+                    <a href="{% url 'checkout' %}" class="btn btn-primary w-100 mt-3">
+                        Proceed to Checkout
+                    </a>
+                    <a href="{% url 'shop' %}" class="btn btn-outline-secondary w-100 mt-2">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cart-item {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        margin-bottom: 1rem;
+        display: flex;
+        gap: 1.5rem;
+    }
+    
+    .cart-item-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .cart-item-details {
+        flex: 1;
+    }
+    
+    .cart-item-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .cart-item-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+    
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .quantity-control button {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border-color);
+        background: white;
+        border-radius: 4px;
+    }
+    
+    .quantity-control input {
+        width: 60px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+    }
+    
+    .cart-summary {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        position: sticky;
+        top: 100px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .summary-row.total {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        border-bottom: none;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    if (!isAuthenticated()) {
+        window.location.href = '/user/login/?next=/cart/';
+    }
+    
+    async function loadCart() {
+        const container = document.getElementById('cart-items-container');
+        
+        try {
+            const data = await apiFetch('/cart/');
+            
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = data.results.map(item => `
+                    <div class="cart-item">
+                        <img src="${item.product_variant.image || '/static/images/placeholder.png'}" 
+                             alt="${item.product_variant.name}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h5 class="cart-item-title">${item.product_variant.name}</h5>
+                            <div class="cart-item-price">$${item.price}</div>
+                            <div class="quantity-control">
+                                <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                                <input type="number" value="${item.quantity}" readonly>
+                                <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                                <button class="btn btn-sm btn-danger ms-3" onclick="removeItem(${item.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                calculateTotal(data.results);
+            } else {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+                        <h4>Your cart is empty</h4>
+                        <a href="/shop/" class="btn btn-primary mt-3">Start Shopping</a>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            showError('Failed to load cart', container);
+        }
+    }
+    
+    function calculateTotal(items) {
+        const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+        document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('total').textContent = `$${subtotal.toFixed(2)}`;
+    }
+    
+    window.updateQuantity = async function(itemId, newQty) {
+        if (newQty < 1) return;
+        
+        try {
+            await apiFetch(`/cart/items/${itemId}/`, {
+                method: 'PATCH',
+                body: JSON.stringify({ quantity: newQty })
+            });
+            loadCart();
+            updateCartCount();
+        } catch (error) {
+            alert('Failed to update quantity');
+        }
+    };
+    
+    window.removeItem = async function(itemId) {
+        try {
+            await apiFetch(`/cart/items/${itemId}/`, { method: 'DELETE' });
+            loadCart();
+            updateCartCount();
+        } catch (error) {
+            alert('Failed to remove item');
+        }
+    };
+    
+    document.addEventListener('DOMContentLoaded', loadCart);
+</script>
+{% endblock %}

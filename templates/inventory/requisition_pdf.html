@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; }
+    .header { text-align: center; margin-bottom: 10px; }
+    .meta th { text-align: left; padding-right: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #999; padding: 6px; }
+    th { background: #f2f2f2; }
+    .right { text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Purchase Requisition</h2>
+    <div>PR #: {{ requisition.pr_number }}</div>
+  </div>
+
+  <table class="meta" style="margin-bottom: 10px;">
+    <tr>
+      <th>Warehouse</th><td>{{ requisition.warehouse.name }}</td>
+      <th>Requisition Date</th><td>{{ requisition.requisition_date }}</td>
+    </tr>
+    <tr>
+      <th>Required Date</th><td>{{ requisition.required_date }}</td>
+      <th>Status</th><td>{{ requisition.get_status_display }}</td>
+    </tr>
+    <tr>
+      <th>Priority</th><td>{{ requisition.get_priority_display }}</td>
+      <th>Requested By</th><td>{{ requisition.requested_by }}</td>
+    </tr>
+  </table>
+
+  <p><strong>Purpose:</strong> {{ requisition.purpose }}</p>
+  {% if requisition.notes %}
+  <p><strong>Notes:</strong> {{ requisition.notes }}</p>
+  {% endif %}
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%">SKU</th>
+        <th style="width: 40%">Variant</th>
+        <th class="right" style="width: 10%">Qty</th>
+        <th class="right" style="width: 15%">Unit Price</th>
+        <th class="right" style="width: 15%">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in requisition.items.all %}
+      <tr>
+        <td>{{ item.product_variant.sku }}</td>
+        <td>{{ item.product_variant.variant_name }}</td>
+        <td class="right">{{ item.quantity_requested }}</td>
+        <td class="right">{{ item.estimated_unit_price }}</td>
+        <td class="right">{{ item.estimated_total }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="4" class="right">Grand Total</th>
+        <th class="right">{{ requisition.total_amount }}</th>
+      </tr>
+    </tfoot>
+  </table>
+</body>
+</html>
+

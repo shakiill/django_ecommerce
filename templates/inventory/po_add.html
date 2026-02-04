@@ -1,0 +1,549 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex flex-column flex-column-fluid">
+  <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+    <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+      <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+        <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+          {% if is_edit %}Edit{% else %}Create{% endif %} Purchase Order
+        </h1>
+      </div>
+      <div class="d-flex align-items-center gap-2 gap-lg-3">
+        <a href="{% url 'inventory:po_list' %}" class="btn btn-sm fw-bold btn-light">Back to list</a>
+      </div>
+    </div>
+  </div>
+  <div id="kt_app_content" class="app-content flex-column-fluid">
+    <div id="kt_app_content_container" class="app-container container-xxl">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="card mb-6">
+          <div class="card-header">
+            <div class="card-title">Order Info</div>
+          </div>
+          <div class="card-body p-6">
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <div class="row g-5">
+              <div class="col-md-4">{{ form.supplier.label_tag }} {{ form.supplier }} {{ form.supplier.errors }}</div>
+              <div class="col-md-4">{{ form.warehouse.label_tag }} {{ form.warehouse }} {{ form.warehouse.errors }}</div>
+              <div class="col-md-4">{{ form.order_date.label_tag }} {{ form.order_date }} {{ form.order_date.errors }}</div>
+              <div class="col-md-4">{{ form.expected_delivery_date.label_tag }} {{ form.expected_delivery_date }} {{ form.expected_delivery_date.errors }}</div>
+              <div class="col-md-4">{{ form.payment_method.label_tag }} {{ form.payment_method }} {{ form.payment_method.errors }}</div>
+              <div class="col-md-4">{{ form.payment_terms.label_tag }} {{ form.payment_terms }} {{ form.payment_terms.errors }}</div>
+              <div class="col-md-4">{{ form.shipping_method.label_tag }} {{ form.shipping_method }} {{ form.shipping_method.errors }}</div>
+              <div class="col-md-4">{{ form.shipping_cost.label_tag }} {{ form.shipping_cost }} {{ form.shipping_cost.errors }}</div>
+              <div class="col-md-12">{{ form.shipping_address.label_tag }} {{ form.shipping_address }} {{ form.shipping_address.errors }}</div>
+              <div class="col-md-12">{{ form.notes.label_tag }} {{ form.notes }} {{ form.notes.errors }}</div>
+              <div class="col-md-12">{{ form.terms_and_conditions.label_tag }} {{ form.terms_and_conditions }} {{ form.terms_and_conditions.errors }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-title">Items</div>
+            <div>
+              <button type="button" class="btn btn-light-success" id="btn-import-pr"><i class="bi bi-download"></i> Import from Requisition</button>
+            </div>
+          </div>
+          <div class="card-body p-6">
+            {% if formset.non_form_errors %}
+              <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+            {% endif %}
+            {{ formset.management_form }}
+            <div class="mb-3">
+              <button type="button" class="btn btn-light-primary" id="add-po-item">
+                <i class="bi bi-plus-circle"></i> Add Row
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-row-dashed align-middle">
+                <thead>
+                  <tr>
+                    <th style="width:35%">Product Variant</th>
+                    <th style="width:10%">Qty</th>
+                    <th style="width:15%">Unit Price</th>
+                    <th style="width:10%">Disc %</th>
+                    <th style="width:10%">Tax %</th>
+                    <th style="width:20%">Notes</th>
+                    <th style="width:10%">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="po-items-body">
+                {% for f in formset %}
+                  <tr class="align-middle">
+                    <td>{{ f.product_variant }} {{ f.product_variant.errors }}</td>
+                    <td>{{ f.quantity_ordered }} {{ f.quantity_ordered.errors }}</td>
+                    <td>{{ f.unit_price }} {{ f.unit_price.errors }}</td>
+                    <td>{{ f.discount_percent }} {{ f.discount_percent.errors }}</td>
+
+                    {# Replace visible tax input with hidden + select populated from taxes #}
+                    <td>
+                      {{ f.tax_rate.as_hidden }}
+                      <select class="form-select form-select-sm tax-select" data-hidden-id="{{ f.tax_rate.id_for_label }}">
+                        <option value="">-- None --</option>
+                        {% for t in taxes %}
+                          <option value="{{ t.rate }}" {% if f.tax_rate.value|stringformat:"s" == t.rate|stringformat:"s" %}selected{% endif %}>
+                            {{ t.name }} ({{ t.rate }})
+                          </option>
+                        {% endfor %}
+                      </select>
+                      {{ f.tax_rate.errors }}
+                    </td>
+
+                    <td>{{ f.notes }} {{ f.notes.errors }}</td>
+                    <td>
+                      {% if is_edit %}
+                        <label class="form-check form-check-sm form-check-custom form-check-solid" title="Mark for deletion">
+                          {{ f.DELETE }}<span class="ms-2">Delete</span>
+                        </label>
+                      {% else %}
+                        <button type="button" class="btn btn-sm btn-light-danger btn-remove-row" title="Remove row">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      {% endif %}
+                    </td>
+                    {% for hidden in f.hidden_fields %}
+                      {# avoid double-rendering tax_rate if it appears among hidden_fields #}
+                      {% if hidden.name != 'tax_rate' %}{{ hidden }}{% endif %}
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-6">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-title">Additional Costs</div>
+            <div>
+              <button type="button" class="btn btn-light-primary" id="add-cost-item">
+                <i class="bi bi-plus-circle"></i> Add Cost
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-6">
+            {% if cost_formset.non_form_errors %}
+              <div class="alert alert-danger">{{ cost_formset.non_form_errors }}</div>
+            {% endif %}
+            {{ cost_formset.management_form }}
+            <div class="table-responsive">
+              <table class="table table-row-dashed align-middle">
+                <thead>
+                  <tr>
+                    <th style="width:70%">Description</th>
+                    <th style="width:20%">Amount</th>
+                    <th style="width:10%">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="po-costs-body">
+                  {% for cf in cost_formset %}
+                  <tr class="align-middle">
+                    <td>{{ cf.description }} {{ cf.description.errors }}</td>
+                    <td>{{ cf.amount }} {{ cf.amount.errors }}</td>
+                    <td>
+                      {% if is_edit %}
+                        <label class="form-check form-check-sm form-check-custom form-check-solid" title="Mark for deletion">
+                          {{ cf.DELETE }}<span class="ms-2">Delete</span>
+                        </label>
+                      {% else %}
+                        <button type="button" class="btn btn-sm btn-light-danger btn-remove-cost" title="Remove row">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      {% endif %}
+                    </td>
+                    {% for hidden in cf.hidden_fields %}{{ hidden }}{% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-6">
+            <a href="{% url 'inventory:po_list' %}" class="btn btn-light me-3">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Purchase Order</button>
+        </div>
+      </form>
+
+      <!-- Import from PR Modal -->
+      <div class="modal fade" id="importPrModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Import Items from Requisition</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Search Requisition (PR number)</label>
+                <input type="text" id="pr-search-input" class="form-control" placeholder="Type PR number..." />
+                <div class="form-text">Only approved/partially ordered/ordered PRs can be imported</div>
+              </div>
+              <div id="pr-search-results" class="list-group" style="max-height: 300px; overflow-y: auto;"></div>
+              <hr>
+              <div id="pr-items-section" class="d-none">
+                <div class="fw-bold mb-2">Outstanding Items</div>
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <thead><tr><th>SKU</th><th>Name</th><th>Outstanding</th><th>Qty to import</th><th>Unit Price</th><th></th></tr></thead>
+                    <tbody id="pr-items-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Create{% endif %} Purchase Order{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function(){
+    // --- PO Items Formset ---
+    function updateItemFormCount(delta){
+      const total = document.querySelector('input[name="items-TOTAL_FORMS"]');
+      if (total) total.value = String(parseInt(total.value || '0', 10) + delta);
+    }
+
+    document.getElementById('add-po-item').addEventListener('click', function(){
+      const total = document.querySelector('input[name="items-TOTAL_FORMS"]');
+      const idx = parseInt(total.value || '0', 10);
+      const emptyFormHtml = `{{ formset.empty_form.as_p|escapejs }}`.replace(/__prefix__/g, idx);
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = emptyFormHtml;
+      const fields = tempDiv.querySelectorAll('p');
+
+      const tr = document.createElement('tr');
+      tr.className = 'align-middle table-active';
+
+      const tdVariant = document.createElement('td');
+      tdVariant.appendChild(fields[0].querySelector('select') || fields[0].querySelector('input') || fields[0]);
+      tr.appendChild(tdVariant);
+
+      const tdQty = document.createElement('td');
+      tdQty.appendChild(fields[1].querySelector('input') || fields[1]);
+      tr.appendChild(tdQty);
+
+      const tdPrice = document.createElement('td');
+      tdPrice.appendChild(fields[2].querySelector('input') || fields[2]);
+      tr.appendChild(tdPrice);
+
+      const tdDisc = document.createElement('td');
+      tdDisc.appendChild(fields[3].querySelector('input') || fields[3]);
+      tr.appendChild(tdDisc);
+
+      // Tax field is handled by MutationObserver below
+      const tdTax = document.createElement('td');
+      tdTax.appendChild(fields[4].querySelector('input') || fields[4]);
+      tr.appendChild(tdTax);
+
+      const tdNotes = document.createElement('td');
+      tdNotes.appendChild(fields[5].querySelector('textarea') || fields[5]);
+      tr.appendChild(tdNotes);
+
+      const tdActions = document.createElement('td');
+      tdActions.innerHTML = `<button type="button" class="btn btn-sm btn-light-danger btn-remove-row" title="Remove row"><i class="bi bi-trash"></i></button>`;
+      tr.appendChild(tdActions);
+
+      for (let i = 6; i < fields.length; i++) {
+        const hiddenInputs = fields[i].querySelectorAll('input[type="hidden"]');
+        hiddenInputs.forEach(input => tr.appendChild(input));
+      }
+
+      document.getElementById('po-items-body').appendChild(tr);
+      updateItemFormCount(1);
+    });
+
+    document.getElementById('po-items-body').addEventListener('click', function(e){
+      if (e.target && e.target.closest('.btn-remove-row')) {
+        const row = e.target.closest('tr');
+        row.parentNode.removeChild(row);
+        // Note: We don't decrement count for non-dynamic forms to avoid issues with Django formset validation on existing items.
+        // Django handles this via the DELETE checkbox for existing forms.
+      }
+    });
+
+    // --- Import from Requisition ---
+    let importPrModal;
+    let prSearchTimeout;
+
+    function addPOItemFromPR(variantId, name, qty, price){
+      const total = document.querySelector('input[name="items-TOTAL_FORMS"]');
+      const idx = parseInt(total.value || '0', 10);
+      const emptyFormHtml = `{{ formset.empty_form.as_p|escapejs }}`.replace(/__prefix__/g, idx);
+      const tempDiv = document.createElement('div'); tempDiv.innerHTML = emptyFormHtml;
+      const fields = tempDiv.querySelectorAll('p');
+
+      const tr = document.createElement('tr'); tr.className = 'align-middle table-active';
+
+      const tdVariant = document.createElement('td');
+      const variantField = fields[0].querySelector('select') || fields[0].querySelector('input') || fields[0];
+      if (variantField.tagName && variantField.tagName.toLowerCase() === 'select') {
+        let opt = Array.from(variantField.options).find(o => o.value === String(variantId));
+        if (!opt) { opt = document.createElement('option'); opt.value = String(variantId); opt.text = name; variantField.appendChild(opt); }
+        variantField.value = String(variantId);
+      } else if (variantField.tagName && variantField.tagName.toLowerCase() === 'input') {
+        variantField.value = String(variantId);
+      }
+      tdVariant.appendChild(variantField); tr.appendChild(tdVariant);
+
+      const tdQty = document.createElement('td');
+      const qtyField = fields[1].querySelector('input') || fields[1];
+      if (qtyField.tagName && qtyField.tagName.toLowerCase() === 'input') { qtyField.value = String(qty); }
+      tdQty.appendChild(qtyField); tr.appendChild(tdQty);
+
+      const tdPrice = document.createElement('td');
+      const priceField = fields[2].querySelector('input') || fields[2];
+      if (priceField.tagName && priceField.tagName.toLowerCase() === 'input') { priceField.value = String(price || '0.00'); }
+      tdPrice.appendChild(priceField); tr.appendChild(tdPrice);
+
+      const tdDisc = document.createElement('td'); tdDisc.appendChild(fields[3].querySelector('input') || fields[3]); tr.appendChild(tdDisc);
+      const tdTax = document.createElement('td'); tdTax.appendChild(fields[4].querySelector('input') || fields[4]); tr.appendChild(tdTax);
+      const tdNotes = document.createElement('td'); tdNotes.appendChild(fields[5].querySelector('textarea') || fields[5]); tr.appendChild(tdNotes);
+
+      const tdActions = document.createElement('td');
+      tdActions.innerHTML = '<button type="button" class="btn btn-sm btn-light-danger btn-remove-row"><i class="bi bi-trash"></i></button>';
+      tr.appendChild(tdActions);
+
+      for (let i = 6; i < fields.length; i++) {
+        const hiddenInputs = fields[i].querySelectorAll('input[type="hidden"]');
+        hiddenInputs.forEach(input => tr.appendChild(input));
+      }
+
+      document.getElementById('po-items-body').appendChild(tr);
+      updateItemFormCount(1);
+    }
+
+    function renderPrResults(list){
+      const box = document.getElementById('pr-search-results');
+      box.innerHTML = '';
+      list.forEach(r => {
+        const a = document.createElement('a'); a.href = '#'; a.className = 'list-group-item list-group-item-action';
+        a.textContent = `${r.pr_number} • ${r.status.toUpperCase()} • ${r.warehouse || ''}`;
+        a.onclick = (e)=>{ e.preventDefault(); loadOutstanding(r.id); };
+        box.appendChild(a);
+      });
+    }
+
+    function loadOutstanding(id){
+      fetch(`/inventory/api/requisitions/${id}/outstanding/`)
+        .then(r => r.json())
+        .then(data => {
+          const section = document.getElementById('pr-items-section');
+          const tbody = document.getElementById('pr-items-body');
+          tbody.innerHTML='';
+          if (!data.items?.length){ section.classList.add('d-none'); return; }
+          section.classList.remove('d-none');
+          data.items.forEach(it => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${it.sku}</td>
+              <td>${it.name}</td>
+              <td>${it.outstanding_qty}</td>
+              <td><input type="number" class="form-control form-control-sm" min="1" max="${it.outstanding_qty}" value="${it.outstanding_qty}" data-varid="${it.variant_id}" data-name="${it.name}" data-price="${it.suggested_price}"></td>
+              <td><input type="number" class="form-control form-control-sm" step="0.01" value="${it.suggested_price}"></td>
+              <td><button type="button" class="btn btn-sm btn-primary btn-import-one">Add</button></td>`;
+            tbody.appendChild(tr);
+          });
+          ensureAddAllButton();
+        });
+    }
+
+    document.getElementById('btn-import-pr').addEventListener('click', function(){
+      importPrModal = new bootstrap.Modal(document.getElementById('importPrModal'));
+      document.getElementById('pr-search-input').value='';
+      document.getElementById('pr-search-results').innerHTML='';
+      document.getElementById('pr-items-section').classList.add('d-none');
+      importPrModal.show();
+    });
+
+    document.getElementById('pr-search-input').addEventListener('input', function(e){
+      clearTimeout(prSearchTimeout);
+      const q = e.target.value.trim();
+      if (q.length < 2){ document.getElementById('pr-search-results').innerHTML=''; return; }
+      prSearchTimeout = setTimeout(() => {
+        fetch(`/inventory/api/requisitions/search/?q=${encodeURIComponent(q)}`)
+          .then(r => r.json())
+          .then(data => renderPrResults(data.requisitions || []));
+      }, 300);
+    });
+
+    function findExistingVariantSelects(){
+      return Array.from(document.querySelectorAll('#po-items-body [name$="-product_variant"]'));
+    }
+    function mergeOrAddPOItem(variantId, name, qty, price){
+      // Try to merge into existing row if same variant exists
+      const selects = findExistingVariantSelects();
+      const existing = selects.find(sel => sel.value === String(variantId));
+      if (existing){
+        // quantity field is sibling cell index 1 in our table structure
+        const row = existing.closest('tr');
+        const qtyInput = row.querySelector('td:nth-child(2) input');
+        const priceInput = row.querySelector('td:nth-child(3) input');
+        const current = parseInt(qtyInput.value || '0', 10);
+        qtyInput.value = String(current + parseInt(qty, 10));
+        if (price && !priceInput.value){ priceInput.value = String(price); }
+        return;
+      }
+      addPOItemFromPR(variantId, name, qty, price);
+    }
+
+    document.getElementById('pr-items-body').addEventListener('click', function(e){
+      if (e.target && e.target.closest('.btn-import-one')){
+        const row = e.target.closest('tr');
+        const qtyInput = row.querySelector('input[min]');
+        const priceInput = row.querySelector('input[step]');
+        const qty = parseInt(qtyInput.value || '0', 10);
+        const price = priceInput.value || '0.00';
+        const variantId = qtyInput.getAttribute('data-varid');
+        const name = qtyInput.getAttribute('data-name');
+        if (qty > 0){ mergeOrAddPOItem(variantId, name, qty, price); }
+      }
+    });
+
+    // Add an Add All button dynamically when items load
+    function ensureAddAllButton(){
+      const section = document.getElementById('pr-items-section');
+      if (!section.querySelector('#btn-import-all')){
+        const footer = document.createElement('div');
+        footer.className = 'd-flex justify-content-end mt-2';
+        footer.innerHTML = '<button type="button" class="btn btn-primary" id="btn-import-all">Add All</button>';
+        section.appendChild(footer);
+        footer.querySelector('#btn-import-all').addEventListener('click', function(){
+          const rows = Array.from(document.querySelectorAll('#pr-items-body tr'));
+          rows.forEach(row => {
+            const qtyInput = row.querySelector('input[min]');
+            const priceInput = row.querySelector('input[step]');
+            const qty = parseInt(qtyInput.value || '0', 10);
+            const price = priceInput.value || '0.00';
+            const variantId = qtyInput.getAttribute('data-varid');
+            const name = qtyInput.getAttribute('data-name');
+            if (qty > 0){ mergeOrAddPOItem(variantId, name, qty, price); }
+          });
+        });
+      }
+    }
+
+    // --- Tax Field Transformation ---
+    const TAX_OPTIONS_HTML = `
+      <option value="">-- None --</option>
+      {% for t in taxes %}
+        <option value="{{ t.rate }}">{{ t.name }} ({{ t.rate }})</option>
+      {% endfor %}
+    `;
+
+    function transformTaxField(row){
+      const taxInput = row.querySelector('input[name$="-tax_rate"]');
+      if (!taxInput) return;
+
+      if (taxInput.type !== 'hidden'){
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = taxInput.name;
+        hidden.id = taxInput.id;
+        hidden.value = taxInput.value || '';
+        taxInput.parentNode.replaceChild(hidden, taxInput);
+        const sel = document.createElement('select');
+        sel.className = 'form-select form-select-sm tax-select';
+        sel.innerHTML = TAX_OPTIONS_HTML;
+        if (hidden.value){
+          const opt = sel.querySelector(`option[value="${hidden.value}"]`);
+          if (opt) opt.selected = true;
+        }
+        hidden.parentNode.insertBefore(sel, hidden);
+        sel.addEventListener('change', function(){ hidden.value = sel.value; });
+      } else {
+        let sel = row.querySelector('.tax-select');
+        if (!sel){
+          sel = document.createElement('select');
+          sel.className = 'form-select form-select-sm tax-select';
+          sel.innerHTML = TAX_OPTIONS_HTML;
+          taxInput.parentNode.insertBefore(sel, taxInput);
+        }
+        if (taxInput.value){
+          const opt = sel.querySelector(`option[value="${taxInput.value}"]`);
+          if (opt) opt.selected = true;
+        }
+        sel.addEventListener('change', function(){ taxInput.value = sel.value; });
+      }
+    }
+
+    const poBody = document.getElementById('po-items-body');
+    if (poBody){
+      const mo = new MutationObserver(mutations => {
+        mutations.forEach(m => {
+          m.addedNodes.forEach(node => {
+            if (node.nodeType === 1 && node.matches('tr')) transformTaxField(node);
+          });
+        });
+      });
+      mo.observe(poBody, { childList: true });
+    }
+
+    // --- Additional Costs Formset ---
+    function updateCostFormCount(delta){
+      const total = document.querySelector('input[name="costs-TOTAL_FORMS"]');
+      if (total) total.value = String(parseInt(total.value || '0', 10) + delta);
+    }
+
+    document.getElementById('add-cost-item').addEventListener('click', function(){
+      const total = document.querySelector('input[name="costs-TOTAL_FORMS"]');
+      const idx = parseInt(total.value || '0', 10);
+      const emptyHtml = `{{ cost_formset.empty_form.as_p|escapejs }}`.replace(/__prefix__/g, idx);
+      const temp = document.createElement('div'); temp.innerHTML = emptyHtml;
+      const fields = temp.querySelectorAll('p');
+
+      const tr = document.createElement('tr'); tr.className = 'align-middle table-active';
+
+      const tdDesc = document.createElement('td');
+      tdDesc.appendChild(fields[0].querySelector('input') || fields[0]);
+      tr.appendChild(tdDesc);
+
+      const tdAmt = document.createElement('td');
+      tdAmt.appendChild(fields[1].querySelector('input') || fields[1]);
+      tr.appendChild(tdAmt);
+
+      const tdAct = document.createElement('td');
+      tdAct.innerHTML = '<button type="button" class="btn btn-sm btn-light-danger btn-remove-cost"><i class="bi bi-trash"></i></button>';
+      tr.appendChild(tdAct);
+
+      for (let i = 2; i < fields.length; i++) {
+        const hiddenInputs = fields[i].querySelectorAll('input[type="hidden"]');
+        hiddenInputs.forEach(input => tr.appendChild(input));
+      }
+
+      document.getElementById('po-costs-body').appendChild(tr);
+      updateCostFormCount(1);
+    });
+
+    document.getElementById('po-costs-body').addEventListener('click', function(e){
+      if (e.target && e.target.closest('.btn-remove-cost')) {
+        const row = e.target.closest('tr');
+        row.parentNode.removeChild(row);
+        // Note: We don't decrement count for non-dynamic forms to avoid issues with Django formset validation on existing items.
+      }
+    });
+
+    // --- Initial Load ---
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('#po-items-body tr').forEach(tr => transformTaxField(tr));
+    });
+  })();
+</script>
+{% endblock %}

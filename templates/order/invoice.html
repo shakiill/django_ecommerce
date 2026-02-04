@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Invoice - {{ order.order_number }}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        /* Modern, print-friendly invoice */
+        :root{
+            --bg:#f4f7fb;
+            --card:#ffffff;
+            --muted:#6b7280;
+            --accent:#0f62fe; /* blue accent */
+            --accent-2:#0b5ed7;
+            --surface:#f8fafc;
+            --shadow: 0 6px 18px rgba(15,22,39,0.06);
+            --radius:10px;
+        }
+        html,body{height:100%}
+        body{
+            margin:0;
+            padding:36px;
+            font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+            background:var(--bg);
+            color:#111827;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+        }
+
+        .wrap{
+            max-width:1100px;
+            margin:0 auto;
+            padding:28px;
+        }
+
+        .invoice-card{
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            overflow:hidden;
+            border:1px solid rgba(15,22,39,0.04);
+        }
+
+        .invoice-header{
+            display:flex;
+            justify-content:space-between;
+            gap:20px;
+            align-items:center;
+            padding:28px;
+            background: linear-gradient(90deg, rgba(11,94,215,0.08), rgba(15,98,254,0.06));
+        }
+
+        .brand-area{
+            display:flex;
+            align-items:center;
+            gap:16px;
+        }
+        .logo-badge{
+            width:64px;height:64px;border-radius:12px;
+            display:flex;align-items:center;justify-content:center;
+            font-weight:800;color:#fff;
+            background:linear-gradient(135deg,var(--accent),var(--accent-2));
+            box-shadow: 0 6px 18px rgba(11,94,215,0.12);
+            font-family: monospace;
+            font-size:20px;
+        }
+        .brand-info{
+            line-height:1;
+        }
+        .brand-info .company{ font-size:18px; font-weight:700; color:var(--accent-2); letter-spacing:0.3px;}
+        .brand-info .tag{ font-size:12px; color:var(--muted); margin-top:4px; }
+
+        .invoice-meta{
+            text-align:right;
+            min-width:220px;
+        }
+        .invoice-meta .label{ display:block; font-size:12px; color:var(--muted); }
+        .invoice-meta .value{ font-weight:700; font-size:16px; margin-top:6px; }
+
+        .invoice-body{ padding:28px; }
+        .addresses{
+            display:flex;
+            gap:20px;
+            flex-wrap:wrap;
+        }
+        .addr-box{
+            flex:1;
+            min-width:240px;
+            background:var(--surface);
+            padding:14px;
+            border-radius:8px;
+            border:1px solid rgba(15,22,39,0.03);
+        }
+        .addr-box .title{ font-size:12px; color:var(--muted); margin-bottom:8px; }
+        .addr-box strong{ display:block; font-weight:700; margin-bottom:6px; color:#111827; }
+
+        .items{
+            margin-top:20px;
+            width:100%;
+            border-radius:8px;
+            overflow:hidden;
+            border:1px solid rgba(15,22,39,0.06);
+        }
+        table.items-table{ width:100%; border-collapse:collapse; font-size:13px; }
+        table.items-table thead{ background:#fbfdff; color:#374151; }
+        table.items-table th{ text-align:left; padding:12px 14px; font-weight:600; font-size:13px; border-bottom:1px solid rgba(15,22,39,0.04); }
+        table.items-table td{ padding:12px 14px; border-bottom:1px dashed rgba(15,22,39,0.03); vertical-align:middle; }
+        table.items-table tr:last-child td{ border-bottom:none; }
+
+        .text-right{ text-align:right; }
+        .muted{ color:var(--muted); font-size:13px; }
+
+        .summary{
+            margin-top:18px;
+            display:flex;
+            justify-content:flex-end;
+        }
+        .summary .box{
+            width:360px;
+            background:linear-gradient(180deg, #ffffff, #fbfdff);
+            border-radius:8px;
+            padding:14px;
+            border:1px solid rgba(15,22,39,0.05);
+            box-shadow: 0 6px 18px rgba(15,22,39,0.04);
+        }
+        .summary .row{ display:flex; justify-content:space-between; padding:6px 0; }
+        .summary .row.total{ font-weight:800; font-size:18px; color:var(--accent-2); border-top:1px dashed rgba(15,22,39,0.04); margin-top:8px; padding-top:10px; }
+
+        .notes{
+            margin-top:18px;
+            font-size:13px;
+            color:var(--muted);
+            background:linear-gradient(180deg, #ffffff, #fbfdff);
+            padding:12px;
+            border-radius:8px;
+            border:1px solid rgba(15,22,39,0.04);
+        }
+
+        footer{ padding:18px 28px; background:transparent; font-size:12px; color:var(--muted); }
+
+        /* Print adjustments */
+        @media print{
+            body{ padding:0; }
+            .wrap{ padding:0; }
+            .invoice-card{ box-shadow:none; border: none; }
+            .invoice-header{ padding:18px; }
+            .invoice-body{ padding:18px; }
+        }
+
+        /* Small screens */
+        @media (max-width:700px){
+            .invoice-header{ flex-direction:column; align-items:flex-start; gap:12px; }
+            .invoice-meta{ text-align:left; width:100%; }
+            .summary{ justify-content:flex-start; }
+            .summary .box{ width:100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="invoice-card">
+        <header class="invoice-header">
+            <div class="brand-area">
+                <div class="logo-badge">AMP</div>
+                <div class="brand-info">
+                    <div class="company">AMPEDUP</div>
+                    <div class="tag">E‑commerce Solutions — Invoice</div>
+                    <div class="muted" style="margin-top:6px; font-size:12px;">123 Business Rd · City, State · support@ampedup.example</div>
+                </div>
+            </div>
+
+            <div class="invoice-meta">
+                <span class="label">Invoice</span>
+                <div class="value">#{{ order.order_number }}</div>
+
+                <div style="height:10px;"></div>
+
+                <span class="label">Date</span>
+                <div class="muted">{{ order.created_at|date:"Y-m-d H:i" }}</div>
+
+                <div style="height:8px;"></div>
+
+                <span class="label">Status</span>
+                <div class="muted">{{ order.get_status_display }} · {{ order.get_payment_status_display }}</div>
+            </div>
+        </header>
+
+        <section class="invoice-body">
+            <div class="addresses">
+                <div class="addr-box">
+                    <div class="title">Bill To</div>
+                    {% if order.user %}
+                        <strong>{{ order.user.get_display_name }}</strong>
+                        <div class="muted">{{ order.user.email }}</div>
+                    {% else %}
+                        <strong>Guest</strong>
+                        <div class="muted">{{ order.guest_email }}</div>
+                    {% endif %}
+                    {% if order.billing_address %}
+                        <div style="margin-top:8px;">
+                            <div>{{ order.billing_address.full_name }}</div>
+                            <div class="muted">{{ order.billing_address.line1 }}{% if order.billing_address.line2 %}, {{ order.billing_address.line2 }}{% endif %}</div>
+                            <div class="muted">{{ order.billing_address.city }} {{ order.billing_address.postal_code }} · {{ order.billing_address.country }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="addr-box">
+                    <div class="title">Ship To</div>
+                    {% if order.shipping_address %}
+                        <strong>{{ order.shipping_address.full_name }}</strong>
+                        <div class="muted">{{ order.shipping_address.line1 }}{% if order.shipping_address.line2 %}, {{ order.shipping_address.line2 }}{% endif %}</div>
+                        <div class="muted">{{ order.shipping_address.city }} {{ order.shipping_address.postal_code }} · {{ order.shipping_address.country }}</div>
+                    {% else %}
+                        <div class="muted">Not provided</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="items">
+                <table class="items-table" role="table" aria-label="Invoice items">
+                    <thead>
+                        <tr>
+                            <th style="width:6%;">#</th>
+                            <th style="width:52%;">Product</th>
+                            <th style="width:12%;" class="text-right">Unit</th>
+                            <th style="width:10%;" class="text-right">Qty</th>
+                            <th style="width:20%;" class="text-right">Line Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <div style="font-weight:600;">{{ item.product_name }}</div>
+                                    <div class="muted" style="margin-top:4px;">SKU: {{ item.sku }}</div>
+                                </td>
+                                <td class="text-right">{{ item.unit_price }} {{ order.currency }}</td>
+                                <td class="text-right">{{ item.quantity }}</td>
+                                <td class="text-right" style="font-weight:700;">{{ item.line_total }} {{ order.currency }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="muted text-center">No items</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="summary">
+                <div class="box">
+                    <div class="row"><div class="muted">Subtotal</div><div class="muted">{{ order.subtotal_amount }} {{ order.currency }}</div></div>
+                    <div class="row"><div class="muted">Discount</div><div class="muted">-{{ order.discount_amount }} {{ order.currency }}</div></div>
+                    <div class="row"><div class="muted">Shipping</div><div class="muted">{{ order.shipping_amount }} {{ order.currency }}</div></div>
+                    <div class="row"><div class="muted">Tax</div><div class="muted">{{ order.tax_amount }} {{ order.currency }}</div></div>
+                    <div class="row total"><div>Total</div><div>{{ order.total_amount }} {{ order.currency }}</div></div>
+                </div>
+            </div>
+
+            {% if order.notes %}
+                <div class="notes">
+                    <div style="font-weight:700; margin-bottom:6px;">Notes</div>
+                    <div>{{ order.notes|linebreaksbr }}</div>
+                </div>
+            {% endif %}
+        </section>
+
+        <footer>
+            This is a system generated invoice for <strong>{{ order.order_number }}</strong>. For questions contact <a href="mailto:support@ampedup.example">support@ampedup.example</a>.
+        </footer>
+    </div>
+</div>
+</body>
+</html>

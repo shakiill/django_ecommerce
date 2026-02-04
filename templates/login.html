@@ -1,0 +1,80 @@
+{% extends "base_auth.html" %}
+{% load static %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<a class="top-link" href="/">Home</a>
+<h1>Welcome back</h1>
+<p class="sub">Sign in to access your dashboard.</p>
+
+{% if messages %}
+  <ul class="messages">
+    {% for m in messages %}
+      <li class="{{ m.tags }}">{{ m }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if form.non_field_errors %}
+  <div class="non-field-errors">
+    {% for e in form.non_field_errors %}
+      <div>{{ e }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if user.is_authenticated %}
+  <p>You are already logged in as <strong>{{ user.username }}</strong>.</p>
+  <hr class="divider">
+  <form action="{% url 'staff_logout' %}" method="post">
+    {% csrf_token %}
+    <button class="primary" type="submit">Logout</button>
+  </form>
+{% else %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="field">
+      <label>{{ form.username.label }}</label>
+      <div class="input-wrapper">
+        {{ form.username }}
+      </div>
+      {% if form.username.errors %}
+        <div class="field-errors">
+          {% for e in form.username.errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div class="field">
+      <label>{{ form.password.label }}</label>
+      <div class="input-wrapper">
+        {{ form.password }}
+        <button type="button" class="toggle-pass" data-target="id_password">Show</button>
+      </div>
+      {% if form.password.errors %}
+        <div class="field-errors">
+          {% for e in form.password.errors %}{{ e }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <button type="submit" class="primary">Sign In</button>
+  </form>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.toggle-pass').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const id = btn.getAttribute('data-target');
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.type === 'password'){ el.type='text'; btn.textContent='Hide'; }
+    else { el.type='password'; btn.textContent='Show'; }
+  });
+});
+const err = document.querySelector('.field-errors');
+if(err){
+  const prevInput = err.parentElement.querySelector('.input-field');
+  if(prevInput) prevInput.focus();
+}
+</script>
+{% endblock %}

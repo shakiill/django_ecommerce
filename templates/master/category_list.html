@@ -1,0 +1,329 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                    Categories
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted"><a href="/" class="text-muted text-hover-primary">Home</a></li>
+                    <li class="breadcrumb-item"><span class="bullet bg-gray-400 w-5px h-2px"></span></li>
+                    <li class="breadcrumb-item text-muted">Masters</li>
+                </ul>
+            </div>
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+                <button id="btn-create-category" class="btn btn-sm fw-bold btn-primary">Create Category</button>
+            </div>
+        </div>
+    </div>
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Categories</h3></div>
+                <div class="card-body">
+                    <table class="table table-striped align-middle" id="category-table">
+                        <thead>
+                        <tr>
+                            <th class="align-middle text-center">ID</th>
+                            <th class="align-middle text-center">Name</th>
+                            <th class="align-middle text-center">Slug</th>
+                            <th class="align-middle text-center">Parent</th>
+                            <th class="align-middle text-center">Active</th>
+                            <th class="align-middle text-center">Featured</th>
+                            <th class="align-middle text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="category-table-loading" style="display:none;">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="category-form" class="modal-content" autocomplete="off" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalLabel">Create/Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Slug</label>
+                    <input type="text" name="slug" class="form-control" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Parent</label>
+                    <select name="parent" class="form-select select2" multiple style="width: 100%;">
+                        <!-- options populated by JS -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Image</label>
+                    <input type="file" name="image" class="form-control" accept="image/*">
+                    <div id="category-image-preview" class="mt-2">
+                        <!-- Image preview will be shown here -->
+                    </div>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_active" id="category_is_active" checked>
+                    <label class="form-check-label" for="category_is_active">Active</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_featured" id="category_is_featured">
+                    <label class="form-check-label" for="category_is_featured">Featured</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-category" type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block title %} Categories | Admin {% endblock %}
+
+{% block extra_js %}
+<!-- Select2 CSS/JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+(() => {
+    const categoryApi = '/master/api/categories/';
+    const tableBody = document.querySelector('#category-table tbody');
+    const tableLoading = document.getElementById('category-table-loading');
+    const categoryModalEl = document.getElementById('categoryModal');
+    const categoryForm = document.getElementById('category-form');
+    const parentSelect = categoryForm.querySelector('select[name="parent"]');
+    const imageInput = categoryForm.querySelector('input[name="image"]');
+    const imagePreviewDiv = document.getElementById('category-image-preview');
+    let bsModal = null;
+    let editingId = null;
+
+    function getModalInstance() {
+        if (!bsModal) {
+            bsModal = new bootstrap.Modal(categoryModalEl);
+        }
+        return bsModal;
+    }
+
+    function swalMsg(msg, icon = "success") {
+        Swal.fire({
+            text: msg,
+            icon: icon,
+            confirmButtonText: 'OK',
+            customClass: {popup: 'swal2-border-radius'}
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    async function fetchWithCsrf(url, options = {}) {
+        options.headers = options.headers || {};
+        options.credentials = 'same-origin';
+        if (!('X-CSRFToken' in options.headers)) {
+            options.headers['X-CSRFToken'] = csrftoken;
+        }
+        return fetch(url, options);
+    }
+
+    async function fetchAndRenderTable() {
+        tableLoading.style.display = '';
+        tableBody.innerHTML = '';
+        try {
+            const res = await fetchWithCsrf(categoryApi);
+            if (!res.ok) {
+                tableBody.innerHTML = '<tr><td colspan="7">Error loading data</td></tr>';
+                tableLoading.style.display = 'none';
+                return;
+            }
+            const categories = await res.json();
+            if (categories.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7">No categories found.</td></tr>';
+                tableLoading.style.display = 'none';
+                return;
+            }
+            tableBody.innerHTML = '';
+            categories.forEach(cat => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="align-middle text-center">${cat.id}</td>
+                    <td class="align-middle">${cat.name}</td>
+                    <td class="align-middle">${cat.slug || ''}</td>
+                    <td class="align-middle">${Array.isArray(cat.parent) ? cat.parent.join(', ') : (cat.parent || '')}</td>
+                    <td class="align-middle text-center">${cat.is_active ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">${cat.is_featured ? 'Yes' : ''}</td>
+                    <td class="align-middle text-center">
+                        <button type="button" class="btn btn-sm btn-secondary btn-edit-category" data-id="${cat.id}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger btn-del-category" data-id="${cat.id}">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        } catch (err) {
+            tableBody.innerHTML = '<tr><td colspan="7">Error loading data</td></tr>';
+        }
+        tableLoading.style.display = 'none';
+    }
+
+    // Initialize Select2 on parent select
+    $(document).ready(function() {
+        $(parentSelect).select2({
+            dropdownParent: $('#categoryModal'),
+            width: '100%',
+            placeholder: "Select parent categories"
+        });
+    });
+
+    // Re-initialize Select2 options after repopulating
+    async function populateParentSelect(selectedIds) {
+        const res = await fetchWithCsrf(categoryApi);
+        if (!res.ok) return;
+        const categories = await res.json();
+        parentSelect.innerHTML = '';
+        categories.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat.id;
+            opt.textContent = cat.name;
+            parentSelect.appendChild(opt);
+        });
+        // Refresh Select2
+        $(parentSelect).trigger('change.select2');
+        if (selectedIds && selectedIds.length) {
+            $(parentSelect).val(selectedIds.map(String)).trigger('change');
+        } else {
+            $(parentSelect).val(null).trigger('change');
+        }
+    }
+
+    function showImagePreview(src) {
+        imagePreviewDiv.innerHTML = src
+            ? `<img src="${src}" alt="Category Image" style="max-width:100%;max-height:150px;border:1px solid #eee;">`
+            : '';
+    }
+
+    imageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                showImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(this.files[0]);
+        } else {
+            showImagePreview('');
+        }
+    });
+
+    function showCategoryModal(data) {
+        editingId = data && data.id ? data.id : null;
+        categoryForm.reset();
+        categoryForm.name.value = data?.name || '';
+        categoryForm.slug.value = data?.slug || '';
+        // parent: support multiple
+        let parentIds = [];
+        if (Array.isArray(data?.parent)) {
+            parentIds = data.parent;
+        } else if (data?.parent) {
+            parentIds = [data.parent];
+        }
+        populateParentSelect(parentIds);
+        categoryForm.is_active.checked = data?.is_active !== false;
+        categoryForm.is_featured.checked = !!data?.is_featured;
+        imageInput.value = '';
+        // Show current image if editing and image exists
+        if (data && data.image) {
+            showImagePreview(data.image);
+        } else {
+            showImagePreview('');
+        }
+        document.getElementById('categoryModalLabel').textContent = editingId ? 'Edit Category' : 'Create Category';
+        Swal.close();
+        getModalInstance().show();
+    }
+
+    document.getElementById('btn-create-category').addEventListener('click', () => showCategoryModal());
+
+    tableBody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        if (btn.classList.contains('btn-edit-category')) {
+            const r = await fetchWithCsrf(categoryApi + id + '/');
+            if (!r.ok) return swalMsg('Failed to load', 'error');
+            const data = await r.json();
+            showCategoryModal(data);
+        } else if (btn.classList.contains('btn-del-category')) {
+            const result = await Swal.fire({
+                text: `Delete category #${id}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            });
+            if (!result.isConfirmed) return;
+            const r = await fetchWithCsrf(categoryApi + id + '/', {method: 'DELETE'});
+            if (r.status === 204) {
+                swalMsg('Deleted');
+                fetchAndRenderTable();
+            } else swalMsg('Delete failed', 'error');
+        }
+    });
+
+    categoryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('name', categoryForm.name.value);
+        formData.append('slug', categoryForm.slug.value);
+        // parent: multiple
+        Array.from(parentSelect.selectedOptions).forEach(opt => {
+            formData.append('parent', opt.value);
+        });
+        formData.append('is_active', categoryForm.is_active.checked ? 'true' : 'false');
+        formData.append('is_featured', categoryForm.is_featured.checked ? 'true' : 'false');
+        if (imageInput.files && imageInput.files[0]) {
+            formData.append('image', imageInput.files[0]);
+        }
+        let url = editingId ? (categoryApi + editingId + '/') : categoryApi;
+        let method = editingId ? 'PUT' : 'POST';
+        const r = await fetchWithCsrf(url, {
+            method,
+            body: formData
+        });
+        if (r.ok) {
+            getModalInstance().hide();
+            swalMsg(editingId ? 'Updated' : 'Created');
+            fetchAndRenderTable();
+        } else {
+            const text = await r.text();
+            swalMsg('Error: ' + (text || r.status), 'error');
+        }
+    });
+
+    fetchAndRenderTable();
+})();
+</script>
+{% endblock %}

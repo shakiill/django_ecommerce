@@ -1,0 +1,611 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="app-content flex-column-fluid">
+        <div class="container-xxl py-4">
+            <div class="card">
+                <div class="card-header border-0 py-5">
+                    <h3 class="card-title align-items-start flex-column">
+                        <span class="card-label fw-bolder fs-3 mb-1">{% if is_edit %}Edit Supplier{% else %}Add
+                            Supplier{% endif %}</span>
+                        <span class="text-muted fw-semibold fs-7">Manage supplier details</span>
+                    </h3>
+                    <div class="card-toolbar">
+                        <a href="{% url 'supplier_list' %}" class="btn btn-sm btn-light-primary">
+                            <i class="bi bi-arrow-left-short me-1"></i> Back to list
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body pt-0">
+                    <form id="supplier-form" method="post" action="" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger d-flex align-items-center p-5 mb-5">
+                                <i class="bi bi-exclamation-triangle-fill fs-2x text-danger me-4"></i>
+                                <div class="d-flex flex-column">
+                                    <h5 class="mb-1">Validation Error</h5>
+                                    <span>{{ form.non_field_errors }}</span>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {# Contact Type Selection #}
+                        <div class="card card-bordered mb-5">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bold">Contact Type</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-6 fw-semibold required">Contact Type</label>
+                                        {{ form.contact_type }}
+                                        {% if form.contact_type.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.contact_type.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-6 fw-semibold">Status</label>
+                                        <div class="form-check form-switch form-check-custom form-check-solid">
+                                            {{ form.is_active }}
+                                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                                Active
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Business Information - shown when contact_type is 'business' #}
+                        <div class="card card-bordered mb-5" id="business-section">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bold">Business Information</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row gx-5 gy-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.business_name.id_for_label }}">
+                                            Business Name <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.business_name }}
+                                        {% if form.business_name.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.business_name.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.tax_number.id_for_label }}">
+                                            Tax Number
+                                        </label>
+                                        {{ form.tax_number }}
+                                        {% if form.tax_number.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.tax_number.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Individual Information - shown when contact_type is 'individual' #}
+                        <div class="card card-bordered mb-5" id="individual-section">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bold">Personal Information</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row gx-5 gy-4">
+                                    <div class="col-md-2">
+                                        <label class="form-label fs-6 fw-semibold" for="{{ form.prefix.id_for_label }}">Prefix</label>
+                                        {{ form.prefix }}
+                                        {% if form.prefix.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.prefix.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.first_name.id_for_label }}">
+                                            First Name <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.first_name.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.middle_name.id_for_label }}">Middle Name</label>
+                                        {{ form.middle_name }}
+                                        {% if form.middle_name.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.middle_name.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.last_name.id_for_label }}">
+                                            Last Name <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.last_name.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                                        {{ form.date_of_birth }}
+                                        {% if form.date_of_birth.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.date_of_birth.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Contact Information #}
+                        <div class="card card-bordered mb-5">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bold">Contact Information</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row gx-5 gy-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold required"
+                                               for="{{ form.mobile.id_for_label }}">Mobile</label>
+                                        {{ form.mobile }}
+                                        {% if form.mobile.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.mobile.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.alternate_contact_number.id_for_label }}">Alternate
+                                            Contact</label>
+                                        {{ form.alternate_contact_number }}
+                                        {% if form.alternate_contact_number.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.alternate_contact_number.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.landline.id_for_label }}">Landline</label>
+                                        {{ form.landline }}
+                                        {% if form.landline.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.landline.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label fs-6 fw-semibold" for="{{ form.email.id_for_label }}">Email</label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.email.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Address Information #}
+                        <div class="card card-bordered mb-5">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bold">Address Details</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row gx-5 gy-4">
+                                    <div class="col-md-12">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.address_line1.id_for_label }}">Address Line 1</label>
+                                        {{ form.address_line1 }}
+                                        {% if form.address_line1.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.address_line1.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.address_line2.id_for_label }}">Address Line 2</label>
+                                        {{ form.address_line2 }}
+                                        {% if form.address_line2.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.address_line2.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold" for="{{ form.city.id_for_label }}">City</label>
+                                        {{ form.city }}
+                                        {% if form.city.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.city.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold" for="{{ form.state.id_for_label }}">State</label>
+                                        {{ form.state }}
+                                        {% if form.state.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.state.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.country.id_for_label }}">Country</label>
+                                        {{ form.country }}
+                                        {% if form.country.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.country.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.zip_code.id_for_label }}">Zip Code</label>
+                                        {{ form.zip_code }}
+                                        {% if form.zip_code.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.zip_code.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.shipping_address.id_for_label }}">Shipping Address</label>
+                                        {{ form.shipping_address }}
+                                        <div class="form-text">If different from billing address</div>
+                                        {% if form.shipping_address.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.shipping_address.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Financial Information #}
+                        <div class="card card-bordered mb-5">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bold">Financial Details</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row gx-5 gy-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.opening_balance.id_for_label }}">Opening Balance</label>
+                                        {{ form.opening_balance }}
+                                        {% if form.opening_balance.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.opening_balance.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.pay_term.id_for_label }}">Payment Term</label>
+                                        {{ form.pay_term }}
+                                        {% if form.pay_term.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.pay_term.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.pay_term_type.id_for_label }}">Payment Term Type</label>
+                                        {{ form.pay_term_type }}
+                                        {% if form.pay_term_type.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.pay_term_type.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Assignment & Notes #}
+                        <div class="card card-bordered mb-5">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bold">Assignment & Notes</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row gx-5 gy-4">
+                                    <div class="col-md-12">
+                                        <label class="form-label fs-6 fw-semibold"
+                                               for="{{ form.assigned_to.id_for_label }}">Assigned To</label>
+                                        {{ form.assigned_to }}
+                                        <div class="form-text">Assign staff members to manage this supplier</div>
+                                        {% if form.assigned_to.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.assigned_to.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label fs-6 fw-semibold" for="{{ form.notes.id_for_label }}">Notes</label>
+                                        {{ form.notes }}
+                                        {% if form.notes.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.notes.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Custom Fields - Collapsible #}
+                        <div class="card card-bordered mb-5">
+                            <div class="card-header cursor-pointer" data-bs-toggle="collapse"
+                                 data-bs-target="#custom-fields-section">
+                                <h3 class="card-title fw-bold">Custom Fields</h3>
+                                <div class="card-toolbar">
+                                    <i class="bi bi-chevron-down fs-3"></i>
+                                </div>
+                            </div>
+                            <div id="custom-fields-section" class="collapse">
+                                <div class="card-body">
+                                    <div class="row gx-5 gy-4">
+                                        {% for i in "12345" %}
+                                            <div class="col-md-6">
+                                                <label class="form-label fs-6 fw-semibold"
+                                                       for="id_custom_field_{{ i }}">Custom Field {{ i }}</label>
+                                                {% with field_name="custom_field_"|add:i %}
+                                                    {% for field in form %}
+                                                        {% if field.name == field_name %}
+                                                            {{ field }}
+                                                            {% if field.errors %}
+                                                                <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </div>
+                                        {% endfor %}
+                                        {% for i in "678910" %}
+                                            <div class="col-md-6">
+                                                <label class="form-label fs-6 fw-semibold"
+                                                       for="id_custom_field_{{ i }}">Custom Field {{ i }}</label>
+                                                {% with field_name="custom_field_"|add:i %}
+                                                    {% for field in form %}
+                                                        {% if field.name == field_name %}
+                                                            {{ field }}
+                                                            {% if field.errors %}
+                                                                <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# hidden fields #}
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+
+                        {# Action Buttons #}
+                        <div class="d-flex justify-content-end gap-3">
+                            <a href="{% url 'supplier_list' %}" class="btn btn-light">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="supplier-submit">
+                <span class="indicator-label">
+                  <i class="bi bi-check-circle me-2"></i>{% if is_edit %}Update Supplier{% else %}Create
+                    Supplier{% endif %}
+                </span>
+                                <span class="indicator-progress d-none">
+                  Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'plugins/custom/select2/select2.bundle.js' %}"></script>
+<script>
+(function () {
+    const form = document.getElementById('supplier-form');
+    if (!form) return;
+
+    // Always use jQuery to select the contact type field by name and select2 class
+    function getContactTypeSelect() {
+        // Try by id first (Django default)
+        let el = document.getElementById('{{ form.contact_type.id_for_label }}');
+        if (el) return el;
+        // Fallback: by name and select2 class
+        if (window.jQuery) {
+            const $el = jQuery('select[name="{{ form.contact_type.html_name }}"].select2');
+            if ($el.length) return $el[0];
+        }
+        // Fallback: by name only
+        return form.querySelector('[name="{{ form.contact_type.html_name }}"]');
+    }
+    const businessSection = document.getElementById('business-section');
+    const individualSection = document.getElementById('individual-section');
+
+    function toggleSections() {
+        const contactTypeSelect = getContactTypeSelect();
+        let type = 'individual';
+        if (contactTypeSelect) {
+            // If using select2, get value via jQuery
+            if (window.jQuery && jQuery(contactTypeSelect).hasClass('select2')) {
+                type = jQuery(contactTypeSelect).val();
+            } else {
+                type = contactTypeSelect.value;
+            }
+        }
+        if (type === 'business') {
+            if (businessSection) businessSection.style.display = 'block';
+            if (individualSection) individualSection.style.display = 'none';
+            const businessNameInput = document.getElementById('{{ form.business_name.id_for_label }}');
+            if (businessNameInput) businessNameInput.setAttribute('required', 'required');
+            const firstNameInput = document.getElementById('{{ form.first_name.id_for_label }}');
+            const lastNameInput = document.getElementById('{{ form.last_name.id_for_label }}');
+            if (firstNameInput) firstNameInput.removeAttribute('required');
+            if (lastNameInput) lastNameInput.removeAttribute('required');
+        } else {
+            if (businessSection) businessSection.style.display = 'none';
+            if (individualSection) individualSection.style.display = 'block';
+            const firstNameInput = document.getElementById('{{ form.first_name.id_for_label }}');
+            const lastNameInput = document.getElementById('{{ form.last_name.id_for_label }}');
+            if (firstNameInput) firstNameInput.setAttribute('required', 'required');
+            if (lastNameInput) lastNameInput.setAttribute('required', 'required');
+            const businessNameInput = document.getElementById('{{ form.business_name.id_for_label }}');
+            if (businessNameInput) businessNameInput.removeAttribute('required');
+        }
+    }
+
+    function initSelect2() {
+        if (typeof jQuery === 'undefined' || typeof jQuery.fn.select2 === 'undefined') {
+            console.warn('Select2 not available');
+            return;
+        }
+        jQuery('select.select2').each(function () {
+            const $el = jQuery(this);
+            if ($el.data('select2')) {
+                $el.select2('destroy');
+            }
+            const isMultiple = $el.prop('multiple');
+            $el.select2({
+                width: '100%',
+                placeholder: $el.data('placeholder') || $el.attr('data-placeholder') || (isMultiple ? 'Select multiple options' : 'Select an option'),
+                allowClear: !$el.prop('required'),
+                multiple: isMultiple,
+                dropdownParent: $el.closest('.card-body').length ? $el.closest('.card-body') : jQuery('body'),
+                closeOnSelect: !isMultiple
+            });
+        });
+    }
+
+    // Bind both native and select2 change events
+    function bindContactTypeEvents() {
+        const contactTypeSelect = getContactTypeSelect();
+        if (!contactTypeSelect) return;
+        // Remove previous event listeners (if any)
+        if (window.jQuery) {
+            jQuery(contactTypeSelect).off('change.supplierType').on('change.supplierType', toggleSections);
+            if (jQuery(contactTypeSelect).hasClass('select2')) {
+                jQuery(contactTypeSelect).off('change.select2.supplierType').on('change.select2.supplierType', toggleSections);
+            }
+        } else {
+            contactTypeSelect.removeEventListener('change', toggleSections);
+            contactTypeSelect.addEventListener('change', toggleSections);
+        }
+    }
+
+    // Clear and display field errors
+    function clearFieldErrors() {
+        form.querySelectorAll('.invalid-feedback.d-block').forEach(function (el) {
+            el.remove();
+        });
+    }
+
+    function displayFieldErrors(errors) {
+        Object.keys(errors || {}).forEach(function (name) {
+            const field = form.querySelector('[name="' + name + '"]');
+            const msgs = errors[name];
+            if (field) {
+                const wrap = document.createElement('div');
+                wrap.className = 'invalid-feedback d-block mt-1';
+                wrap.textContent = Array.isArray(msgs) ? msgs.join(' ') : msgs;
+                if (field.parentNode) field.parentNode.appendChild(wrap);
+            }
+        });
+    }
+
+    // AJAX submit
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearFieldErrors();
+
+        const submitBtn = document.getElementById('supplier-submit');
+        const indicatorLabel = submitBtn.querySelector('.indicator-label');
+        const indicatorProgress = submitBtn.querySelector('.indicator-progress');
+
+        submitBtn.disabled = true;
+        if (indicatorLabel && indicatorProgress) {
+            indicatorLabel.classList.add('d-none');
+            indicatorProgress.classList.remove('d-none');
+        }
+
+        // Sync select2 values (important for M2M)
+        if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
+            jQuery('select.select2').trigger('change.select2');
+        }
+
+        const data = new FormData(form);
+
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            body: data,
+            credentials: 'same-origin'
+        })
+            .then(async function (res) {
+                const ct = res.headers.get('content-type') || '';
+                if (res.ok) {
+                    if (ct.includes('application/json')) return res.json();
+                    window.location.href = "{% url 'supplier_list' %}";
+                    return null;
+                } else {
+                    if (ct.includes('application/json')) {
+                        const payload = await res.json().catch(function () {
+                            return {};
+                        });
+                        throw payload;
+                    } else {
+                        throw {errors: {'__all__': ['Server error, please try again.']}};
+                    }
+                }
+            })
+            .then(function (payload) {
+                if (!payload) return;
+                if (payload && payload.success) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Supplier saved successfully',
+                            timer: 1200,
+                            showConfirmButton: false
+                        }).then(function () {
+                            window.location.href = "{% url 'supplier_list' %}";
+                        });
+                    } else {
+                        window.location.href = "{% url 'supplier_list' %}";
+                    }
+                }
+            })
+            .catch(function (err) {
+                const errs = err.errors || err;
+                if (errs && typeof errs === 'object') {
+                    displayFieldErrors(errs);
+                    const firstError = form.querySelector('.invalid-feedback.d-block');
+                    if (firstError) firstError.scrollIntoView({behavior: 'smooth', block: 'center'});
+                } else {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Unable to save supplier. Please try again.'
+                        });
+                    } else {
+                        alert('Unable to save supplier. Please try again.');
+                    }
+                }
+            })
+            .finally(function () {
+                submitBtn.disabled = false;
+                if (indicatorLabel && indicatorProgress) {
+                    indicatorLabel.classList.remove('d-none');
+                    indicatorProgress.classList.add('d-none');
+                }
+            });
+    });
+
+    // Init on DOM ready
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+            initSelect2();
+            bindContactTypeEvents();
+            toggleSections();
+        }, 50);
+    });
+    // In case DOMContentLoaded already fired
+    initSelect2();
+    bindContactTypeEvents();
+    toggleSections();
+})();
+</script>
+{% endblock %}

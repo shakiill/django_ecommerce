@@ -1,0 +1,234 @@
+{% extends 'includes/main_layout.html' %}
+{% block content %}
+    <div class="app-content flex-column-fluid">
+        <div class="app-container container-xxl">
+
+            <!-- Header Section -->
+            <div class="row mb-4 align-items-center">
+                <div class="col-lg-8 col-12">
+                    <h2 class="fw-bold mb-1">Purchase Order
+                        <span class="text-primary">#{{ po.po_number }}</span>
+                    </h2>
+                    <span id="po-status-badge"
+                          class="badge bg-light-primary text-primary fs-6">{{ po.get_status_display }}</span>
+                    <form id="po-status-form" method="post"
+                          action="{% url 'inventory:po_status_change' po.id %}"
+                          class="d-inline-flex align-items-center ms-3">
+                        {% csrf_token %}
+                        <label for="po-status-select" class="form-label mb-0 me-2 fw-semibold">Status:</label>
+                        <select id="po-status-select" name="status" class="form-select form-select-sm"
+                                style="width:180px;">
+                            {% for value, label in po.STATUS_CHOICES %}
+                                <option value="{{ value }}"
+                                        {% if po.status == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary ms-2">Update</button>
+                    </form>
+                </div>
+                <div class="col-lg-4 col-12 text-lg-end mt-3 mt-lg-0">
+                    <a href="{% url 'inventory:po_edit' po.id %}" class="btn btn-light-primary me-2">Edit</a>
+                    <a href="{% url 'inventory:po_pdf' po.id %}" target="_blank" class="btn btn-light">Download PDF</a>
+                </div>
+            </div>
+
+            <!-- Supplier & Totals Info -->
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3 text-uppercase text-muted">Supplier Information</h5>
+                            <p class="mb-1"><strong>{{ po.supplier.name }}</strong></p>
+                            <p class="mb-0 text-muted">Warehouse: {{ po.warehouse.name }}</p>
+                            <p class="mb-0 text-muted">Order Date: {{ po.order_date|date:"M d, Y" }}</p>
+                            <p class="mb-0 text-muted">Expected
+                                Delivery: {{ po.expected_delivery_date|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3 text-uppercase text-muted">Summary</h5>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Subtotal:</span><span>{{ po.subtotal }}</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Discount:</span><span>{{ po.discount_amount }}</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Tax:</span><span>{{ po.tax_amount }}</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Shipping:</span><span>{{ po.shipping_cost }}</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Additional Costs:</span><span>{{ po.additional_cost_total }}</span></div>
+                            <div class="d-flex justify-content-between fw-bold border-top pt-2 mt-2">
+                                <span>Total:</span><span>{{ po.total_amount }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="card mt-5 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3 text-uppercase text-muted">Order Items</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle text-center">
+                            <thead class="fw-semibold">
+                            <tr>
+                                <th>SKU</th>
+                                <th>Variant</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th>Disc%</th>
+                                <th>Tax%</th>
+                                <th>Line Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for it in po.items.all %}
+                                <tr>
+                                    <td>{{ it.product_variant.sku }}</td>
+                                    <td>{{ it.product_variant.variant_name }}</td>
+                                    <td>{{ it.quantity_ordered }}</td>
+                                    <td>{{ it.unit_price }}</td>
+                                    <td>{{ it.discount_percent }}</td>
+                                    <td>{{ it.tax_rate }}</td>
+                                    <td>{{ it.line_total }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Summary Section -->
+                    <div class="mt-4 d-flex justify-content-end">
+                        <div class="border rounded-3 p-4" style="width:350px;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Subtotal:</span><span>{{ po.subtotal }}</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Discount:</span><span>{{ po.discount_amount }}</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Tax:</span><span>{{ po.tax_amount }}</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Shipping:</span><span>{{ po.shipping_cost }}</span></div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Additional Costs:</span><span>{{ po.additional_cost_total }}</span></div>
+                            <div class="d-flex justify-content-between fw-bold border-top pt-2 mt-2 fs-6">
+                                <span>Total Amount:</span><span class="text-primary">{{ po.total_amount }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Costs Listing -->
+            <div class="card mt-4 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3 text-uppercase text-muted">Additional Costs</h5>
+                    {% if po.additional_costs.all %}
+                      <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                          <thead>
+                            <tr><th>Description</th><th class="text-end" style="width:20%">Amount</th></tr>
+                          </thead>
+                          <tbody>
+                            {% for c in po.additional_costs.all %}
+                              <tr>
+                                <td>{{ c.description }}</td>
+                                <td class="text-end">{{ c.amount }}</td>
+                              </tr>
+                            {% empty %}
+                              <tr><td colspan="2" class="text-muted">No additional costs.</td></tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    {% else %}
+                      <div class="text-muted">No additional costs.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Status History Card -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <div class="card-title">Status History</div>
+                </div>
+                <div class="card-body">
+                    <ul id="po-status-history" class="list-group">
+                        {% for h in po.status_history %}
+                            <li>
+                                <small class="text-muted">{{ h.timestamp|default:h.timestamp }}</small><br/>
+                                <strong>{{ h.from_display }}</strong> → <strong>{{ h.to_display }}</strong>
+                                {% if h.changed_by %}<br/><em>By: {{ h.changed_by }}</em>{% endif %}
+                                {% if h.note %}
+                                    <div class="mt-1">{{ h.note }}</div>{% endif %}
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No status changes yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('po-status-form');
+            const badge = document.getElementById('po-status-badge');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.ok) {
+                            badge.textContent = data.status;
+                            badge.className = 'badge text-capitalize fs-6';
+                            if (data.status.toLowerCase().includes('cancel')) badge.classList.add('bg-light-danger', 'text-danger');
+                            else if (data.status.toLowerCase().includes('draft')) badge.classList.add('bg-light-warning', 'text-warning');
+                            else if (data.status.toLowerCase().includes('received')) badge.classList.add('bg-light-success', 'text-success');
+                            else badge.classList.add('bg-light-primary', 'text-primary');
+                            showToast('Status updated successfully', 'success');
+                            if (data.history) {
+                                const list = document.getElementById('po-status-history');
+                                const li = document.createElement('li');
+                                li.className = 'list-group-item';
+                                const ts = data.history.timestamp || '';
+                                const from = data.history.from_display || data.history.from || '';
+                                const to = data.history.to_display || data.history.to || '';
+                                const by = data.history.changed_by ? `<br/><em>By: ${data.history.changed_by}</em>` : '';
+                                const note = data.history.note ? `<div class="mt-1">${data.history.note}</div>` : '';
+                                li.innerHTML = `<small class="text-muted">${ts}</small><br/><strong>${from}</strong> → <strong>${to}</strong>${by}${note}`;
+                                list.insertBefore(li, list.firstChild);
+                            }
+                        } else showToast(data.error || 'Update failed', 'error');
+                    })
+                    .catch(() => showToast('Status update failed', 'error'));
+            });
+
+            function showToast(msg, type) {
+                if (window.Swal) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: type,
+                        title: msg,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else alert(msg);
+            }
+        });
+    </script>
+{% endblock %}

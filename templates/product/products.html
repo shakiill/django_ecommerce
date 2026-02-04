@@ -1,0 +1,92 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Products</h3>
+            <a href="{% url 'product_create' %}" class="btn btn-primary">Add Product</a>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <input type="text" id="search_name" class="form-control" placeholder="Search by name or SKU">
+                </div>
+                <div class="col-md-3">
+                    <select id="filter_category" class="form-control">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="filter_brand" class="form-control">
+                        <option value="">All Brands</option>
+                        {% for brand in brands %}
+                            <option value="{{ brand.id }}">{{ brand.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="filter_status" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <table id="productsTable" class="table table-bordered table-hover" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Thumbnail</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Total Stock</th>
+                        <th>Default Price</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        $(document).ready(function () {
+            var table = $('#productsTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{% url 'product_list_ajax' %}",
+                    data: function (d) {
+                        d.name = $('#search_name').val();
+                        d.category = $('#filter_category').val();
+                        d.brand = $('#filter_brand').val();
+                        d.status = $('#filter_status').val();
+                    }
+                },
+                columns: [
+                    {data: 'thumbnail', orderable: false, searchable: false},
+                    {data: 'name'},
+                    {data: 'category'},
+                    {data: 'brand'},
+                    {data: 'total_stock', orderable: false},
+                    {data: 'default_price'},
+                    {data: 'status', orderable: false, searchable: false},
+                    {data: 'created'},
+                    {data: 'actions', orderable: false, searchable: false}
+                ]
+            });
+
+            $('#search_name, #filter_category, #filter_brand, #filter_status').on('change keyup', function () {
+                table.ajax.reload();
+            });
+        });
+    </script>
+{% endblock %}
+{% block title %}Product List | Demo{% endblock %}

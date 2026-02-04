@@ -1,0 +1,151 @@
+{% extends 'includes/main_layout.html' %}
+{% block content %}
+    <div class="app-content flex-column-fluid">
+        <div class="app-container container-xxl">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">Purchase Orders</h3>
+                <a href="{% url 'inventory:po_create' %}" class="btn btn-primary">Create PO</a>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form id="po-filters" class="row g-2">
+                        <div class="col-md-2">
+                            <label class="form-label small">Status</label>
+                            <select id="filter_status" class="form-select">
+                                <option value="">All</option>
+                                {% for v,k in po_statuses %}
+                                    <option value="{{ v }}">{{ k }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small">Supplier</label>
+                            <select id="filter_supplier" class="form-select">
+                                <option value="">All</option>
+                                {% for s in suppliers %}
+                                    <option value="{{ s.id }}">{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label small">Warehouse</label>
+                            <select id="filter_warehouse" class="form-select">
+                                <option value="">All</option>
+                                {% for w in warehouses %}
+                                    <option value="{{ w.id }}">{{ w.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label small">PO #</label>
+                            <input id="filter_po_number" type="text" class="form-control" placeholder="PO #">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small">From</label>
+                            <input id="filter_date_from" type="date" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small">To</label>
+                            <input id="filter_date_to" type="date" class="form-control">
+                        </div>
+                        <div class="col-md-2 mt-1 d-flex gap-2">
+                            <button id="filter_apply" type="button" class="btn btn-primary btn-sm h-40px mt-10">Filter</button>
+                            <button id="filter_reset" type="button" class="btn btn-secondary btn-sm h-40px mt-10">Reset</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="po-table">
+                            <thead>
+                            <tr>
+                                <th>PO #</th>
+                                <th>Supplier</th>
+                                <th>Warehouse</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        (function () {
+            const urlBase = '{% url "inventory:po_list_data" %}';
+
+            function buildQueryParams() {
+                const params = new URLSearchParams();
+                const status = document.getElementById('filter_status').value;
+                const supplier = document.getElementById('filter_supplier').value;
+                const warehouse = document.getElementById('filter_warehouse').value;
+                const po_number = document.getElementById('filter_po_number').value.trim();
+                const date_from = document.getElementById('filter_date_from').value;
+                const date_to = document.getElementById('filter_date_to').value;
+
+                if (status) params.append('status', status);
+                if (supplier) params.append('supplier', supplier);
+                if (warehouse) params.append('warehouse', warehouse);
+                if (po_number) params.append('po_number', po_number);
+                if (date_from) params.append('date_from', date_from);
+                if (date_to) params.append('date_to', date_to);
+
+                return params.toString();
+            }
+
+            function loadPOs() {
+                const qs = buildQueryParams();
+                const fetchUrl = qs ? `${urlBase}?${qs}` : urlBase;
+
+                fetch(fetchUrl)
+                    .then(r => r.json())
+                    .then(data => {
+                        const tbody = document.querySelector('#po-table tbody');
+                        tbody.innerHTML = '';
+                        (data.data || []).forEach(row => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+            <td>${row.po_number}</td>
+            <td>${row.supplier}</td>
+            <td>${row.warehouse}</td>
+            <td>${row.order_date}</td>
+            <td>${row.status}</td>
+            <td>${row.total_amount}</td>
+            <td>
+              <a href="${row.detail_url}" class="btn btn-sm btn-light">View</a>
+              <a href="${row.edit_url}" class="btn btn-sm btn-light-primary">Edit</a>
+            </td>`;
+                            tbody.appendChild(tr);
+                        });
+                    });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                loadPOs();
+
+                document.getElementById('filter_apply').addEventListener('click', loadPOs);
+                document.getElementById('filter_reset').addEventListener('click', function () {
+                    document.getElementById('po-filters').reset();
+                    loadPOs();
+                });
+
+                // Optional: live reload when any filter changes
+                ['filter_status','filter_supplier','filter_warehouse'].forEach(id => {
+                    document.getElementById(id).addEventListener('change', loadPOs);
+                });
+            });
+        })();
+    </script>
+{% endblock %}

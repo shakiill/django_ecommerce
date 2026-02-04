@@ -1,0 +1,270 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+{% block content %}
+    <div class="d-flex flex-column flex-column-fluid">
+        <!-- Toolbar -->
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                        Orders
+                    </h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a href="/" class="text-muted text-hover-primary">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Orders</li>
+                    </ul>
+                </div>
+                <div class="d-flex align-items-center gap-2 gap-lg-3">
+                    <button class="btn btn-sm btn-light" id="toggle_advanced">
+                        <i class="ki-outline ki-filter fs-5"></i> Advanced Filters
+                    </button>
+                    <button class="btn btn-sm btn-light-primary" id="export_csv">
+                        <i class="ki-outline ki-exit-up fs-5"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Content -->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card">
+                    <div class="card-header border-0 pt-6 flex-column">
+                        <!-- Quick Filters Row -->
+                        <div class="d-flex w-100 flex-wrap gap-3 align-items-center mb-4">
+                            <div class="flex-grow-1">
+                                <input type="text" id="orders_search" class="form-control form-control-sm"
+                                       placeholder="Search order number / customer">
+                            </div>
+                            <div>
+                                <select id="filter_status" class="form-select form-select-sm">
+                                    <option value="">Status: All</option>
+                                    {% for value, label in order_status_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <select id="filter_payment_status" class="form-select form-select-sm">
+                                    <option value="">Payment: All</option>
+                                    {% for value, label in payment_status_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <input type="date" id="filter_date_from" class="form-control form-control-sm"
+                                       placeholder="From">
+                                <input type="date" id="filter_date_to" class="form-control form-control-sm"
+                                       placeholder="To">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <input type="number" step="0.01" id="filter_min_total"
+                                       class="form-control form-control-sm" placeholder="Min Total">
+                                <input type="number" step="0.01" id="filter_max_total"
+                                       class="form-control form-control-sm" placeholder="Max Total">
+                            </div>
+                            <div>
+                                <button id="filter_reset" class="btn btn-sm btn-light">
+                                    <i class="ki-outline ki-refresh fs-5"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Advanced Filters (collapsed) -->
+                        <div id="advanced_filters" class="w-100" style="display:none;">
+                            <div class="separator my-4"></div>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Status</label>
+                                    <select class="form-select form-select-sm" id="adv_status">
+                                        <option value="">All</option>
+                                        {% for value, label in order_status_choices %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Payment</label>
+                                    <select class="form-select form-select-sm" id="adv_payment_status">
+                                        <option value="">All</option>
+                                        {% for value, label in payment_status_choices %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Date From</label>
+                                    <input type="date" class="form-control form-control-sm" id="adv_date_from">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Date To</label>
+                                    <input type="date" class="form-control form-control-sm" id="adv_date_to">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold mt-3">Min Total</label>
+                                    <input type="number" step="0.01" class="form-control form-control-sm"
+                                           id="adv_min_total">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold mt-3">Max Total</label>
+                                    <input type="number" step="0.01" class="form-control form-control-sm"
+                                           id="adv_max_total">
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end mt-3">
+                                    <button class="btn btn-sm btn-primary w-100" id="apply_advanced">
+                                        <i class="ki-outline ki-filter fs-5"></i> Apply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="position-relative" style="min-height: 400px;">
+                            <div class="table-responsive">
+                                <table id="orders_table" class="table align-middle table-row-dashed fs-6 gy-5">
+                                    <thead>
+                                    <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                        <th>Order #</th>
+                                        <th>Customer</th>
+                                        <th>Status</th>
+                                        <th>Payment</th>
+                                        <th>Total</th>
+                                        <th>Created</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        $(document).ready(function () {
+
+            // ---------------------------
+            // Helper: debounce for search
+            // ---------------------------
+            function debounce(func, timeout = 400) {
+                let timer;
+                return (...args) => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(this, args), timeout);
+                };
+            }
+
+            // ---------------------------
+            // Initialize DataTable
+            // ---------------------------
+            var table = $("#orders_table").DataTable({
+                processing: true,
+                serverSide: true,
+                searching: false,     // manual search
+                ordering: false,
+                ajax: {
+                    url: "/order/data/",
+                    type: "GET",
+                    data: function (d) {
+                        // Attach filters to request
+                        d.status = $("#filter_status").val();
+                        d.payment_status = $("#filter_payment_status").val();
+                        d.date_from = $("#filter_date_from").val();
+                        d.date_to = $("#filter_date_to").val();
+                        d.min_total = $("#filter_min_total").val();
+                        d.max_total = $("#filter_max_total").val();
+
+                        // Advanced filters
+                        d.status = $("#adv_status").val() || d.status;
+                        d.payment_status = $("#adv_payment_status").val() || d.payment_status;
+
+                        // Search
+                        d["search[value]"] = $("#orders_search").val();
+                    }
+                },
+                columns: [
+                    { data: "order_number" },
+                    { data: "customer_name" },
+                    { data: "status_display" },
+                    { data: "payment_status_display" },
+                    { data: "total_amount" },
+                    { data: "created_at" },
+                    { data: "actions", orderable: false, searchable: false, className: "text-end" }
+                ]
+            });
+
+
+            // ---------------------------
+            // Search Input (debounced)
+            // ---------------------------
+            $("#orders_search").on("keyup", debounce(function () {
+                table.ajax.reload();
+            }));
+
+            // ---------------------------
+            // Quick Filters
+            // ---------------------------
+            $("#filter_status, #filter_payment_status").on("change", function () {
+                table.ajax.reload();
+            });
+
+            $("#filter_date_from, #filter_date_to").on("change", function () {
+                table.ajax.reload();
+            });
+
+            $("#filter_min_total, #filter_max_total").on("keyup change", debounce(function () {
+                table.ajax.reload();
+            }));
+
+            // ---------------------------
+            // Advanced filter toggle
+            // ---------------------------
+            $("#toggle_advanced").on("click", function () {
+                $("#advanced_filters").slideToggle(200);
+            });
+
+            // ---------------------------
+            // Advanced Filters
+            // ---------------------------
+            $("#adv_status, #adv_payment_status").on("change", function () {
+                table.ajax.reload();
+            });
+
+            // ---------------------------
+            // Reset Filters
+            // ---------------------------
+            $("#filter_reset").on("click", function () {
+                $("#orders_search").val("");
+                $("#filter_status").val("");
+                $("#filter_payment_status").val("");
+                $("#filter_date_from").val("");
+                $("#filter_date_to").val("");
+                $("#filter_min_total").val("");
+                $("#filter_max_total").val("");
+
+                $("#adv_status").val("");
+                $("#adv_payment_status").val("");
+
+                table.ajax.reload();
+            });
+
+            // ---------------------------
+            // Export CSV
+            // ---------------------------
+            $("#export_csv").on("click", function () {
+                window.location.href = "/order/export/";
+            });
+
+        });
+
+    </script>
+{% endblock %}
+{% block title %} Orders | Admin {% endblock %}

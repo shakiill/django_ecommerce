@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}E-Commerce Store{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Shop the latest products at great prices{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}ecommerce, shop, products{% endblock %}">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts - Jost -->
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #222222;
+            --secondary-color: #666666;
+            --border-color: #eeeeee;
+            --bg-light: #f5f5f5;
+            --white: #ffffff;
+            --text-primary: #222222;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Jost', sans-serif;
+            color: var(--text-primary);
+            background-color: var(--white);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        /* Top Announcement Bar */
+        .top-bar {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 10px 0;
+            font-size: 13px;
+            text-align: center;
+        }
+        
+        .top-bar a {
+            color: var(--white);
+            text-decoration: underline;
+        }
+        
+        /* Main Header - Glassmorphism */
+        .main-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Logo */
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .logo:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Navigation */
+        .main-nav {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+            margin: 0;
+            margin-left: 40px;
+        }
+        
+        .main-nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+            position: relative;
+        }
+        
+        .main-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary-color);
+            transition: width 0.3s;
+        }
+        
+        .main-nav a:hover::after {
+            width: 100%;
+        }
+        
+        /* Header Icons */
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        /* Inline Search Box */
+        .header-search {
+            margin-right: 20px;
+            position: relative;
+        }
+
+        .header-search-form {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 4px; /* Optional rounded */
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+        }
+
+        .header-search-form:focus-within {
+            border-color: var(--primary-color);
+            background: var(--white);
+        }
+
+        .header-search-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            color: var(--text-primary);
+            width: 200px;
+            padding: 5px;
+        }
+
+        .header-search-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .header-search-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .header-icon {
+            color: var(--text-primary);
+            font-size: 20px;
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .header-icon:hover {
+            color: var(--text-secondary);
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary-color);
+            color: var(--white);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        /* Mobile Menu Toggle */
+        /* Mobile Menu Toggle */
+        .mobile-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        
+        .mobile-toggle:hover {
+            background: var(--bg-light);
+        }
+        
+        /* Footer - Infrastructure Design */
+        .footer {
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            padding: 80px 0 0;
+            margin-top: 0;
+            border-top: 2px solid rgba(6, 182, 212, 0.2);
+            color: #cbd5e1;
+        }
+        
+        .footer-heading {
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            color: #06b6d4;
+        }
+        
+        .footer-about {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #94a3b8;
+            margin-bottom: 25px;
+        }
+        
+        /* Trust Badges */
+        .footer-badges {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            font-size: 11px;
+            font-weight: 700;
+            color: #22d3ee;
+        }
+        
+        .trust-badge i {
+            font-size: 14px;
+        }
+        
+        /* Social Links */
+        .footer-social {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .social-link:hover {
+            background: #06b6d4;
+            border-color: #06b6d4;
+            color: #0f172a;
+            transform: translateY(-3px);
+        }
+        
+        /* Footer Links */
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .footer-links a::before {
+            content: '→';
+            position: absolute;
+            left: -20px;
+            opacity: 0;
+            transition: all 0.3s;
+            color: #06b6d4;
+        }
+        
+        .footer-links a:hover {
+            color: #22d3ee;
+            padding-left: 20px;
+        }
+        
+        .footer-links a:hover::before {
+            opacity: 1;
+            left: 0;
+        }
+        
+        /* Newsletter Section */
+        .footer-newsletter {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-left: none;
+            border-right: none;
+            padding: 50px 0;
+            margin: 60px 0 40px;
+        }
+        
+        .newsletter-title {
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        
+        .newsletter-desc {
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 0;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            gap: 0;
+        }
+        
+        .newsletter-input {
+            flex: 1;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: none;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .newsletter-input::placeholder {
+            color: #64748b;
+        }
+        
+        .newsletter-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #06b6d4;
+        }
+        
+        .newsletter-btn {
+            padding: 16px 30px;
+            background: #06b6d4;
+            border: 1px solid #06b6d4;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+        
+        .newsletter-btn:hover {
+            background: #22d3ee;
+            border-color: #22d3ee;
+        }
+        
+        .newsletter-btn i {
+            transition: transform 0.3s;
+        }
+        
+        .newsletter-btn:hover i {
+            transform: translateX(5px);
+        }
+        
+        /* Footer Bottom */
+        .footer-bottom {
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer-copyright {
+            font-size: 13px;
+            color: #64748b;
+            margin: 0;
+        }
+        
+        .payment-methods {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        @media (min-width: 768px) {
+            .payment-methods {
+                justify-content: flex-end;
+            }
+        }
+        
+        .payment-methods i {
+            font-size: 32px;
+            color: #475569;
+            transition: color 0.3s;
+        }
+        
+        .payment-methods i:hover {
+            color: #06b6d4;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+            border: 1px solid var(--primary-color);
+            padding: 12px 35px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            background: var(--white);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 12px 35px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Mobile Navigation Panel */
+        .mobile-nav-panel {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            max-width: 85%;
+            height: 100%;
+            background: var(--white);
+            z-index: 1200;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-nav-panel.active {
+            left: 0;
+        }
+        
+        .mobile-nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .mobile-nav-header .logo {
+            font-size: 24px;
+        }
+        
+        .mobile-nav-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: color 0.3s;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+        
+        .mobile-nav-close:hover {
+            color: var(--text-secondary);
+        }
+        
+        .mobile-nav-menu {
+            list-style: none;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .mobile-nav-menu li {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .mobile-nav-menu a {
+            display: block;
+            padding: 15px 0;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+        }
+        
+        .mobile-nav-menu a:hover {
+            color: var(--text-secondary);
+        }
+        
+        .mobile-nav-icons {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .mobile-nav-icons a {
+            color: var(--text-primary);
+            font-size: 20px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .mobile-nav-icons a:hover {
+            color: var(--text-secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 991px) {
+            .main-nav {
+                display: none !important;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .header-container {
+                padding: 0 15px;
+            }
+            
+            .logo {
+                font-size: 22px;
+            }
+            
+            .header-icons {
+                gap: 15px;
+            }
+            
+            .header-icon {
+                font-size: 18px;
+            }
+            
+            /* Hide header search on mobile, keep mobile nav search */
+            .header-search {
+                display: none;
+            }
+            
+            /* Hide some icons on mobile - they're in mobile nav */
+            .header-icons .header-icon#account-icon {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .top-bar {
+                font-size: 12px;
+                padding: 8px 0;
+            }
+            
+            .main-header {
+                padding: 15px 0;
+            }
+            
+            .logo {
+                font-size: 20px;
+            }
+            
+            .header-icons {
+                gap: 12px;
+            }
+            
+            .header-icon {
+                font-size: 16px;
+            }
+            
+            .cart-count {
+                width: 16px;
+                height: 16px;
+                font-size: 10px;
+                top: -6px;
+                right: -6px;
+            }
+            
+            .mobile-nav-panel {
+                width: 280px;
+            }
+        }
+        
+        /* Prevent body scroll when mobile menu is open */
+        body.mobile-menu-open {
+            overflow: hidden;
+        }
+        .account-dropdown {
+            position: relative;
+        }
+        
+        .account-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            min-width: 180px;
+            margin-top: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .account-dropdown:hover .account-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .account-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .account-link:last-child {
+            border-bottom: none;
+        }
+        
+        .account-link:hover {
+            background: var(--bg-light);
+            color: var(--primary-color);
+        }
+        
+        .account-link i {
+            font-size: 14px;
+        }
+        
+
+        
+        /* Responsive */
+        @media (max-width: 991px) {
+            .main-nav {
+                display: none;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .search-input {
+                font-size: 18px;
+                padding: 15px 20px;
+            }
+            
+            .search-submit {
+                padding: 15px 25px;
+                font-size: 18px;
+            }
+        }
+        
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+    <!-- Top Announcement Bar -->
+    <div class="top-bar">
+        <div class="container">
+            Limited Time Offer - Up to 60% off & Free Shipping
+        </div>
+    </div>
+    
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Logo -->
+            <a href="{% url 'home' %}" class="logo">ECOM</a>
+            
+            <!-- Main Navigation -->
+            <nav>
+                <ul class="main-nav" id="main-nav">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'shop' %}">Shop</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Pages</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Header Icons -->
+            <div class="header-icons">
+                <!-- Search Input Box -->
+                <div class="header-search">
+                    <form action="{% url 'shop' %}" method="get" class="header-search-form">
+                        <input type="text" name="search" placeholder="Search products..." class="header-search-input" autocomplete="off">
+                        <button type="submit" class="header-search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Account Dropdown -->
+                <div class="account-dropdown">
+                    <a href="#" class="header-icon" id="account-icon">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <div class="account-menu" id="account-menu">
+                        {% if user.is_authenticated %}
+                            {% if user.is_staff %}
+                            <a href="{% url 'admin:index' %}" class="account-link">
+                                <i class="fas fa-user-shield"></i> Admin
+                            </a>
+                            {% else %}
+                            <a href="{% url 'customer_dashboard' %}" class="account-link">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'staff_logout' %}" class="account-link">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        {% else %}
+                            <a href="{% url 'staff_login' %}" class="account-link">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                            <a href="{% url 'customer_register' %}" class="account-link">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <a href="#" class="header-icon">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a href="{% url 'cart' %}" class="header-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                </a>
+                <div class="mobile-toggle" id="mobile-toggle">
+                    <span>MENU</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-menu-overlay" id="mobile-overlay"></div>
+    
+    <!-- Mobile Navigation Panel -->
+    <div class="mobile-nav-panel" id="mobile-nav-panel">
+        <div class="mobile-nav-header">
+            <a href="{% url 'home' %}" class="logo">ECOM</a>
+            <button class="mobile-nav-close" id="mobile-nav-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-menu">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'shop' %}">Shop</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Pages</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        <div class="mobile-nav-icons">
+            <a href="{% url 'shop' %}">Search</a>
+            <a href="{% if user.is_authenticated %}{% url 'customer_dashboard' %}{% else %}{% url 'staff_login' %}{% endif %}">Account</a>
+            <a href="#">Wishlist</a>
+            <a href="{% url 'cart' %}">Cart</a>
+        </div>
+    </div>
+    
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer - High Density Infrastructure Design -->
+    <footer class="footer">
+        <div class="container">
+            <!-- Main Footer Content -->
+            <div class="row">
+                <!-- Column 1: Company & About -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="footer-heading">INFRASTRUCTURE</h5>
+                    <p class="footer-about">
+                        Enterprise-grade e-commerce platform built for scale. 
+                        Trusted by 500K+ users worldwide.
+                    </p>
+                    
+                    <!-- Social Proof Badges -->
+                    <div class="footer-badges">
+                        <div class="trust-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>SSL Secured</span>
+                        </div>
+                        <div class="trust-badge">
+                            <i class="fas fa-award"></i>
+                            <span>ISO Certified</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Links -->
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Column 2: Products & Categories -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="footer-heading">PRODUCTS</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'shop' %}">All Products</a></li>
+                        <li><a href="#">New Arrivals</a></li>
+                        <li><a href="#">Best Sellers</a></li>
+                        <li><a href="#">Featured Items</a></li>
+                        <li><a href="#">Sale & Offers</a></li>
+                        <li><a href="#">Gift Cards</a></li>
+                        <li><a href="#">Bundles</a></li>
+                        <li><a href="#">Pre-Orders</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3: Support & Resources -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="footer-heading">SUPPORT</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Track Order</a></li>
+                        <li><a href="#">Returns & Refunds</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Size Guide</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Live Chat</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4: Company & Legal -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="footer-heading">COMPANY</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press Kit</a></li>
+                        <li><a href="#">Sustainability</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Accessibility</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Newsletter Section -->
+            <div class="footer-newsletter">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 mb-3 mb-lg-0">
+                        <h6 class="newsletter-title">SUBSCRIBE TO UPDATES</h6>
+                        <p class="newsletter-desc">Get the latest product releases, exclusive offers, and infrastructure updates.</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="newsletter-form">
+                            <input type="email" class="newsletter-input" placeholder="Enter your email address">
+                            <button class="newsletter-btn" type="button">
+                                <span>SUBSCRIBE</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+                        <p class="footer-copyright">
+                            © 2026 Infrastructure E-Commerce. All rights reserved.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="payment-methods">
+                            <i class="fab fa-cc-visa"></i>
+                            <i class="fab fa-cc-mastercard"></i>
+                            <i class="fab fa-cc-amex"></i>
+                            <i class="fab fa-cc-paypal"></i>
+                            <i class="fab fa-cc-stripe"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Base JavaScript -->
+    <script>
+        // API Configuration
+        const API_BASE_URL = '/api/v1';
+        const USER_IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
+        
+        // Get CSRF Token
+        function getCsrfToken() {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, 10) === ('csrftoken=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(10));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // API fetch wrapper
+        async function apiFetch(endpoint, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken(),
+                },
+            };
+            
+            const mergedOptions = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers,
+                },
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, mergedOptions);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+        
+        // Update cart count
+        async function updateCartCount() {
+            if (!USER_IS_AUTHENTICATED) {
+                document.getElementById('cart-count').textContent = '0';
+                return;
+            }
+            
+            try {
+                const data = await apiFetch('/cart/');
+                const count = data.results ? data.results.length : 0;
+                document.getElementById('cart-count').textContent = count;
+            } catch (error) {
+                console.error('Failed to update cart count:', error);
+            }
+        }
+        
+        // Show loading spinner in a container
+        function showLoading(container) {
+            if (container) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-3">Loading...</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Show error message in a container
+        function showError(message, container) {
+            if (container) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            ${message}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Mobile menu functions
+        function openMobileMenu() {
+            document.getElementById('mobile-nav-panel').classList.add('active');
+            document.getElementById('mobile-overlay').classList.add('active');
+            document.body.classList.add('mobile-menu-open');
+        }
+        
+        function closeMobileMenu() {
+            document.getElementById('mobile-nav-panel').classList.remove('active');
+            document.getElementById('mobile-overlay').classList.remove('active');
+            document.body.classList.remove('mobile-menu-open');
+        }
+        
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileToggle = document.getElementById('mobile-toggle');
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', openMobileMenu);
+            }
+            
+            const closeBtn = document.getElementById('mobile-nav-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMobileMenu);
+            }
+            
+            const overlay = document.getElementById('mobile-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
+            
+            updateCartCount();
+        });
+        
+        // Close mobile menu on resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 991) {
+                closeMobileMenu();
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
