@@ -39,6 +39,9 @@ class PaymentStatus(models.TextChoices):
 
 class PaymentMethod(models.TextChoices):
     COD = "cod", "Cash on Delivery"
+    SSL_COMMERZ = "ssl_commerz", "SSL Commerz"
+    PAYSTATION = "paystation", "Pay Station"
+
     CARD = "card", "Card"
     STRIPE = "stripe", "Stripe"
     PAYPAL = "paypal", "PayPal"
@@ -409,7 +412,7 @@ class Order(models.Model):
     payment_status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.UNPAID,
                                       db_index=True)
 
-    currency = models.CharField(max_length=10, default="USD")
+    currency = models.CharField(max_length=10, default="BDT")
     subtotal_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     shipping_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))

@@ -58,7 +58,7 @@
                         <div class="summary-details bg-light p-3 rounded-3 mb-4">
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Subtotal</span>
-                                <span id="summary-subtotal" class="fw-medium">$0.00</span>
+                                <span id="summary-subtotal" class="fw-medium">৳0.00</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Shipping</span>
@@ -66,7 +66,7 @@
                             </div>
                             <div class="d-flex justify-content-between pt-2 border-top">
                                 <span class="h6 mb-0 fw-bold">Total</span>
-                                <span id="order-total" class="h6 mb-0 fw-bold">$0.00</span>
+                                <span id="order-total" class="h6 mb-0 fw-bold">৳0.00</span>
                             </div>
                         </div>
                         
@@ -317,13 +317,13 @@
                             <p class="mb-0 text-muted small">${item.variant_name || ''}</p>
                         </div>
                         <div class="text-end">
-                            <span class="fw-bold small">$${(parseFloat(item.unit_price) * item.quantity).toFixed(2)}</span>
+                            <span class="fw-bold small">৳${(parseFloat(item.unit_price) * item.quantity).toFixed(2)}</span>
                         </div>
                     </div>
                 `).join('');
                 
                 cartSubtotal = parseFloat(data.total);
-                document.getElementById('summary-subtotal').textContent = `$${cartSubtotal.toFixed(2)}`;
+                document.getElementById('summary-subtotal').textContent = `৳${cartSubtotal.toFixed(2)}`;
                 updateTotalDisplay();
             } else {
                 // Cart is empty, redirect back home or shop
@@ -561,7 +561,7 @@
                 container.innerHTML = methods.map((sm, idx) => {
                     const cost = parseFloat(sm.base_cost);
                     const isFree = sm.free_shipping_threshold !== null && cartSubtotal >= parseFloat(sm.free_shipping_threshold);
-                    const displayCost = isFree ? 'FREE' : `$${cost.toFixed(2)}`;
+                    const displayCost = isFree ? 'FREE' : `৳${cost.toFixed(2)}`;
                     const actualCost = isFree ? 0 : cost;
                     
                     return `
@@ -606,7 +606,7 @@
     function updateTotalDisplay() {
         const shippingEl = document.getElementById('summary-shipping');
         if (selectedShippingCost > 0) {
-            shippingEl.textContent = `$${selectedShippingCost.toFixed(2)}`;
+            shippingEl.textContent = `৳${selectedShippingCost.toFixed(2)}`;
             shippingEl.classList.remove('text-success');
         } else {
             shippingEl.textContent = 'Free';
@@ -614,7 +614,7 @@
         }
         
         const total = cartSubtotal + selectedShippingCost;
-        document.getElementById('order-total').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('order-total').textContent = `৳${total.toFixed(2)}`;
     }
 
     async function loadReviewAddress() {

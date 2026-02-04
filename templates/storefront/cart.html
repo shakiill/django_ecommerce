@@ -45,7 +45,7 @@
                     <div class="summary-details">
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Subtotal</span>
-                            <span class="fw-bold" id="subtotal">$0.00</span>
+                            <span class="fw-bold" id="subtotal">৳0.00</span>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Shipping</span>
@@ -53,12 +53,12 @@
                         </div>
                         <div class="d-flex justify-content-between mb-4 pb-4 border-bottom">
                             <span class="text-muted">Estimated Tax</span>
-                            <span class="fw-bold" id="tax">$0.00</span>
+                            <span class="fw-bold" id="tax">৳0.00</span>
                         </div>
                         
                         <div class="d-flex justify-content-between mb-5 align-items-center">
                             <span class="h5 fw-bold mb-0">Total</span>
-                            <span class="h4 fw-bold mb-0 text-primary" id="total">$0.00</span>
+                            <span class="h4 fw-bold mb-0 text-primary" id="total">৳0.00</span>
                         </div>
                     </div>
                     
@@ -262,7 +262,7 @@
                         </div>
                         
                         <div class="cart-item-price d-none d-md-block">
-                            $${parseFloat(item.unit_price).toFixed(2)}
+                            ৳${parseFloat(item.unit_price).toFixed(2)}
                         </div>
                         
                         <div class="text-center" style="grid-column: span 1;">
@@ -274,7 +274,7 @@
                         </div>
                         
                         <div class="cart-item-subtotal">
-                            $${(parseFloat(item.unit_price) * item.quantity).toFixed(2)}
+                            ৳${(parseFloat(item.unit_price) * item.quantity).toFixed(2)}
                         </div>
                         
                         <button class="btn btn-link remove-item" onclick="removeItem(${item.id})">
@@ -284,10 +284,10 @@
                 `).join('');
                 
                 // Update summary
-                document.getElementById('subtotal').textContent = `$${parseFloat(data.subtotal).toFixed(2)}`;
-                document.getElementById('shipping').textContent = parseFloat(data.shipping) === 0 ? 'FREE' : `$${parseFloat(data.shipping).toFixed(2)}`;
-                document.getElementById('tax').textContent = `$${parseFloat(data.tax).toFixed(2)}`;
-                document.getElementById('total').textContent = `$${parseFloat(data.total).toFixed(2)}`;
+                document.getElementById('subtotal').textContent = `৳${parseFloat(data.subtotal).toFixed(2)}`;
+                document.getElementById('shipping').textContent = parseFloat(data.shipping) === 0 ? 'FREE' : `৳${parseFloat(data.shipping).toFixed(2)}`;
+                document.getElementById('tax').textContent = `৳${parseFloat(data.tax).toFixed(2)}`;
+                document.getElementById('total').textContent = `৳${parseFloat(data.total).toFixed(2)}`;
                 
             } else {
                 countEl.textContent = '0 items';
