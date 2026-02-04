@@ -1,0 +1,328 @@
+<!-- Quick View Modal -->
+<div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 overflow-hidden">
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-4 z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <!-- Product Image -->
+                    <div class="col-lg-6">
+                        <div class="quick-view-img-container h-100 bg-light d-flex align-items-center justify-content-center">
+                            <img id="qv-image" src="" alt="Product" class="img-fluid" style="max-height: 500px; object-fit: cover;">
+                        </div>
+                    </div>
+                    <!-- Product Details -->
+                    <div class="col-lg-6">
+                        <div class="p-4 p-lg-5 h-100 d-flex flex-column">
+                            <div class="mb-auto">
+                                <div class="text-uppercase text-muted fw-bold small mb-2" id="qv-category">Category</div>
+                                <h2 class="h3 fw-bold mb-3" id="qv-title">Product Title</h2>
+                                <div class="d-flex align-items-center mb-4">
+                                    <span class="h4 fw-bold mb-0 me-3" id="qv-price">৳0.00</span>
+                                    <span class="badge bg-danger rounded-pill" id="qv-badge">Sale</span>
+                                </div>
+                                <p class="text-muted mb-4" id="qv-description">Description...</p>
+                                
+                                <!-- Attributes Selector -->
+                                <div id="qv-attributes-container" class="mb-4">
+                                    <!-- Dynamic attributes will be loaded here -->
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="d-flex gap-3 mb-3">
+                                    <div class="input-group" style="width: 120px;">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="updateQty(-1)">-</button>
+                                        <input type="text" class="form-control text-center bg-white" id="qv-qty" value="1" readonly>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="updateQty(1)">+</button>
+                                    </div>
+                                    <button class="btn btn-dark flex-grow-1 text-uppercase fw-bold" id="qv-add-to-cart" onclick="addToCartFromQuickView()">
+                                        Add to Cart
+                                    </button>
+                                </div>
+                                <div class="d-flex gap-4 small text-muted">
+                                    <button class="btn btn-link p-0 text-muted text-decoration-none" id="qv-wishlist">
+                                        <i class="far fa-heart me-2"></i> Add to Wishlist
+                                    </button>
+                                    <a href="#" class="text-muted text-decoration-none" id="qv-details-link">
+                                        <i class="fas fa-info-circle me-2"></i> View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Quick View Logic
+    let currentProduct = null;
+    let currentVariants = [];
+    let selectedAttributes = {};
+    let selectedVariant = null;
+
+    async function showQuickView(slug) {
+        const modalEl = document.getElementById('quickViewModal');
+        const modal = new bootstrap.Modal(modalEl);
+        
+        // Show loading state
+        document.getElementById('qv-title').textContent = 'Loading...';
+        document.getElementById('qv-price').textContent = '';
+        document.getElementById('qv-description').textContent = '';
+        document.getElementById('qv-category').textContent = '';
+        document.getElementById('qv-badge').style.display = 'none';
+        document.getElementById('qv-image').src = 'https://via.placeholder.com/400x500?text=Loading...';
+        document.getElementById('qv-attributes-container').innerHTML = '';
+        
+        modal.show();
+
+        try {
+            // Fetch product details
+            const data = await apiFetch(`/products/${slug}/`);
+            currentProduct = data;
+            
+            // Populate basic info
+            document.getElementById('qv-title').textContent = data.name;
+            document.getElementById('qv-category').textContent = data.category_name || 'Fashion';
+            document.getElementById('qv-description').textContent = data.short_description || data.description || '';
+            document.getElementById('qv-details-link').href = `/shop/${data.slug}/`;
+            
+            // Show product thumbnail immediately as primary fallback
+            if (data.thumbnail) {
+                document.getElementById('qv-image').src = data.thumbnail;
+            }
+            
+            // Handle Variants & Attributes
+            currentVariants = data.variant_list || [];
+            const attributes = data.attributes_list || [];
+            
+            // Reset selections
+            selectedAttributes = {};
+            selectedVariant = null;
+            
+            if (attributes.length > 0) {
+                renderAttributes(attributes);
+                // Auto-select: Priority -> default_variant ID, then first variant in list
+                const targetId = data.default_variant || (currentVariants.length > 0 ? currentVariants[0].id : null);
+                if (targetId) {
+                    const variantToSelect = currentVariants.find(v => v.id === targetId);
+                    if (variantToSelect) {
+                        preSelectVariant(variantToSelect, attributes);
+                    }
+                }
+            } else {
+                 // No variants/attributes
+                 updateModalPrice(data.price, null);
+                 document.getElementById('qv-image').src = data.thumbnail || 'https://via.placeholder.com/400';
+            }
+            
+        } catch (error) {
+            console.error('Error loading quick view:', error);
+            document.getElementById('qv-title').textContent = 'Error loading product';
+        }
+    }
+
+    function renderAttributes(attributes) {
+        const container = document.getElementById('qv-attributes-container');
+        container.innerHTML = '';
+        
+        attributes.forEach(attr => {
+            const group = document.createElement('div');
+            group.className = 'mb-3';
+            
+            const label = document.createElement('label');
+            label.className = 'form-label small fw-bold text-uppercase';
+            label.textContent = attr.name;
+            group.appendChild(label);
+            
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'd-flex flex-wrap gap-2';
+            
+            attr.values.forEach(val => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-sm btn-outline-dark attr-btn';
+                btn.dataset.attrId = attr.id;
+                btn.dataset.valId = val.id;
+                btn.textContent = val.value;
+                btn.onclick = () => selectAttribute(attr.id, val.id, btn);
+                optionsContainer.appendChild(btn);
+            });
+            
+            group.appendChild(optionsContainer);
+            container.appendChild(group);
+        });
+    }
+
+    function selectAttribute(attrId, valId, btnElement) {
+        // Update UI
+        const siblings = btnElement.parentElement.querySelectorAll('.attr-btn');
+        siblings.forEach(b => b.classList.remove('active', 'btn-dark'));
+        siblings.forEach(b => b.classList.add('btn-outline-dark'));
+        
+        btnElement.classList.remove('btn-outline-dark');
+        btnElement.classList.add('active', 'btn-dark');
+        
+        // Update State
+        selectedAttributes[attrId] = parseInt(valId);
+        
+        // Check for matching variant
+        findMatchingVariant();
+    }
+
+    function preSelectVariant(variant, allAttributes) {
+        if (!variant || !variant.attributes) return;
+        
+        variant.attributes.forEach(valId => {
+            // Find which attribute group this value belongs to
+            const group = allAttributes.find(attr => 
+                attr.values.some(v => v.id === valId)
+            );
+            
+            if (group) {
+                const btn = document.querySelector(`.attr-btn[data-attr-id="${group.id}"][data-val-id="${valId}"]`);
+                if (btn) {
+                    selectAttribute(group.id, valId, btn);
+                }
+            }
+        });
+    }
+
+    function findMatchingVariant() {
+        // Check if all attributes are selected
+        const requiredAttrs = document.querySelectorAll('#qv-attributes-container .mb-3').length;
+         if (Object.keys(selectedAttributes).length < requiredAttrs) {
+            return; // Not all selected yet
+        }
+
+        // Find match
+        const match = currentVariants.find(v => {
+            // v.attributes is likely a list of IDs based on standard serializer
+            // We need to check if selectedAttributes values are ALL present in v.attributes
+            const variantAttrIds = v.attributes; 
+            const selectedIds = Object.values(selectedAttributes);
+            return selectedIds.every(id => variantAttrIds.includes(id));
+        });
+
+        if (match) {
+            selectedVariant = match;
+            updateModalPrice(match.price, match.discount_price);
+            // Update image if variant has specific image, else use product thumbnail
+            if (match.image_list && match.image_list.length > 0) {
+                 document.getElementById('qv-image').src = match.image_list[0];
+            } else if (currentProduct.thumbnail) {
+                document.getElementById('qv-image').src = currentProduct.thumbnail;
+            }
+        } else {
+            selectedVariant = null;
+            // Fallback to product thumbnail if no variant matches
+            if (currentProduct && currentProduct.thumbnail) {
+                document.getElementById('qv-image').src = currentProduct.thumbnail;
+            }
+        }
+    }
+    
+    function updateModalPrice(price, discountPrice) {
+        const priceEl = document.getElementById('qv-price');
+        const badge = document.getElementById('qv-badge');
+        
+        if (discountPrice && parseFloat(discountPrice) < parseFloat(price)) {
+            priceEl.innerHTML = `
+                <span class="text-primary">৳${parseFloat(discountPrice).toFixed(2)}</span>
+                <span class="text-muted text-decoration-line-through small ms-2">৳${parseFloat(price).toFixed(2)}</span>
+            `;
+            badge.style.display = 'inline-block';
+            badge.textContent = 'Sale';
+        } else {
+            priceEl.textContent = `৳${parseFloat(price).toFixed(2)}`;
+            badge.style.display = 'none';
+        }
+    }
+
+    function updateQty(change) {
+        const input = document.getElementById('qv-qty');
+        let val = parseInt(input.value) + change;
+        if (val < 1) val = 1;
+        input.value = val;
+    }
+
+    async function addToCartFromQuickView() {
+        if (!currentProduct) return;
+        
+        const qty = parseInt(document.getElementById('qv-qty').value);
+        
+        // Validation: if variants exist, one must be selected
+        if (currentVariants.length > 0 && !selectedVariant) {
+             // Check if attributes exist
+             const attrContainer = document.getElementById('qv-attributes-container');
+             if (attrContainer.children.length > 0) {
+                 alert('Please select all options');
+                 return;
+             }
+        }
+
+        let finalVariantId = selectedVariant ? selectedVariant.id : null;
+        
+        // Fallback for single variant products (no attributes to select)
+        if (!finalVariantId && currentProduct.default_variant) {
+            finalVariantId = currentProduct.default_variant;
+        } else if (!finalVariantId && currentVariants.length === 1) {
+            // Determine if it really is a single variant situation
+            finalVariantId = currentVariants[0].id;
+        }
+
+        const payload = {
+            product_id: currentProduct.id,
+            quantity: qty,
+            variant_id: finalVariantId
+        };
+
+        const btn = document.getElementById('qv-add-to-cart');
+        const originalText = btn.textContent;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Adding...';
+        btn.disabled = true;
+
+        try {
+            // To create (add) an item, we POST to the cart root
+            const response = await apiFetch('/cart/', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            
+            // Success feedback
+            btn.innerHTML = 'Added!';
+            btn.classList.remove('btn-dark');
+            btn.classList.add('btn-success');
+            
+            // Update global cart count
+            updateCartCount();
+            
+            setTimeout(() => {
+                const modalEl = document.getElementById('quickViewModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                
+                // Reset button
+                btn.textContent = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-dark');
+                btn.disabled = false;
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Add to cart failed:', error);
+            btn.innerHTML = 'Failed';
+            btn.classList.remove('btn-dark');
+            btn.classList.add('btn-danger');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-dark');
+                btn.disabled = false;
+            }, 2000);
+        }
+    }
+</script>
