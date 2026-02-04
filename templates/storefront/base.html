@@ -1068,15 +1068,22 @@
         
         // Update cart count
         async function updateCartCount() {
+            // Note: If you have guest carts, remove the AUTH check or handle guest tokens
+            /*
             if (!USER_IS_AUTHENTICATED) {
                 document.getElementById('cart-count').textContent = '0';
                 return;
             }
+            */
             
             try {
                 const data = await apiFetch('/cart/');
-                const count = data.results ? data.results.length : 0;
-                document.getElementById('cart-count').textContent = count;
+                // Cart API returns { items: [...], total: "...", ... }
+                const count = (data.items && Array.isArray(data.items)) ? data.items.length : 0;
+                
+                const countEl = document.getElementById('cart-count');
+                if (countEl) countEl.textContent = count;
+                
             } catch (error) {
                 console.error('Failed to update cart count:', error);
             }
@@ -1293,6 +1300,9 @@
                 // Update image if variant has specific image
                 if (match.image_list && match.image_list.length > 0) {
                      document.getElementById('qv-image').src = match.image_list[0];
+                } else if (currentProduct.thumbnail) {
+                    // Revert to main product image if variant has no specific images
+                    document.getElementById('qv-image').src = currentProduct.thumbnail;
                 }
             } else {
                 selectedVariant = null;
@@ -1328,10 +1338,20 @@
                  }
             }
 
+            let finalVariantId = selectedVariant ? selectedVariant.id : null;
+            
+            // Fallback for single variant products (no attributes to select)
+            if (!finalVariantId && currentProduct.default_variant) {
+                finalVariantId = currentProduct.default_variant;
+            } else if (!finalVariantId && currentVariants.length === 1) {
+                // Determine if it really is a single variant situation
+                finalVariantId = currentVariants[0].id;
+            }
+
             const payload = {
                 product_id: currentProduct.id,
                 quantity: qty,
-                variant_id: selectedVariant ? selectedVariant.id : null
+                variant_id: finalVariantId
             };
 
             const btn = document.getElementById('qv-add-to-cart');
@@ -1340,8 +1360,8 @@
             btn.disabled = true;
 
             try {
-                // Assuming POST /cart/items/ or similar. Let's try standard create endpoint
-                const response = await apiFetch('/cart/items/', {
+                // To create (add) an item, we POST to the cart root
+                const response = await apiFetch('/cart/', {
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
