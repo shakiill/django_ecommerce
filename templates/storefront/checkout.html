@@ -1,53 +1,145 @@
 {% extends 'storefront/base.html' %}
 
-{% block title %}Checkout - ShopHub{% endblock %}
+{% block title %}Checkout - UOMO Luxury Store{% endblock %}
 
 {% block content %}
-<div class="checkout-page py-5">
+<div class="checkout-page py-5 bg-light min-vh-100">
     <div class="container">
-        <h2 class="mb-4">Checkout</h2>
+        <div class="checkout-header mb-5 text-center">
+            <h1 class="display-5 fw-bold mb-2">Checkout</h1>
+            <p class="text-muted">Complete your order with ease and security</p>
+        </div>
         
-        <div class="row">
+        <div class="row g-4">
             <div class="col-lg-8">
                 <!-- Checkout Steps -->
-                <div class="checkout-steps mb-4">
-                    <div class="step active" data-step="1">
-                        <span class="step-number">1</span>
-                        <span class="step-label">Shipping Address</span>
-                    </div>
-                    <div class="step" data-step="2">
-                        <span class="step-number">2</span>
-                        <span class="step-label">Shipping Method</span>
-                    </div>
-                    <div class="step" data-step="3">
-                        <span class="step-number">3</span>
-                        <span class="step-label">Payment</span>
-                    </div>
-                    <div class="step" data-step="4">
-                        <span class="step-number">4</span>
-                        <span class="step-label">Review</span>
+                <div class="checkout-progress-wrapper mb-5">
+                    <div class="checkout-progress">
+                        <div class="progress-line"></div>
+                        <div class="step active" data-step="1">
+                            <div class="step-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <span class="step-label">Shipping</span>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-icon"><i class="fas fa-truck"></i></div>
+                            <span class="step-label">Method</span>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-icon"><i class="fas fa-credit-card"></i></div>
+                            <span class="step-label">Payment</span>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                            <span class="step-label">Review</span>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Step Content -->
+                <!-- Step Content Container -->
                 <div id="checkout-content">
                     <div class="text-center py-5">
-                        <div class="spinner-border text-primary"></div>
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-4">
-                <div class="order-summary">
-                    <h4 class="mb-3">Order Summary</h4>
-                    <div id="summary-items"></div>
-                    <div class="summary-total mt-3">
-                        <div class="d-flex justify-content-between">
-                            <span>Total:</span>
-                            <span id="order-total">$0.00</span>
+                <div class="order-summary-card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="card-header bg-white border-bottom py-3 px-4">
+                        <h4 class="h5 mb-0 fw-bold">Order Summary</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="summary-items" class="mb-4">
+                            <!-- Items will be loaded here -->
+                        </div>
+                        
+                        <div class="summary-details bg-light p-3 rounded-3 mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal</span>
+                                <span id="summary-subtotal" class="fw-medium">$0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Shipping</span>
+                                <span id="summary-shipping" class="text-success fw-medium">Free</span>
+                            </div>
+                            <div class="d-flex justify-content-between pt-2 border-top">
+                                <span class="h6 mb-0 fw-bold">Total</span>
+                                <span id="order-total" class="h6 mb-0 fw-bold">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="promo-code mb-0">
+                            <div class="input-group">
+                                <input type="text" class="form-control border-end-0" placeholder="Promo code" style="padding: 12px;">
+                                <button class="btn btn-outline-dark px-4" type="button">Apply</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0 px-4 pt-4">
+                <h5 class="modal-title fw-bold">Add Shipping Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="address-form">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Address Title (e.g. Home, Office)</label>
+                            <input type="text" class="form-control" name="title" required placeholder="Home">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Phone</label>
+                            <input type="text" class="form-control" name="phone" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Address Line 1</label>
+                            <input type="text" class="form-control" name="line1" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Address Line 2 (Optional)</label>
+                            <input type="text" class="form-control" name="line2">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted text-uppercase fw-bold">City</label>
+                            <input type="text" class="form-control" name="city" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted text-uppercase fw-bold">State / Province</label>
+                            <input type="text" class="form-control" name="state" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Postal Code</label>
+                            <input type="text" class="form-control" name="postal_code" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Country</label>
+                            <input type="text" class="form-control" name="country" value="USA" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-dark rounded-pill px-4" onclick="saveAddress()">Save Address</button>
             </div>
         </div>
     </div>
@@ -56,66 +148,136 @@
 
 {% block extra_css %}
 <style>
-    .checkout-steps {
+    /* Progress Bar Styles */
+    .checkout-progress-wrapper {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .checkout-progress {
         display: flex;
         justify-content: space-between;
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
+        position: relative;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .progress-line {
+        position: absolute;
+        top: 25px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #eee;
+        z-index: 1;
     }
     
     .step {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.5rem;
+        z-index: 2;
+        gap: 10px;
         flex: 1;
-        position: relative;
     }
     
-    .step-number {
-        width: 40px;
-        height: 40px;
+    .step-icon {
+        width: 50px;
+        height: 50px;
+        background: #f8f9fa;
+        color: #adb5bd;
         border-radius: 50%;
-        background: var(--light-color);
-        color: var(--text-secondary);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 600;
+        font-size: 18px;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px #eee;
+        transition: all 0.3s ease;
     }
     
-    .step.active .step-number {
+    .step.active .step-icon {
         background: var(--primary-color);
         color: white;
+        box-shadow: 0 0 0 1px var(--primary-color);
+    }
+    
+    .step.completed .step-icon {
+        background: #28a745;
+        color: white;
+        box-shadow: 0 0 0 1px #28a745;
     }
     
     .step-label {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #adb5bd;
     }
     
     .step.active .step-label {
         color: var(--primary-color);
-        font-weight: 600;
     }
     
-    .order-summary {
+    /* Order Summary Styles */
+    .order-summary-card {
         background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
         position: sticky;
         top: 100px;
     }
     
-    .summary-total {
-        padding-top: 1rem;
-        border-top: 2px solid var(--border-color);
-        font-size: 1.25rem;
-        font-weight: 700;
+    .summary-item-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    /* Address Card Styles */
+    .address-card {
+        border: 2px solid #eee;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    
+    .address-card:hover {
+        border-color: #ddd;
+    }
+    
+    .address-card.selected {
+        border-color: var(--primary-color);
+        background: rgba(34, 34, 34, 0.02);
+    }
+    
+    .address-card.selected::after {
+        content: '\f058';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        top: 15px;
+        right: 15px;
         color: var(--primary-color);
+        font-size: 20px;
+    }
+    
+    .form-check-input:checked + .address-card {
+        border-color: var(--primary-color);
+    }
+    
+    /* Animations */
+    #checkout-content {
+        animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 {% endblock %}
@@ -123,139 +285,412 @@
 {% block extra_js %}
 <script>
     if (!isAuthenticated()) {
-        window.location.href = '/user/login/?next=/checkout/';
+        window.location.href = '{% url "staff_login" %}?next=/checkout/';
     }
     
     let currentStep = 1;
+    let selectedAddressId = null;
+    let selectedShippingMethodId = null;
+    let selectedShippingCost = 0;
+    let selectedPaymentMethod = 'cod';
+    let cartSubtotal = 0;
     
+    // Initial Load
     async function loadCheckout() {
-        // Load cart summary
+        showLoading(document.getElementById('checkout-content'));
+        
         try {
             const data = await apiFetch('/cart/');
             const summaryContainer = document.getElementById('summary-items');
             
             if (data.items && data.items.length > 0) {
                 summaryContainer.innerHTML = data.items.map(item => `
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>${item.product_name} x ${item.quantity}</span>
-                        <span>$${(parseFloat(item.unit_price) * item.quantity).toFixed(2)}</span>
+                    <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                        <div class="position-relative">
+                            <img src="${item.product_image || 'https://via.placeholder.com/60'}" class="summary-item-img shadow-sm" alt="${item.product_name}">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark">
+                                ${item.quantity}
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 fw-bold small">${item.product_name}</h6>
+                            <p class="mb-0 text-muted small">${item.variant_name || ''}</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold small">$${(parseFloat(item.unit_price) * item.quantity).toFixed(2)}</span>
+                        </div>
                     </div>
                 `).join('');
                 
-                document.getElementById('order-total').textContent = `$${data.total}`;
+                cartSubtotal = parseFloat(data.total);
+                document.getElementById('summary-subtotal').textContent = `$${cartSubtotal.toFixed(2)}`;
+                updateTotalDisplay();
+            } else {
+                // Cart is empty, redirect back home or shop
+                window.location.href = '{% url "shop" %}';
             }
         } catch (error) {
-            console.error('Failed to load cart:', error);
+            console.error('Failed to load cart summary:', error);
+            showError('Failed to load cart. Please try again.', document.getElementById('checkout-content'));
         }
         
-        // Load step content
         loadStepContent(currentStep);
     }
     
-    function loadStepContent(step) {
+    async function loadStepContent(step) {
         const content = document.getElementById('checkout-content');
+        updateStepIndicator();
         
         switch(step) {
-            case 1:
+            case 1: // Shipping Address
                 content.innerHTML = `
-                    <div class="card">
-                        <div class="card-body">
-                            <h4>Shipping Address</h4>
-                            <p>Select or add a shipping address</p>
-                            <div id="addresses-list"></div>
-                            <button class="btn btn-primary mt-3" onclick="nextStep()">Continue</button>
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="mb-0 fw-bold">Shipping Address</h4>
+                            <button class="btn btn-dark btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                                <i class="fas fa-plus me-2"></i> Add New
+                            </button>
+                        </div>
+                        <div id="addresses-list" class="row g-3 mb-4">
+                            <div class="col-12 text-center py-4 text-muted">
+                                <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                                <p>Loading addresses...</p>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button class="btn btn-dark w-100 py-3 fw-bold rounded-pill text-uppercase" id="addr-continue-btn" onclick="nextStep()" disabled>
+                                Continue to Shipping Method
+                            </button>
                         </div>
                     </div>
                 `;
-                loadAddresses();
+                await loadAddresses();
                 break;
-            case 2:
+                
+            case 2: // Shipping Method
                 content.innerHTML = `
-                    <div class="card">
-                        <div class="card-body">
-                            <h4>Shipping Method</h4>
-                            <p>Choose your shipping method</p>
-                            <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h4 class="mb-4 fw-bold">Shipping Method</h4>
+                        <div id="shipping-methods-list" class="row g-3 mb-4">
+                            <div class="col-12 text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-dark"></div>
+                                <p class="small text-muted mt-2">Loading options...</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 mt-2">
+                             <button class="btn btn-outline-dark px-4 py-3 rounded-pill fw-bold" onclick="prevStep()"><i class="fas fa-arrow-left"></i></button>
+                             <button class="btn btn-dark flex-grow-1 py-3 fw-bold rounded-pill text-uppercase" id="shipping-continue-btn" onclick="nextStep()" disabled>
+                                Continue to Payment
+                            </button>
+                        </div>
+                    </div>
+                `;
+                await loadShippingMethods();
+                break;
+                
+            case 3: // Payment
+                content.innerHTML = `
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h4 class="mb-4 fw-bold">Payment Method</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label class="address-card w-100 d-block selected">
+                                    <input type="radio" name="payment_method" value="cod" class="d-none" checked>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="icon h4 mb-0 text-primary"><i class="fas fa-hand-holding-usd"></i></div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">Cash on Delivery</h6>
+                                            <p class="mb-0 text-muted small">Pay when you receive the package</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                             <div class="col-12">
+                                <label class="address-card w-100 d-block text-muted" style="opacity: 0.6; cursor: not-allowed;">
+                                    <input type="radio" name="payment_method" value="card" class="d-none" disabled>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="icon h4 mb-0"><i class="fas fa-credit-card"></i></div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">Credit/Debit Card</h6>
+                                            <p class="mb-0 text-muted small">Pay securely online (Coming Soon)</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 mt-2">
+                             <button class="btn btn-outline-dark px-4 py-3 rounded-pill fw-bold" onclick="prevStep()"><i class="fas fa-arrow-left"></i></button>
+                             <button class="btn btn-dark flex-grow-1 py-3 fw-bold rounded-pill text-uppercase" onclick="nextStep()">
+                                Review Order
+                            </button>
                         </div>
                     </div>
                 `;
                 break;
-            case 3:
+                
+            case 4: // Final Review
                 content.innerHTML = `
-                    <div class="card">
-                        <div class="card-body">
-                            <h4>Payment Method</h4>
-                            <p>Select payment method</p>
-                            <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h4 class="mb-4 fw-bold text-center">Final Review</h4>
+                        <div class="alert alert-info border-0 rounded-4 p-4 mb-4">
+                             <div class="d-flex gap-3">
+                                <i class="fas fa-info-circle fa-2x"></i>
+                                <div>
+                                    <h6 class="fw-bold">Ready to place your order!</h6>
+                                    <p class="mb-0 small">Please review your order details on the right and click "Place Order" below to confirm.</p>
+                                </div>
+                             </div>
+                        </div>
+                        
+                        <div class="row g-4 mb-4">
+                             <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold mb-2">Shipping to</label>
+                                <div id="review-addr" class="border p-3 rounded-4 bg-light small">Loading...</div>
+                             </div>
+                             <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold mb-2">Payment</label>
+                                <div class="border p-3 rounded-4 bg-light small">Cash on Delivery</div>
+                             </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                             <button class="btn btn-outline-dark px-4 py-3 rounded-pill fw-bold" onclick="prevStep()"><i class="fas fa-arrow-left"></i></button>
+                             <button class="btn btn-success flex-grow-1 py-3 fw-bold rounded-pill text-uppercase shadow-sm" id="place-order-btn" onclick="placeOrder()">
+                                Place Order Now
+                            </button>
                         </div>
                     </div>
                 `;
-                break;
-            case 4:
-                content.innerHTML = `
-                    <div class="card">
-                        <div class="card-body">
-                            <h4>Review Order</h4>
-                            <p>Review and place your order</p>
-                            <button class="btn btn-success" onclick="placeOrder()">Place Order</button>
-                        </div>
-                    </div>
-                `;
+                loadReviewAddress();
                 break;
         }
     }
     
     async function loadAddresses() {
+        const container = document.getElementById('addresses-list');
+        const continueBtn = document.getElementById('addr-continue-btn');
+        
         try {
             const data = await apiFetch('/addresses/');
-            const container = document.getElementById('addresses-list');
             
             if (data.results && data.results.length > 0) {
-                container.innerHTML = data.results.map(addr => `
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="address" value="${addr.id}">
-                        <label class="form-check-label">
-                            ${addr.address_line1}, ${addr.city}
-                        </label>
+                container.innerHTML = data.results.map((addr, idx) => `
+                    <div class="col-md-6">
+                        <div class="address-card h-100 ${idx === 0 ? 'selected' : ''}" onclick="selectAddress(${addr.id}, this)">
+                            <h6 class="mb-1 fw-bold">${addr.title}</h6>
+                            <p class="mb-1 small fw-medium">${addr.full_name}</p>
+                            <p class="mb-1 text-muted small">${addr.line1}, ${addr.city}</p>
+                            <p class="mb-0 text-muted small">${addr.phone}</p>
+                        </div>
                     </div>
                 `).join('');
+                
+                // Select first by default
+                if (data.results.length > 0) {
+                    selectedAddressId = data.results[0].id;
+                    continueBtn.disabled = false;
+                }
+            } else {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5 border rounded-4 border-dashed bg-light">
+                        <i class="fas fa-home fa-3x mb-3 text-muted" style="opacity: 0.3;"></i>
+                        <h5>No shipping addresses found</h5>
+                        <p class="text-muted small">Please add a shipping address to continue</p>
+                        <button class="btn btn-dark rounded-pill px-4 mt-2" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                            Add Shipping Address
+                        </button>
+                    </div>
+                `;
+                continueBtn.disabled = true;
             }
         } catch (error) {
             console.error('Failed to load addresses:', error);
+            container.innerHTML = '<div class="alert alert-danger">Failed to load addresses</div>';
         }
+    }
+    
+    function selectAddress(id, element) {
+        document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedAddressId = id;
+        document.getElementById('addr-continue-btn').disabled = false;
+    }
+    
+    async function saveAddress() {
+        const form = document.getElementById('address-form');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+        btn.disabled = true;
+        
+        try {
+            await apiFetch('/addresses/', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addAddressModal'));
+            modal.hide();
+            
+            // Refresh addresses
+            if (currentStep === 1) {
+                await loadAddresses();
+            }
+            form.reset();
+        } catch (error) {
+            alert('Failed to save address. Please check your inputs.');
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+    }
+    
+    async function loadShippingMethods() {
+        const container = document.getElementById('shipping-methods-list');
+        const continueBtn = document.getElementById('shipping-continue-btn');
+        
+        try {
+            const data = await apiFetch('/shippingmethods/');
+            const methods = data.results || data; // Handle both paginated and flat lists
+            
+            if (methods.length > 0) {
+                container.innerHTML = methods.map((sm, idx) => {
+                    const cost = parseFloat(sm.base_cost);
+                    const isFree = sm.free_shipping_threshold !== null && cartSubtotal >= parseFloat(sm.free_shipping_threshold);
+                    const displayCost = isFree ? 'FREE' : `$${cost.toFixed(2)}`;
+                    const actualCost = isFree ? 0 : cost;
+                    
+                    return `
+                        <div class="col-12">
+                            <label class="address-card w-100 d-block ${selectedShippingMethodId == sm.id ? 'selected' : ''}" onclick="selectShippingMethod(${sm.id}, ${actualCost}, this)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">${sm.name}</h6>
+                                        <p class="mb-0 text-muted small">${sm.description || ''}</p>
+                                        ${sm.estimated_days_min ? `<p class="mb-0 text-muted x-small">Est. ${sm.estimated_days_min}-${sm.estimated_days_max} days</p>` : ''}
+                                    </div>
+                                    <span class="fw-bold ${isFree ? 'text-success' : ''}">${displayCost}</span>
+                                </div>
+                            </label>
+                        </div>
+                    `;
+                }).join('');
+                
+                // If one was already selected, keep it, otherwise maybe select first
+                if (selectedShippingMethodId) {
+                    continueBtn.disabled = false;
+                }
+            } else {
+                container.innerHTML = '<div class="col-12 text-center py-4">No shipping methods available</div>';
+            }
+        } catch (error) {
+            console.error('Failed to load shipping methods:', error);
+            container.innerHTML = '<div class="alert alert-danger">Error loading shipping methods</div>';
+        }
+    }
+
+    function selectShippingMethod(id, cost, element) {
+        document.querySelectorAll('#shipping-methods-list .address-card').forEach(c => c.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedShippingMethodId = id;
+        selectedShippingCost = cost;
+        document.getElementById('shipping-continue-btn').disabled = false;
+        
+        updateTotalDisplay();
+    }
+
+    function updateTotalDisplay() {
+        const shippingEl = document.getElementById('summary-shipping');
+        if (selectedShippingCost > 0) {
+            shippingEl.textContent = `$${selectedShippingCost.toFixed(2)}`;
+            shippingEl.classList.remove('text-success');
+        } else {
+            shippingEl.textContent = 'Free';
+            shippingEl.classList.add('text-success');
+        }
+        
+        const total = cartSubtotal + selectedShippingCost;
+        document.getElementById('order-total').textContent = `$${total.toFixed(2)}`;
+    }
+
+    async function loadReviewAddress() {
+        if (!selectedAddressId) return;
+        try {
+            const addr = await apiFetch(`/addresses/${selectedAddressId}/`);
+            document.getElementById('review-addr').innerHTML = `
+                <div class="fw-bold mb-1">${addr.full_name} (${addr.title})</div>
+                <div>${addr.line1}</div>
+                ${addr.line2 ? `<div>${addr.line2}</div>` : ''}
+                <div>${addr.city}, ${addr.state}, ${addr.postal_code}</div>
+                <div>${addr.phone}</div>
+            `;
+        } catch (error) {
+            document.getElementById('review-addr').textContent = 'Error loading address';
+        }
+    }
+
+    function updateStepIndicator() {
+        document.querySelectorAll('.step').forEach((step, index) => {
+            const stepNum = index + 1;
+            step.classList.remove('active', 'completed');
+            
+            if (stepNum < currentStep) {
+                step.classList.add('completed');
+                step.querySelector('.step-icon').innerHTML = '<i class="fas fa-check"></i>';
+            } else if (stepNum === currentStep) {
+                step.classList.add('active');
+                // Restore icon
+                const icons = ['fa-map-marker-alt', 'fa-truck', 'fa-credit-card', 'fa-check-circle'];
+                step.querySelector('.step-icon').innerHTML = `<i class="fas ${icons[index]}"></i>`;
+            } else {
+                const icons = ['fa-map-marker-alt', 'fa-truck', 'fa-credit-card', 'fa-check-circle'];
+                step.querySelector('.step-icon').innerHTML = `<i class="fas ${icons[index]}"></i>`;
+            }
+        });
     }
     
     window.nextStep = function() {
         if (currentStep < 4) {
             currentStep++;
-            updateStepIndicator();
             loadStepContent(currentStep);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
     
-    function updateStepIndicator() {
-        document.querySelectorAll('.step').forEach((step, index) => {
-            if (index + 1 <= currentStep) {
-                step.classList.add('active');
-            } else {
-                step.classList.remove('active');
-            }
-        });
+    window.prevStep = function() {
+        if (currentStep > 1) {
+            currentStep--;
+            loadStepContent(currentStep);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
     
     window.placeOrder = async function() {
+        const btn = document.getElementById('place-order-btn');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Processing...';
+        btn.disabled = true;
+        
         try {
             const order = await apiFetch('/orders/', {
                 method: 'POST',
                 body: JSON.stringify({
-                    // Order data
+                    shipping_address_id: selectedAddressId,
+                    shipping_method_id: selectedShippingMethodId,
+                    payment_method: selectedPaymentMethod
                 })
             });
             
-            alert('Order placed successfully!');
-            window.location.href = `/my-account/orders/${order.id}/`;
+            // Show success modal or redirect
+            window.location.href = `{% url 'customer_dashboard' %}?order_success=true&order_id=${order.id}`;
         } catch (error) {
-            alert('Failed to place order');
+            console.error('Order Error:', error);
+            alert('Failed to place order. Please try again or contact support.');
+            btn.textContent = 'Place Order Now';
+            btn.disabled = false;
         }
     };
     

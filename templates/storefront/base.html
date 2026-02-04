@@ -255,6 +255,37 @@
         .main-header.header-scrolled .header-icon:hover {
             color: var(--primary-color);
         }
+
+        /* Solid Header for non-home pages */
+        .main-header.header-solid {
+            background: #ffffff;
+            position: sticky;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .main-header.header-solid .logo,
+        .main-header.header-solid .main-nav a,
+        .main-header.header-solid .header-icon,
+        .main-header.header-solid .header-search-btn {
+            color: var(--primary-color);
+        }
+
+        .main-header.header-solid .main-nav a::after {
+            background: var(--primary-color);
+        }
+
+        .main-header.header-solid .header-search-form {
+            border-color: #ddd;
+            background: #f5f5f5;
+        }
+
+        .main-header.header-solid .header-search-input {
+            color: var(--text-primary);
+        }
+
+        .main-header.header-solid .header-search-input::placeholder {
+            color: #999;
+        }
         
         .cart-count {
             position: absolute;
@@ -830,7 +861,7 @@
     </div> {% endcomment %}
     
     <!-- Main Header -->
-    <header class="main-header">
+    <header class="main-header {% if request.path != '/' and request.path != '/home/' %}header-solid{% endif %}">
         <div class="header-container">
             <!-- Logo -->
             <a href="{% url 'home' %}" class="logo">ECOM</a>
@@ -1157,7 +1188,9 @@
                 if (window.scrollY > 50) {
                     header.classList.add('header-scrolled');
                 } else {
-                    header.classList.remove('header-scrolled');
+                    if (!header.classList.contains('header-solid')) {
+                        header.classList.remove('header-scrolled');
+                    }
                 }
             });
         });

@@ -426,6 +426,9 @@ class Order(models.Model):
     billing_address = models.ForeignKey("Address", on_delete=models.PROTECT, related_name="billing_orders",
                                         null=True, blank=True)
 
+    shipping_method = models.ForeignKey("master.ShippingMethod", on_delete=models.SET_NULL, null=True, blank=True, related_name="orders")
+    shipping_method_name = models.CharField(max_length=100, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -520,7 +523,9 @@ class Order(models.Model):
     def create_from_cart(cls, cart: Optional[Cart] = None, user: Optional[CustomUser] = None,
                          guest_token: Optional[str] = None, guest_email: Optional[str] = None,
                          shipping_address: Optional['Address'] = None,
-                         billing_address: Optional['Address'] = None, currency: str = "USD"):
+                         billing_address: Optional['Address'] = None,
+                         shipping_method: Optional['master.ShippingMethod'] = None,
+                         currency: str = "USD"):
         """
         Create an Order from the given cart (preferred).
         Backward-compat: if cart is None, resolve from user/guest_token.
@@ -564,7 +569,19 @@ class Order(models.Model):
                 currency=currency,
                 shipping_address=shipping_address,
                 billing_address=billing_address,
+                shipping_method=shipping_method,
             )
+            
+            if shipping_method:
+                order.shipping_method_name = shipping_method.name
+                # Calculate shipping charge
+                shipping_charge = shipping_method.base_cost
+                # Threshold check
+                if shipping_method.free_shipping_threshold is not None:
+                    # We'll calculate threshold after items are summed, 
+                    # but for now we initialize it
+                    pass
+                order.shipping_amount = quantize_money(shipping_charge)
 
             subtotal = Decimal("0.00")
             # Validate & create order items, decrement stock where applicable
@@ -613,6 +630,11 @@ class Order(models.Model):
                 order.coupon = cart_coupon.coupon
                 order.coupon_code = cart_coupon.coupon.code
                 order.discount_amount = quantize_money(cart_coupon.coupon.apply(order.subtotal_amount))
+
+            # Re-check free shipping threshold after subtotal is known
+            if shipping_method and shipping_method.free_shipping_threshold is not None:
+                if order.subtotal_amount >= shipping_method.free_shipping_threshold:
+                    order.shipping_amount = Decimal("0.00")
 
             order.total_amount = quantize_money(order.subtotal_amount - order.discount_amount + order.shipping_amount + order.tax_amount)
             order.save()

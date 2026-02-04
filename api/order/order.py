@@ -42,7 +42,8 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             "id", "order_number", "status", "payment_status", "currency",
             "subtotal_amount", "discount_amount", "shipping_amount", "tax_amount", "total_amount",
-            "coupon_code", "created_at", "items", "shipping_address", "billing_address"
+            "coupon_code", "created_at", "items", "shipping_address", "billing_address",
+            "shipping_method", "shipping_method_name"
         ]
 
 
@@ -55,6 +56,7 @@ class OrderCreateSerializer(serializers.Serializer):
     # New: IDs for existing user addresses
     shipping_address_id = serializers.IntegerField(required=False)
     billing_address_id = serializers.IntegerField(required=False)
+    shipping_method_id = serializers.IntegerField(required=False)
 
     def validate(self, attrs):
         req = self.context["request"]
@@ -173,6 +175,13 @@ class OrderViewSet(viewsets.ViewSet):
         else:
             cart = Cart.objects.get_or_create_for_owner(user=user, guest_token=guest_token)
 
+        # Resolve shipping method
+        from apps.master.models import ShippingMethod
+        shipping_method = None
+        sm_id = data.get("shipping_method_id")
+        if sm_id:
+            shipping_method = ShippingMethod.objects.filter(id=sm_id, is_active=True).first()
+
         order = Order.create_from_cart(
             cart=cart,
             user=user,
@@ -180,6 +189,7 @@ class OrderViewSet(viewsets.ViewSet):
             guest_email=data.get("guest_email"),
             shipping_address=shipping,
             billing_address=billing,
+            shipping_method=shipping_method,
             currency="USD",
         )
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
