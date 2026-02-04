@@ -394,8 +394,7 @@
                         <h4 class="mb-4 fw-bold">Payment Method</h4>
                         <div class="row g-3 mb-4">
                             <div class="col-12">
-                                <label class="address-card w-100 d-block selected">
-                                    <input type="radio" name="payment_method" value="cod" class="d-none" checked>
+                                <label class="address-card w-100 d-block ${selectedPaymentMethod === 'cod' ? 'selected' : ''}" onclick="selectPaymentMethod('cod', this)">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="icon h4 mb-0 text-primary"><i class="fas fa-hand-holding-usd"></i></div>
                                         <div>
@@ -405,14 +404,24 @@
                                     </div>
                                 </label>
                             </div>
-                             <div class="col-12">
-                                <label class="address-card w-100 d-block text-muted" style="opacity: 0.6; cursor: not-allowed;">
-                                    <input type="radio" name="payment_method" value="card" class="d-none" disabled>
+                            <div class="col-12">
+                                <label class="address-card w-100 d-block ${selectedPaymentMethod === 'ssl_commerz' ? 'selected' : ''}" onclick="selectPaymentMethod('ssl_commerz', this)">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="icon h4 mb-0"><i class="fas fa-credit-card"></i></div>
+                                        <div class="icon h4 mb-0 text-primary"><i class="fas fa-shield-alt"></i></div>
                                         <div>
-                                            <h6 class="mb-0 fw-bold">Credit/Debit Card</h6>
-                                            <p class="mb-0 text-muted small">Pay securely online (Coming Soon)</p>
+                                            <h6 class="mb-0 fw-bold">SSL Commerz</h6>
+                                            <p class="mb-0 text-muted small">Pay securely with SSLCommerz Gateway</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-12">
+                                <label class="address-card w-100 d-block ${selectedPaymentMethod === 'paystation' ? 'selected' : ''}" onclick="selectPaymentMethod('paystation', this)">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="icon h4 mb-0 text-primary"><i class="fas fa-credit-card"></i></div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">Pay Station</h6>
+                                            <p class="mb-0 text-muted small">Fast and secure local payment</p>
                                         </div>
                                     </div>
                                 </label>
@@ -449,7 +458,7 @@
                              </div>
                              <div class="col-md-6">
                                 <label class="small text-muted text-uppercase fw-bold mb-2">Payment</label>
-                                <div class="border p-3 rounded-4 bg-light small">Cash on Delivery</div>
+                                <div id="review-payment" class="border p-3 rounded-4 bg-light small text-capitalize">${selectedPaymentMethod.replace('_', ' ')}</div>
                              </div>
                         </div>
 
@@ -615,6 +624,12 @@
         
         const total = cartSubtotal + selectedShippingCost;
         document.getElementById('order-total').textContent = `৳${total.toFixed(2)}`;
+    }
+
+    window.selectPaymentMethod = function(method, element) {
+        selectedPaymentMethod = method;
+        document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+        element.classList.add('selected');
     }
 
     async function loadReviewAddress() {

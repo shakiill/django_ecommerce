@@ -190,6 +190,6 @@ class OrderViewSet(viewsets.ViewSet):
             shipping_address=shipping,
             billing_address=billing,
             shipping_method=shipping_method,
-            currency="USD",
+            currency="BDT",
         )
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)

@@ -42,11 +42,6 @@ class PaymentMethod(models.TextChoices):
     SSL_COMMERZ = "ssl_commerz", "SSL Commerz"
     PAYSTATION = "paystation", "Pay Station"
 
-    CARD = "card", "Card"
-    STRIPE = "stripe", "Stripe"
-    PAYPAL = "paypal", "PayPal"
-    BANK = "bank", "Bank Transfer"
-
 
 # ---- Cart / Cart Manager ----
 class CartManager(models.Manager):
@@ -507,7 +502,7 @@ class Order(models.Model):
             self.notes = (self.notes + "\nCancel: " + reason) if self.notes else ("Cancel: " + reason)
         self.save(update_fields=["status", "notes"])
 
-    def mark_paid(self, transaction_id: str = "", method: str = PaymentMethod.CARD):
+    def mark_paid(self, transaction_id: str = "", method: str = PaymentMethod.COD):
         """Convenience: mark order paid and optionally create a Payment record."""
         self.payment_status = PaymentStatus.PAID
         self.save(update_fields=["payment_status"])
@@ -528,7 +523,7 @@ class Order(models.Model):
                          shipping_address: Optional['Address'] = None,
                          billing_address: Optional['Address'] = None,
                          shipping_method: Optional['master.ShippingMethod'] = None,
-                         currency: str = "USD"):
+                         currency: str = "BDT"):
         """
         Create an Order from the given cart (preferred).
         Backward-compat: if cart is None, resolve from user/guest_token.
@@ -755,7 +750,7 @@ class Payment(models.Model):
     method = models.CharField(max_length=20, choices=PaymentMethod.choices)
     status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.PENDING)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    currency = models.CharField(max_length=10, default="USD")
+    currency = models.CharField(max_length=10, default="BDT")
     transaction_id = models.CharField(max_length=128, blank=True, db_index=True)
     gateway_response = models.TextField(blank=True)
     paid_at = models.DateTimeField(null=True, blank=True)
