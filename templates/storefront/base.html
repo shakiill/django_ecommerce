@@ -283,7 +283,8 @@
                 const response = await fetch(`${API_BASE_URL}${endpoint}`, mergedOptions);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || errorData.message || `HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 return await response.json();
@@ -291,6 +292,64 @@
                 console.error('API Error:', error);
                 throw error;
             }
+        }
+
+        // Shared Cart Utility
+        async function addToCart(variantId, quantity = 1) {
+            try {
+                const payload = {
+                    variant_id: variantId,
+                    quantity: parseInt(quantity)
+                };
+                
+                const data = await apiFetch('/cart/', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                showToast('Product added to cart successfully!', 'success');
+                updateCartCount();
+                return true;
+            } catch (error) {
+                console.error('Failed to add to cart:', error);
+                showToast(error.message || 'Failed to add item to cart', 'danger');
+                return false;
+            }
+        }
+
+        // Generic Toast Notification
+        function showToast(message, type = 'success') {
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.style.cssText = 'position: fixed; top: 100px; right: 20px; z-index: 10000;';
+                document.body.appendChild(toastContainer);
+            }
+
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'danger' ? 'danger' : (type === 'success' ? 'success' : 'warning')} border-0 mb-2 show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-${type === 'danger' ? 'exclamation-circle' : 'check-circle'} me-2"></i>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toastEl = document.getElementById(toastId);
+            
+            setTimeout(() => {
+                if (toastEl) {
+                    const bsToast = new bootstrap.Toast(toastEl);
+                    bsToast.hide();
+                    setTimeout(() => toastEl.remove(), 1000);
+                }
+            }, 3000);
         }
         
         // Update cart count

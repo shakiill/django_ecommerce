@@ -1,1025 +1,775 @@
 {% extends 'storefront/base.html' %}
 {% load static %}
 
-{% block title %}Loading... - UOMO{% endblock %}
+{% block title %}Product Detail - Shop{% endblock %}
 
 {% block content %}
-<div class="product-detail-page">
-    <div class="container">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="py-3 mb-3">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'shop' %}">Shop</a></li>
-                <li class="breadcrumb-item active" aria-current="page" id="breadcrumbName">Loading...</li>
+<main class="product-detail-page pt-110">
+    <div class="container-custom">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb-nav mb-4" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/shop/">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page" id="breadcrumb-product-name">Product</li>
             </ol>
         </nav>
 
-        <!-- Loading State -->
-        <div id="pdpLoading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-3 text-muted">Loading product details...</p>
-        </div>
-
-        <!-- Product Main Section -->
-        <div class="row g-5 d-none animate-fade-in" id="pdpContent">
-            <!-- Gallery Section -->
-            <div class="col-lg-6">
-                <div class="product-gallery sticky-top" style="top: 100px; z-index: 1;">
-                    <div class="pdp-image-main mb-4 position-relative overflow-hidden rounded-4">
-                        <!-- Sale Badge -->
-                        <div class="pdp-sale-badge d-none" id="pdpSaleBadge">
-                            <span>Sale</span>
-                        </div>
-                        
-                        <div class="pdp-image-wrapper">
-                            <img id="mainImage" 
-                                 src="{% static 'assets/images/placeholder.png' %}" 
-                                 alt="Product Image" 
-                                 class="pdp-main-image img-fluid w-100">
-                             
-                             <div class="pdp-zoom-hint">
-                                <i class="fas fa-search-plus"></i> Hover to zoom
+        <div class="row g-5">
+            <!-- Product Gallery Column -->
+            <div class="col-lg-7">
+                <div class="product-gallery-container sticky-top" style="top: 110px; z-index: 10;">
+                    <div class="row g-3">
+                        <!-- Vertical Thumbnails -->
+                        <div class="col-md-2 order-2 order-md-1">
+                            <div class="product-thumbnails d-flex flex-md-column gap-3" id="product-thumbnails">
+                                <!-- Dynamic Thumbnails -->
                             </div>
                         </div>
                         
-                        <button class="btn-expand position-absolute bottom-0 end-0 m-3" onclick="openLightbox()">
-                            <i class="fas fa-expand-alt"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- Thumbnails -->
-                    <div class="gallery-thumbs d-flex gap-3 overflow-auto pb-2" id="galleryThumbs">
-                        <!-- Thumbnails injected by JS -->
+                        <!-- Main Image -->
+                        <div class="col-md-10 order-1 order-md-2">
+                            <div class="product-main-view glass-panel p-3">
+                                <div class="main-image-wrapper">
+                                    <img id="main-product-image" src="" alt="Product" class="img-fluid rounded-4">
+                                    <div class="image-zoom-hint">
+                                        <i class="fas fa-search-plus"></i> Hover to Zoom
+                                    </div>
+                                    <div id="product-badges" class="product-badges-detail">
+                                        <!-- Dynamic Badges -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Product Info Section -->
-            <div class="col-lg-6">
-                <div class="product-info-wrapper ps-lg-4">
-                    <!-- Category & Rating -->
-                    <div class="pdp-meta mb-3">
-                        <a href="#" class="pdp-category" id="pdpCategory">CATEGORY</a>
-                        <div class="pdp-rating">
+            <!-- Product Info Column -->
+            <div class="col-lg-5">
+                <div class="product-details-content">
+                    <div class="qv-meta mb-2">
+                        <span class="qv-category" id="detail-category">Category</span>
+                        <div class="detail-brand d-flex align-items-center gap-2">
+                             <span class="text-muted small fw-bold">BRAND:</span>
+                             <span id="detail-brand" class="fw-bold text-dark">Brand Name</span>
+                        </div>
+                    </div>
+
+                    <h1 class="qv-title mb-3" id="detail-title">Loading...</h1>
+                    
+                    <div class="detail-rating-section mb-4 d-flex align-items-center gap-3">
+                        <div class="qv-rating">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star-half-alt"></i>
-                            <span class="rating-count ms-2 text-muted">(4.8 Reviews)</span>
+                        </div>
+                        <span class="text-muted small">(4.8 / 5.0 Rating based on 24 reviews)</span>
+                    </div>
+
+                    <div class="qv-price-section mb-4">
+                        <div class="qv-price d-flex align-items-center gap-3">
+                            <span id="detail-price" class="text-primary fs-2 fw-900">৳0.00</span>
+                            <span id="detail-old-price" class="text-muted text-decoration-line-through fs-5" style="display: none;">৳0.00</span>
+                        </div>
+                        <div class="qv-stock-status mt-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span id="stock-status-text">In Stock</span>
                         </div>
                     </div>
-                    
-                    <h1 class="pdp-title mb-3" id="pdpName">Product Name</h1>
-                    
-                    <!-- Price -->
-                    <div class="pdp-price-section mb-4">
-                        <div class="pdp-price" id="pdpPrice">৳0.00</div>
-                        <div class="pdp-old-price d-none" id="pdpOldPrice">৳0.00</div>
-                        <div class="pdp-stock-status ms-auto">
-                            <i class="fas fa-check-circle"></i>
-                            <span>In Stock</span>
-                        </div>
+
+                    <div class="qv-description mb-4" id="detail-short-description">
+                        <!-- Short description or snippet -->
                     </div>
 
-                    <div class="pdp-description text-muted mb-4" id="pdpShortDesc"></div>
-                    
-                    <div class="pdp-divider my-4"></div>
+                    <div class="qv-divider mb-4"></div>
 
-                    <!-- Attributes Section -->
-                    <div class="product-attributes mb-4" id="pdpAttributes">
-                        <!-- Attributes injected by JS -->
+                    <!-- Attributes Container -->
+                    <div id="detail-attributes-container" class="qv-attributes">
+                        <!-- Dynamic attributes -->
                     </div>
 
-                    <!-- Actions -->
-                    <div class="pdp-actions mb-5">
-                        <div class="pdp-quantity">
-                            <label class="pdp-label mb-2">Quantity</label>
-                            <div class="quantity-selector">
-                                <button type="button" class="qty-btn qty-minus" onclick="updatePdpQty(-1)">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="text" class="qty-input" id="pdpQty" value="1" readonly>
-                                <button type="button" class="qty-btn qty-plus" onclick="updatePdpQty(1)">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                    <!-- Actions Section -->
+                    <div class="qv-actions-wrapper glass-panel p-4 mb-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <div class="qv-quantity">
+                                    <label class="qv-label mb-2 d-block">Quantity</label>
+                                    <div class="quantity-selector-detail">
+                                        <button type="button" class="qty-btn" onclick="updateDetailQty(-1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="text" class="qty-input" id="detail-qty" value="1" readonly>
+                                        <button type="button" class="qty-btn" onclick="updateDetailQty(1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="d-flex gap-2">
+                                    <button class="btn qv-add-to-cart flex-grow-1" id="detail-add-to-cart" onclick="addToCartFromDetail()">
+                                        <i class="fas fa-shopping-bag me-2"></i> Add to Cart
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="d-flex flex-column flex-sm-row gap-3 flex-grow-1 w-100 mt-4 mt-sm-0">
-                            <button class="pdp-add-to-cart flex-grow-1" id="addToCartBtn" onclick="pdpAddToCart()">
-                                <i class="fas fa-shopping-bag"></i>
-                                <span id="btnText">Add to Cart</span>
-                            </button>
-                            <button class="pdp-buy-now flex-grow-1" id="buyNowBtn" onclick="pdpBuyNow()">
-                                <i class="fas fa-bolt"></i>
-                                <span>Buy Now</span>
+                        <div class="mt-3">
+                            <button class="btn btn-dark w-100 py-3 rounded-3 fw-bold text-uppercase" onclick="buyNowFromDetail()" style="letter-spacing: 1px;">
+                                <i class="fas fa-bolt me-2 text-warning"></i> Buy It Now
                             </button>
                         </div>
                     </div>
 
                     <!-- Secondary Actions -->
-                    <div class="pdp-secondary-actions d-flex gap-4 mb-4">
-                        <button class="pdp-action-btn">
+                    <div class="qv-secondary-actions mb-5 pb-4 border-bottom">
+                        <button class="qv-action-btn">
                             <i class="far fa-heart"></i> Add to Wishlist
                         </button>
-                        <button class="pdp-action-btn">
-                            <i class="fas fa-share-alt"></i> Share
+                        <button class="qv-action-btn">
+                            <i class="fas fa-share-alt"></i> Share Product
+                        </button>
+                        <button class="qv-action-btn">
+                            <i class="fas fa-balance-scale"></i> Compare
                         </button>
                     </div>
 
-                    <!-- Meta Info -->
-                    <div class="pdp-product-meta p-4 bg-light rounded-3">
-                        <div class="mb-2 d-flex justify-content-between">
-                            <span class="text-muted fw-bold">SKU:</span>
-                            <span class="text-dark" id="pdpSku">N/A</span>
-                        </div>
-                        <div class="mb-2 d-flex justify-content-between">
-                            <span class="text-muted fw-bold">Category:</span>
-                            <span class="text-dark" id="pdpMetaCategory"></span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted fw-bold">Tags:</span>
-                            <span class="text-dark">Modern, Luxury, Trend</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Trust Badges -->
-                    <div class="pdp-trust-badges mt-4">
-                        <div class="trust-badge">
-                            <i class="fas fa-truck"></i>
-                            <span>Free Delivery</span>
-                        </div>
-                        <div class="trust-badge">
-                            <i class="fas fa-undo"></i>
-                            <span>Easy Returns</span>
-                        </div>
-                        <div class="trust-badge">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Secure Payment</span>
-                        </div>
+                    <!-- Key Features / Trust -->
+                    <div class="trust-features glass-panel p-3">
+                         <div class="row g-4 text-center">
+                              <div class="col-4">
+                                   <div class="trust-item">
+                                        <i class="fas fa-truck mb-2 text-primary fs-4"></i>
+                                        <p class="mb-0 x-small fw-bold">Free Delivery</p>
+                                   </div>
+                              </div>
+                              <div class="col-4 border-start border-end">
+                                   <div class="trust-item">
+                                        <i class="fas fa-undo mb-2 text-primary fs-4"></i>
+                                        <p class="mb-0 x-small fw-bold">30 Days Return</p>
+                                   </div>
+                              </div>
+                              <div class="col-4">
+                                   <div class="trust-item">
+                                        <i class="fas fa-shield-alt mb-2 text-primary fs-4"></i>
+                                        <p class="mb-0 x-small fw-bold">Secure Pay</p>
+                                   </div>
+                              </div>
+                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tabs Section -->
-        <div class="row mt-5 pt-5 d-none animate-up" id="pdpTabsSection">
-            <div class="col-12">
-                <ul class="nav nav-tabs pdp-tabs justify-content-center mb-5" id="productTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Description</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews (0)</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Additional Info</button>
-                    </li>
-                </ul>
-                <div class="tab-content" id="productTabsContent">
-                    <!-- Description Tab -->
-                    <div class="tab-pane fade show active" id="desc" role="tabpanel">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="prose text-muted lh-lg" id="pdpFullDesc"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Reviews Tab -->
-                    <div class="tab-pane fade" id="reviews" role="tabpanel">
-                        <div class="text-center py-5 text-muted">
-                            <div class="mb-4">
-                                <i class="far fa-comment-alt fa-3x text-light-gray"></i>
-                            </div>
-                            <h5>No reviews yet</h5>
-                            <p class="mb-4">Be the first to review this product!</p>
-                            <button class="btn btn-outline-dark rounded-pill px-4">Write a Review</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Additional Info Tab -->
-                    <div class="tab-pane fade" id="info" role="tabpanel">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <table class="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <th class="bg-light w-25">Weight</th>
-                                            <td>0.5 kg</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="bg-light">Dimensions</th>
-                                            <td>20 x 10 x 5 cm</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="bg-light">Materials</th>
-                                            <td>100% Cotton</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Product Extra Tabs -->
+        <div class="product-tabs-section mt-100">
+             <ul class="nav nav-tabs justify-content-center border-0 gap-5 mb-5" id="productTab" role="tablist">
+                 <li class="nav-item" role="presentation">
+                     <button class="nav-link active tab-link" id="description-tab" data-bs-toggle="tab" data-bs-target="#description-content" type="button" role="tab">Description</button>
+                 </li>
+                 <li class="nav-item" role="presentation">
+                     <button class="nav-link tab-link" id="spec-tab" data-bs-toggle="tab" data-bs-target="#spec-content" type="button" role="tab">Specifications</button>
+                 </li>
+                 <li class="nav-item" role="presentation">
+                     <button class="nav-link tab-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-content" type="button" role="tab">Reviews (2)</button>
+                 </li>
+             </ul>
+             <div class="tab-content glass-panel p-5 rounded-5" id="productTabContent">
+                 <div class="tab-pane fade show active" id="description-content" role="tabpanel">
+                     <div class="rich-text-content" id="full-description">
+                         <!-- Full description -->
+                     </div>
+                 </div>
+                 <div class="tab-pane fade" id="spec-content" role="tabpanel">
+                     <div class="specs-table-container">
+                         <table class="table table-striped custom-table">
+                             <tbody id="specs-body">
+                                 <!-- Specifications -->
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+                 <div class="tab-pane fade" id="reviews-content" role="tabpanel">
+                      <div class="reviews-placeholder py-5 text-center text-muted">
+                           <i class="far fa-comments fs-1 mb-3"></i>
+                           <p>No reviews yet for this product.</p>
+                      </div>
+                 </div>
+             </div>
         </div>
-
     </div>
+</main>
+
+<!-- Sticky Mobile Buy Bar -->
+<div class="mobile-buy-bar d-lg-none">
+     <div class="container-fluid d-flex gap-2">
+          <div class="flex-shrink-0">
+               <div class="quantity-selector-detail mobile">
+                    <button class="qty-btn" onclick="updateDetailQty(-1)"><i class="fas fa-minus"></i></button>
+                    <input type="text" class="qty-input" value="1" disabled>
+                    <button class="qty-btn" onclick="updateDetailQty(1)"><i class="fas fa-plus"></i></button>
+               </div>
+          </div>
+          <button class="btn btn-primary flex-grow-1" onclick="addToCartFromDetail()">Add</button>
+          <button class="btn btn-dark flex-grow-1" onclick="buyNowFromDetail()">Buy</button>
+     </div>
 </div>
-{% endblock %}
 
-{% block extra_css %}
 <style>
-    /* ============================================
-       PRODUCT DETAIL PAGE - Premium Design
-       ============================================ */
-    
-    :root {
-        --pdp-primary: #111111;
-        --pdp-accent: #ff4e50;
-        --pdp-bg-light: #f8f9fa;
-        --pdp-border-color: #e5e7eb;
-    }
+/* Product Detail Specific styles */
+.product-detail-page {
+    padding-bottom: 80px;
+}
 
-    .product-detail-page {
-        padding-top: 30px;
-        padding-bottom: 80px;
-        background: #fff;
-        font-family: 'Jost', sans-serif;
-    }
+.breadcrumb-nav .breadcrumb {
+    background: transparent;
+    padding: 0;
+}
 
-    /* Gallery */
-    .pdp-image-main {
-        background: var(--pdp-bg-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px;
-        cursor: crosshair;
-    }
-    
-    .pdp-image-wrapper {
-        position: relative;
-        overflow: hidden;
-        border-radius: 12px;
-        transition: transform 0.3s ease;
-    }
+.breadcrumb-item a {
+    color: var(--gray-600);
+    font-weight: 500;
+}
 
-    .pdp-main-image {
-        max-height: 600px;
-        object-fit: contain;
-        transition: transform 0.5s ease;
-        will-change: transform;
-    }
-    
-    .pdp-image-main:hover .pdp-main-image {
-        transform: scale(1.05);
-    }
-    
-    .pdp-zoom-hint {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.7);
-        color: #fff;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        opacity: 0;
-        transition: opacity 0.3s;
-        pointer-events: none;
-    }
-    
-    .pdp-image-main:hover .pdp-zoom-hint {
-        opacity: 1;
-    }
-    
-    /* Sale Badge */
-    .pdp-sale-badge {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        z-index: 10;
-    }
-    
-    .pdp-sale-badge span {
-        background: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%);
-        color: #fff;
-        padding: 6px 16px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        box-shadow: 0 4px 10px rgba(255, 78, 80, 0.3);
-    }
-    
-    .btn-expand {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #fff;
-        border: none;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        color: #333;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-    }
-    
-    .pdp-image-main:hover .btn-expand {
-        opacity: 1;
-    }
-    
-    .btn-expand:hover {
-        background: var(--pdp-primary);
-        color: #fff;
-    }
+.breadcrumb-item.active {
+    color: var(--black);
+    font-weight: 700;
+}
 
-    /* Thumbnails */
-    .gallery-thumbs .thumb-item {
-        width: 80px;
-        height: 80px;
-        border-radius: 10px;
-        border: 2px solid transparent;
-        overflow: hidden;
-        cursor: pointer;
-        opacity: 0.6;
-        background: var(--pdp-bg-light);
-        transition: all 0.3s;
-        flex-shrink: 0;
-        padding: 5px;
-    }
-    
-    .gallery-thumbs .thumb-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-    
-    .gallery-thumbs .thumb-item.active-thumb,
-    .gallery-thumbs .thumb-item:hover {
-        border-color: var(--pdp-primary);
-        opacity: 1;
-        transform: translateY(-2px);
-    }
+.main-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: var(--white);
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    /* Info Section */
-    .pdp-category {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--pdp-accent);
-        background: rgba(255, 78, 80, 0.1);
-        padding: 5px 12px;
-        border-radius: 20px;
-        text-decoration: none;
-        transition: all 0.2s;
-        display: inline-block;
-        margin-right: 15px;
-    }
-    
-    .pdp-category:hover {
-        background: var(--pdp-accent);
-        color: #fff;
-    }
+#main-product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+}
 
-    .pdp-rating {
-        display: inline-flex;
-        align-items: center;
-        color: #fbbf24;
-        font-size: 13px;
-    }
-    
-    .pdp-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #111;
-        line-height: 1.2;
-    }
-    
-    .pdp-price-section {
-        display: flex;
-        align-items: baseline;
-        gap: 15px;
-    }
-    
-    .pdp-price {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #111;
-    }
-    
-    .pdp-old-price {
-        font-size: 1.25rem;
-        color: #9ca3af;
-        text-decoration: line-through;
-        font-weight: 500;
-    }
-    
-    .pdp-stock-status {
-        color: #10b981;
-        font-size: 14px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    
-    .pdp-description {
-        line-height: 1.7;
-        font-size: 1rem;
-    }
-    
-    .pdp-divider {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
-    }
+.main-image-wrapper:hover #main-product-image {
+    transform: scale(1.05);
+}
 
-    /* Attributes */
-    .pdp-label {
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #4b5563;
-        display: block;
-    }
-    
-    .pdp-attr-btn {
-        padding: 10px 20px;
-        border: 1px solid var(--pdp-border-color);
-        background: #fff;
-        color: #374151;
-        font-weight: 600;
-        font-size: 14px;
-        border-radius: 8px;
-        transition: all 0.2s;
-        min-width: 48px;
-    }
-    
-    .pdp-attr-btn:hover {
-        border-color: #111;
-        background: #f9fafb;
-    }
-    
-    .pdp-attr-btn.active {
-        background: #111;
-        color: #fff;
-        border-color: #111;
-    }
-    
-    /* Actions */
-    .quantity-selector {
-        display: inline-flex;
-        align-items: center;
-        background: #f3f4f6;
-        border-radius: 8px;
-        height: 48px;
-    }
-    
-    .qty-btn {
-        width: 40px;
-        height: 100%;
-        border: none;
-        background: transparent;
-        color: #374151;
-        cursor: pointer;
-        transition: color 0.2s;
-    }
-    
-    .qty-btn:hover { color: #111; }
-    
-    .qty-input {
-        width: 50px;
-        height: 100%;
-        border: none;
-        background: transparent;
-        text-align: center;
-        font-weight: 700;
-        color: #111;
-    }
-    
-    .pdp-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        gap: 20px;
-    }
-    
-    .pdp-add-to-cart {
-        height: 54px;
-        background: linear-gradient(135deg, #111 0%, #333 100%);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        transition: all 0.3s;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        font-size: 14px;
-    }
-    
-    .pdp-add-to-cart:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        background: linear-gradient(135deg, #000 0%, #222 100%);
-    }
-    
-    .pdp-buy-now {
-        height: 54px;
-        background: transparent;
-        color: #111;
-        border: 2px solid #111;
-        border-radius: 8px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        transition: all 0.3s;
-        font-size: 14px;
-    }
-    
-    .pdp-buy-now:hover {
-        background: #111;
-        color: #fff;
-    }
-    
-    .pdp-action-btn {
-        background: none;
-        border: none;
-        color: #6b7280;
-        font-size: 14px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 0;
-        transition: color 0.2s;
-    }
-    
-    .pdp-action-btn:hover { color: var(--pdp-accent); }
-    
-    .pdp-trust-badges {
-        display: flex;
-        gap: 24px;
-        padding-top: 20px;
-        border-top: 1px solid var(--pdp-border-color);
-        flex-wrap: wrap;
-    }
-    
-    .trust-badge {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 13px;
-        color: #4b5563;
-        font-weight: 500;
-    }
-    
-    .trust-badge i {
-        color: #10b981;
-        font-size: 16px;
-    }
+.thumbnail-item {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition-base);
+    background: var(--white);
+    flex-shrink: 0;
+}
 
-    /* Tabs */
-    .pdp-tabs {
-        border-bottom: 2px solid #f3f4f6;
-    }
-    
-    .pdp-tabs .nav-link {
-        border: none;
-        color: #9ca3af;
-        font-weight: 600;
-        font-size: 18px;
-        padding: 15px 30px;
-        background: transparent;
-        position: relative;
-    }
-    
-    .pdp-tabs .nav-link.active {
-        color: #111;
-    }
-    
-    .pdp-tabs .nav-link.active::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: #111;
-    }
+.thumbnail-item.active {
+    border-color: var(--accent-color);
+    box-shadow: 0 5px 15px rgba(255, 78, 80, 0.2);
+}
 
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animate-up {
-        animation: fadeInUp 0.5s ease forwards;
-        opacity: 0;
-    }
+.thumbnail-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-    /* Responsive */
-    @media (max-width: 991px) {
-        .pdp-title { font-size: 2rem; }
-        .pdp-image-main { padding: 20px; }
-        .pdp-price { font-size: 1.75rem; }
-    }
+.qv-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.qv-category {
+    background: rgba(255, 78, 80, 0.1);
+    color: var(--accent-color);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.qv-title {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--black);
+    line-height: 1.2;
+}
+
+.qv-price .fw-900 {
+    font-weight: 900;
+}
+
+.quantity-selector-detail {
+    display: flex;
+    align-items: center;
+    background: #f3f4f6;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.quantity-selector-detail .qty-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-base);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.quantity-selector-detail .qty-btn:hover {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+.quantity-selector-detail .qty-input {
+    width: 50px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.tab-link {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray-500);
+    border: none !important;
+    background: transparent !important;
+    position: relative;
+    padding: 10px 0;
+}
+
+.tab-link.active {
+    color: var(--black) !important;
+}
+
+.tab-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color);
+    border-radius: 10px;
+}
+
+.image-zoom-hint {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border-radius: 50px;
+    font-size: 11px;
+    backdrop-filter: blur(5px);
+    pointer-events: none;
+}
+
+.product-badges-detail {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mobile-buy-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    padding: 15px;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.x-small {
+    font-size: 11px;
+}
+
+.fw-900 { font-weight: 900; }
+
+@media (max-width: 767px) {
+    .qv-title { font-size: 28px; }
+    .product-thumbnails { overflow-x: auto; padding-bottom: 10px; }
+}
 </style>
-<style>
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-      20%, 40%, 60%, 80% { transform: translateX(5px); }
-    }
-</style>
-{% endblock %}
 
-{% block extra_js %}
 <script>
-    const PDP_SLUG = "{{ product_slug }}";
-    
-    // State Management
-    let pdpProduct = null;
-    let pdpVariants = [];
-    let pdpSelectedAttributes = {};
-    let pdpSelectedVariant = null;
+    const productSlug = "{{ product_slug }}";
+    let detailProduct = null;
+    let detailVariants = [];
+    let detailSelectedAttributes = {};
+    let detailSelectedVariant = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        if(PDP_SLUG) {
-            initPDP(PDP_SLUG);
-        } else {
-            showError('Product not found.', document.getElementById('pdpLoading'));
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (productSlug) {
+            await loadProductDetail(productSlug);
         }
     });
 
-    async function initPDP(slug) {
-        // Reset State
-        pdpProduct = null;
-        pdpVariants = [];
-        pdpSelectedAttributes = {};
-        pdpSelectedVariant = null;
-
+    async function loadProductDetail(slug) {
         try {
             const data = await apiFetch(`/products/${slug}/`);
-            pdpProduct = data;
-            pdpVariants = data.variant_list || [];
+            detailProduct = data;
             
-            renderPDP();
+            // Update UI elements
+            document.title = `${data.name} - Shop`;
+            const breadcrumbEl = document.getElementById('breadcrumb-product-name');
+            if (breadcrumbEl) breadcrumbEl.textContent = data.name;
+            
+            const titleEl = document.getElementById('detail-title');
+            if (titleEl) titleEl.textContent = data.name;
+            
+            const categoryEl = document.getElementById('detail-category');
+            if (categoryEl) categoryEl.textContent = data.category_name || 'General';
+            
+            const brandEl = document.getElementById('detail-brand');
+            if (brandEl) brandEl.textContent = data.brand_name || 'Generic';
+            
+            const shortDescEl = document.getElementById('detail-short-description');
+            if (shortDescEl) shortDescEl.innerHTML = data.short_description || (data.description ? data.description.substring(0, 200) + '...' : 'No description available.');
+            
+            const fullDescEl = document.getElementById('full-description');
+            if (fullDescEl) fullDescEl.innerHTML = data.description || 'No detailed description.';
+            
+            // Render Images and Thumbnails
+            renderGallery(data);
+            
+            // Handle Specifications
+            renderSpecs(data);
+
+            // Handle Variants & Attributes
+            detailVariants = data.variant_list || [];
+            const attributes = data.attributes_list || [];
+            
+            if (attributes.length > 0) {
+                renderDetailAttributes(attributes);
+                // Auto-select priority
+                const targetId = data.default_variant || (detailVariants.length > 0 ? detailVariants[0].id : null);
+                if (targetId) {
+                    const variantToSelect = detailVariants.find(v => v.id === targetId);
+                    if (variantToSelect) {
+                        preSelectDetailVariant(variantToSelect, attributes);
+                    }
+                }
+            } else {
+                 updateDetailUIPrice(data.price, null);
+            }
+            
         } catch (error) {
-            console.error('Error loading PDP:', error);
-            showError(`
-                Failed to load product details. <br>
-                <button class="btn btn-sm btn-outline-danger mt-2" onclick="location.reload()">Retry</button>
-            `, document.getElementById('pdpLoading'));
+            console.error('Error loading product detail:', error);
+            document.getElementById('detail-title').textContent = 'Product Not Found';
         }
     }
 
-    function renderPDP() {
-        if (!pdpProduct) return;
+    function renderGallery(data) {
+        const thumbContainer = document.getElementById('product-thumbnails');
+        thumbContainer.innerHTML = '';
         
-        console.log("Rendering PDP with product:", pdpProduct);
+        let images = [];
+        // Use thumbnail as first image if exists
+        if (data.thumbnail) images.push({ url: data.thumbnail });
+        
+        // Add images from images list (list of objects)
+        if (data.images && data.images.length > 0) {
+            data.images.forEach(img => images.push({ url: img.image }));
+        }
 
-        try {
-            // Hide loader, show content
-            document.getElementById('pdpLoading').classList.add('d-none');
-            document.getElementById('pdpContent').classList.remove('d-none');
-            document.getElementById('pdpTabsSection').classList.remove('d-none');
-            
-            // Populate Meta
-            document.title = `${pdpProduct.name} - UOMO`;
-            
-            const breadcrumb = document.getElementById('breadcrumbName');
-            if(breadcrumb) breadcrumb.textContent = pdpProduct.name;
-            
-            const titleEl = document.getElementById('pdpName');
-            if(titleEl) titleEl.textContent = pdpProduct.name;
-
-            const catEl = document.getElementById('pdpCategory');
-            if(catEl) {
-                catEl.textContent = pdpProduct.category_name || "Uncategorized";
-                catEl.href = `/shop/?category=${pdpProduct.category || ''}`;
-            }
-
-            const metaCatEl = document.getElementById('pdpMetaCategory');
-            if(metaCatEl) metaCatEl.textContent = pdpProduct.category_name || "Uncategorized";
-            
-            // Description
-            const shortDesc = document.getElementById('pdpShortDesc');
-            if(shortDesc) shortDesc.innerHTML = pdpProduct.short_description || "No short description available.";
-
-            const fullDesc = document.getElementById('pdpFullDesc');
-            if(fullDesc) fullDesc.innerHTML = pdpProduct.description || "<p>No detailed description available.</p>";
-
-            // Images - Always set initial product image/thumbnail first
-            let initialImages = [];
-            if(pdpProduct.images && pdpProduct.images.length > 0) {
-                 // Assuming product.images is list of objects with .image url
-                 initialImages = pdpProduct.images.map(i => i.image);
-            } else if(pdpProduct.thumbnail) {
-                 initialImages = [pdpProduct.thumbnail];
-            }
-            // Fallback placeholder if absolutely nothing
-            if(initialImages.length === 0) initialImages = ['/static/assets/images/placeholder.png'];
-            
-            updateImages(initialImages[0], initialImages);
-
-            // Attributes
-            const attributes = pdpProduct.attributes_list || [];
-            renderAttributes(attributes);
-
-            // Variant Selection / Price Init
-            const defaultVarId = pdpProduct.default_variant;
-            let initialVariant = null;
-
-            if (defaultVarId) {
-                initialVariant = pdpVariants.find(v => v.id === defaultVarId);
-            }
-            if (!initialVariant && pdpVariants.length > 0) {
-                initialVariant = pdpVariants[0];
-            }
-
-            if (attributes.length > 0) {
-                // If we have attributes, try to pre-select
-                if (initialVariant) {
-                    preSelectVariant(initialVariant, attributes);
-                } else {
-                    // No variant found matching? show base price
-                    updatePrice(pdpProduct.price, null, false);
+        // Add images from variants if any (list of strings)
+        if (data.variant_list) {
+            data.variant_list.forEach(v => {
+                if (v.image_list && v.image_list.length > 0) {
+                    v.image_list.forEach(vurl => {
+                         if (!images.find(i => i.url === vurl)) {
+                             images.push({ url: vurl });
+                         }
+                    });
                 }
-            } else {
-                // No attributes (Single variant or Simple product)
-                if (initialVariant) {
-                    // We found a variant (e.g. the single one), set it as selected
-                    pdpSelectedVariant = initialVariant;
-                    updatePrice(initialVariant.price, initialVariant.discount_price, initialVariant.is_discount);
-                    if(initialVariant.sku) document.getElementById('pdpSku').textContent = initialVariant.sku;
-                    
-                    // If this single variant has images, use them, otherwise we keep base images
-                    if (initialVariant.image_list && initialVariant.image_list.length > 0) {
-                        updateImages(initialVariant.image_list[0], initialVariant.image_list);
-                    }
-                    setButtonsState(true, 'Add to Cart');
-                } else {
-                    // Fallback to product info
-                    updatePrice(pdpProduct.price, null, false);
-                    setButtonsState(true, 'Add to Cart');
-                }
-            }
+            });
+        }
 
-            // Animation Entrance
-            document.querySelectorAll('.product-info-wrapper > *').forEach((el, idx) => {
-                el.style.opacity = '0';
-                el.style.animation = `fadeInUp 0.5s ease ${idx * 0.05}s forwards`;
+        if (images.length === 0) {
+             // Fallback
+             document.getElementById('main-product-image').src = '{% static "assets/images/placeholder.jpg" %}';
+             return;
+        }
+
+        images.forEach((imgObj, idx) => {
+            const thumb = document.createElement('div');
+            thumb.className = `thumbnail-item ${idx === 0 ? 'active' : ''}`;
+            thumb.innerHTML = `<img src="${imgObj.url}" alt="Thumb">`;
+            thumb.onclick = () => {
+                document.querySelectorAll('.thumbnail-item').forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+                document.getElementById('main-product-image').src = imgObj.url;
+            };
+            thumbContainer.appendChild(thumb);
+            
+            if (idx === 0) {
+                document.getElementById('main-product-image').src = imgObj.url;
+            }
+        });
+    }
+
+    function renderSpecs(data) {
+        const body = document.getElementById('specs-body');
+        body.innerHTML = '';
+        
+        const specs = [
+            { label: 'Weight', value: data.weight ? `${data.weight} kg` : 'N/A' },
+            { label: 'Dimensions', value: data.dimensions || 'N/A' },
+            { label: 'Product Type', value: data.product_type || 'Physical' },
+            { label: 'Warranty', value: data.warranty || 'No Warranty' },
+            { label: 'Tax', value: data.tax_type || 'Inclusive' }
+        ];
+
+        specs.forEach(spec => {
+             const row = document.createElement('tr');
+             row.innerHTML = `<th width="30%">${spec.label}</th><td>${spec.value}</td>`;
+             body.appendChild(row);
+        });
+    }
+
+    function renderDetailAttributes(attributes) {
+        const container = document.getElementById('detail-attributes-container');
+        container.innerHTML = '';
+        
+        attributes.forEach(attr => {
+            const group = document.createElement('div');
+            group.className = 'mb-4';
+            
+            const label = document.createElement('label');
+            label.className = 'qv-label mb-2';
+            label.textContent = attr.name;
+            group.appendChild(label);
+            
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'd-flex flex-wrap gap-2';
+            
+            attr.values.forEach(val => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'attr-btn style-button';
+                btn.dataset.attrId = attr.id;
+                btn.dataset.valId = val.id;
+                
+                if (val.color_code) {
+                    btn.className += ' color-swatch';
+                    btn.style.backgroundColor = val.color_code;
+                    btn.title = val.value;
+                    btn.innerHTML = `<span class="visually-hidden">${val.value}</span>`;
+                } else {
+                    btn.textContent = val.value;
+                }
+                
+                btn.onclick = () => selectDetailAttribute(attr.id, val.id, btn);
+                optionsContainer.appendChild(btn);
             });
             
-        } catch (err) {
-            console.error("Error in renderPDP:", err);
-            // alert("Render Error: " + err.message);
-        }
-    }
-
-    // ... renderAttributes ...
-
-    // ... selectAttribute ...
-
-    function checkVariantMatch() {
-        const requiredCount = document.querySelectorAll('#pdpAttributes .mb-4').length;
-        if(requiredCount > 0 && Object.keys(pdpSelectedAttributes).length < requiredCount) return;
-
-        const match = pdpVariants.find(v => {
-            const variantAttrs = v.attributes; 
-            const selectedAttrs = Object.values(pdpSelectedAttributes);
-            return selectedAttrs.every(id => variantAttrs.includes(id));
+            group.appendChild(optionsContainer);
+            container.appendChild(group);
         });
-
-        if (match) {
-            pdpSelectedVariant = match;
-            updatePrice(match.price, match.discount_price, match.is_discount);
-            document.getElementById('pdpSku').textContent = match.sku || pdpProduct.sku || 'N/A';
-            
-            // Only update images if the variant explicitly has them
-            if (match.image_list && match.image_list.length > 0) {
-                updateImages(match.image_list[0], match.image_list);
-            } 
-            // Else: Keep showing the product level images, which is usually correct for "Color: Black -> shows main black jacket" 
-            // if that main image was the product thumbnail. 
-            // If the variation should change image (e.g. Color Red) but has no image in API, 
-            // we can't do much but show previous image.
-            
-            setButtonsState(true, 'Add to Cart');
-        } else {
-            pdpSelectedVariant = null;
-            setButtonsState(false, 'Unavailable');
-        }
     }
 
-    function updatePrice(price, discountPrice, isDiscount) {
-        const priceEl = document.getElementById('pdpPrice');
-        const oldPriceEl = document.getElementById('pdpOldPrice');
-        const badge = document.getElementById('pdpSaleBadge');
-
-        const p = parseFloat(price);
-        const dp = discountPrice ? parseFloat(discountPrice) : null;
-
-        if (dp && dp < p) {
-            priceEl.textContent = `৳${dp.toFixed(0)}`;
-            oldPriceEl.textContent = `৳${p.toFixed(0)}`;
-            oldPriceEl.classList.remove('d-none');
-            badge.classList.remove('d-none');
-            priceEl.classList.add('text-danger');
-        } else {
-            priceEl.textContent = `৳${p.toFixed(0)}`;
-            oldPriceEl.classList.add('d-none');
-            badge.classList.add('d-none');
-            priceEl.classList.remove('text-danger');
-        }
-    }
-
-    function updateImages(mainSrc, imageList) {
-        if(mainSrc) {
-            const main = document.getElementById('mainImage');
-            main.style.opacity = 0;
-            setTimeout(() => {
-                main.src = mainSrc;
-                main.style.opacity = 1;
-            }, 200);
-        }
-
-        const thumbs = document.getElementById('galleryThumbs');
-        thumbs.innerHTML = '';
+    function selectDetailAttribute(attrId, valId, btn) {
+        // Toggle active class in the same group
+        const group = btn.parentElement;
+        group.querySelectorAll('.attr-btn').forEach(b => b.classList.remove('active', 'btn-dark'));
+        btn.classList.add('active', 'btn-dark');
         
-        if(!imageList || imageList.length === 0) {
-            if(pdpProduct.thumbnail) imageList = [pdpProduct.thumbnail];
-            else imageList = [];
-        }
+        detailSelectedAttributes[attrId] = valId;
+        findMatchingDetailVariant();
+    }
 
-        imageList.forEach((src, idx) => {
-            const thumb = document.createElement('div');
-            thumb.className = `thumb-item ${idx === 0 ? 'active-thumb' : ''}`;
-            thumb.innerHTML = `<img src="${src}">`;
-            thumb.onclick = () => {
-                document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active-thumb'));
-                thumb.classList.add('active-thumb');
+    function preSelectDetailVariant(variant, attributes) {
+        variant.attributes.forEach(attrValId => {
+            // Find which attribute this value belongs to
+            attributes.forEach(attr => {
+                const hasVal = attr.values.find(v => v.id === attrValId);
+                if (hasVal) {
+                    detailSelectedAttributes[attr.id] = attrValId;
+                    // Find the button and activate it
+                    const btn = document.querySelector(`.attr-btn[data-attr-id="${attr.id}"][data-val-id="${attrValId}"]`);
+                    if (btn) {
+                        btn.classList.add('active', 'btn-dark');
+                    }
+                }
+            });
+        });
+        findMatchingDetailVariant();
+    }
+
+    function findMatchingDetailVariant() {
+        const selectedValIds = Object.values(detailSelectedAttributes);
+        const attributeCount = detailProduct.attributes_list.length;
+        
+        if (selectedValIds.length === attributeCount) {
+            const matching = detailVariants.find(v => {
+                return v.attributes.length === selectedValIds.length && 
+                       v.attributes.every(id => selectedValIds.includes(id));
+            });
+            
+            if (matching) {
+                detailSelectedVariant = matching;
+                updateDetailUIPrice(matching.price, matching.discount_price);
                 
-                const main = document.getElementById('mainImage');
-                main.style.opacity = 0;
-                setTimeout(() => {
-                    main.src = src;
-                    main.style.opacity = 1;
-                }, 200);
-            };
-            thumbs.appendChild(thumb);
-        });
-    }
-
-    function preSelectVariant(variant, attributes) {
-        if(!variant || !variant.attributes) return;
-
-        attributes.forEach(attr => {
-            const matchingValId = variant.attributes.find(id => 
-                attr.values.some(v => v.id === id)
-            );
-            
-            if(matchingValId) {
-                const btn = document.querySelector(`.pdp-attr-btn[data-attr-id="${attr.id}"][data-val-id="${matchingValId}"]`);
-                if(btn) selectAttribute(attr.id, matchingValId, btn);
+                // Update image if variant has image
+                if (matching.image_list && matching.image_list.length > 0) {
+                    const imageUrl = matching.image_list[0];
+                    document.getElementById('main-product-image').src = imageUrl;
+                    
+                    // Find and activate thumbnail if it exists
+                    const thumbs = document.querySelectorAll('.thumbnail-item img');
+                    thumbs.forEach(t => {
+                        if (t.src === imageUrl) {
+                            t.parentElement.classList.add('active');
+                        } else {
+                            t.parentElement.classList.remove('active');
+                        }
+                    });
+                }
+                
+                document.getElementById('detail-add-to-cart').disabled = false;
+                document.getElementById('detail-add-to-cart').innerHTML = '<i class="fas fa-shopping-bag me-2"></i> Add to Cart';
+            } else {
+                detailSelectedVariant = null;
+                document.getElementById('detail-add-to-cart').disabled = true;
+                document.getElementById('detail-add-to-cart').textContent = 'Unavailable';
             }
-        });
+        }
     }
 
-    function updatePdpQty(change) {
-        const input = document.getElementById('pdpQty');
-        let val = parseInt(input.value) + change;
-        if(val < 1) val = 1;
+    function updateDetailUIPrice(price, discountPrice) {
+        const priceEl = document.getElementById('detail-price');
+        const oldPriceEl = document.getElementById('detail-old-price');
         
-        // Check stock if variant selected
-        if(pdpSelectedVariant && pdpSelectedVariant.stock && val > pdpSelectedVariant.stock) {
-            val = pdpSelectedVariant.stock;
+        if (discountPrice && parseFloat(discountPrice) < parseFloat(price)) {
+            priceEl.textContent = `৳${discountPrice}`;
+            oldPriceEl.textContent = `৳${price}`;
+            oldPriceEl.style.display = 'inline';
+        } else {
+            priceEl.textContent = `৳${price}`;
+            oldPriceEl.style.display = 'none';
         }
+    }
+
+    function updateDetailQty(delta) {
+        const input = document.getElementById('detail-qty');
+        let val = parseInt(input.value) + delta;
+        if (val < 1) val = 1;
         input.value = val;
+        
+        // Update mobile mirror
+        const mobileInput = document.querySelector('.mobile-buy-bar .qty-input');
+        if (mobileInput) mobileInput.value = val;
     }
 
-    async function pdpAddToCart(redirect = false) {
-        const qty = parseInt(document.getElementById('pdpQty').value);
-        
-        // Validation: Verify if attributes need strictly to be selected
-        // Matches Quick View logic
-        if (pdpVariants.length > 0 && !pdpSelectedVariant) {
-             const attrDiv = document.getElementById('pdpAttributes');
-             // If attributes are displayed but no variant resolved => incomplete selection
-             if (attrDiv && attrDiv.children.length > 0) {
-                 attrDiv.style.animation = 'none';
-                 attrDiv.offsetHeight; // trigger reflow
-                 attrDiv.style.animation = 'shake 0.5s';
-                 
-                 // Show toast or tooltip could be added here
-                 return; 
-             }
+    async function addToCartFromDetail() {
+        if (detailProduct.attributes_list.length > 0 && !detailSelectedVariant) {
+             showToast('Please select all options', 'warning');
+             return;
         }
 
-        // Resolve Target Variant ID
-        let variantId = pdpSelectedVariant ? pdpSelectedVariant.id : null;
+        const qty = parseInt(document.getElementById('detail-qty').value);
+        const variantId = detailSelectedVariant ? detailSelectedVariant.id : (detailProduct.variant_list[0] ? detailProduct.variant_list[0].id : null);
         
-        // Fallback Logic (Only if validation passed, meaning no attributes required or single variant handled)
-        if(!variantId && pdpProduct.default_variant) {
-            variantId = pdpProduct.default_variant;
-        } else if(!variantId && pdpVariants.length === 1) {
-            variantId = pdpVariants[0].id;
+        if (!variantId) {
+             showToast('Product error: No variant found', 'error');
+             return;
         }
 
-        const payload = {
-            product_id: pdpProduct.id,
-            variant_id: variantId,
-            quantity: qty
-        };
-
-        // UI Feedback
-        const btn = document.getElementById('addToCartBtn');
-        const buyBtn = document.getElementById('buyNowBtn');
-        const btnText = document.getElementById('btnText');
-        const originalText = btnText ? btnText.innerText : 'Add to Cart';
+        const btn = document.getElementById('detail-add-to-cart');
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Adding...';
+        btn.disabled = true;
 
         try {
-            if(!redirect) {
-                if(btn) {
-                    btn.disabled = true;
-                    if(btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-                }
-            } else {
-                if(buyBtn) {
-                    buyBtn.disabled = true;
-                    buyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-                }
-            }
-
-            await apiFetch('/cart/', { method: 'POST', body: JSON.stringify(payload) });
-
-            if(redirect) {
-                window.location.href = '/cart/';
-                return;
-            }
-
-            // Success State
-            if(btnText) btnText.innerHTML = 'Added!';
-            if(btn) btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)'; // Success Green
-            
-            if(window.updateCartCount) window.updateCartCount();
-
-            setTimeout(() => {
-                if(btn) {
+            const success = await addToCart(variantId, qty);
+            if (success) {
+                btn.innerHTML = '<i class="fas fa-check me-2"></i> Added!';
+                btn.classList.add('btn-success');
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.classList.remove('btn-success');
                     btn.disabled = false;
-                    btn.style.background = ''; // Revert to CSS default
-                }
-                if(btnText) btnText.innerText = originalText;
-                if(buyBtn) buyBtn.disabled = false;
-            }, 2000);
-
-        } catch(error) {
-            console.error(error);
-            if(btn) btn.disabled = false;
-            if(buyBtn) buyBtn.disabled = false;
-            if(btnText) btnText.innerText = 'Error';
-            if(buyBtn) buyBtn.innerHTML = '<i class="fas fa-bolt"></i> <span>Buy Now</span>';
-            alert("Failed to add to cart: " + error.message);
+                }, 2000);
+            } else {
+                 btn.innerHTML = originalContent;
+                 btn.disabled = false;
+            }
+        } catch (error) {
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
         }
     }
 
-    function pdpBuyNow() {
-        pdpAddToCart(true);
-    }
+    async function buyNowFromDetail() {
+         if (detailProduct.attributes_list.length > 0 && !detailSelectedVariant) {
+             showToast('Please select all options', 'warning');
+             return;
+        }
 
-    function setButtonsState(enabled, text) {
-        const btn = document.getElementById('addToCartBtn');
-        const btnText = document.getElementById('btnText');
-        if(btn) btn.disabled = !enabled;
-        if(enabled && btnText) btnText.textContent = text;
-        if(!enabled && btnText) btnText.textContent = text; 
+        const qty = parseInt(document.getElementById('detail-qty').value);
+        const variantId = detailSelectedVariant ? detailSelectedVariant.id : (detailProduct.variant_list[0] ? detailProduct.variant_list[0].id : null);
+        
+        const success = await addToCart(variantId, qty);
+        if (success) {
+             window.location.href = '/checkout/';
+        }
     }
-    
-    // Lightbox placeholder (optional)
-    function openLightbox() {
-        // Implement full screen gallery if desired
-    }
-
 </script>
+
+<style>
+/* Additional helper classes */
+.attr-btn.color-swatch {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #ddd;
+}
+.attr-btn.color-swatch.active {
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+.style-button {
+    min-width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.style-button.active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+</style>
 {% endblock %}
