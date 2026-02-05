@@ -1,14 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{% block title %}E-Commerce Store{% endblock %}</title>
+    <title>{% block title %}UOMO - Modern E-Commerce{% endblock %}</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="{% block meta_description %}Shop the latest products at great prices{% endblock %}">
-    <meta name="keywords" content="{% block meta_keywords %}ecommerce, shop, products{% endblock %}">
+    <meta name="description" content="{% block meta_description %}Shop the latest luxury products at UOMO{% endblock %}">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,865 +17,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts - Jost -->
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     
-    <style>
-        :root {
-            --primary-color: #222222;
-            --secondary-color: #666666;
-            --border-color: #eeeeee;
-            --bg-light: #f5f5f5;
-            --white: #ffffff;
-            --text-primary: #222222;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Jost', sans-serif;
-            color: var(--text-primary);
-            background-color: var(--white);
-            line-height: 1.6;
-            font-size: 15px;
-        }
-        
-        /* Top Announcement Bar */
-        .top-bar {
-            background: var(--primary-color);
-            color: var(--white);
-            padding: 10px 0;
-            font-size: 13px;
-            text-align: center;
-        }
-        
-        .top-bar a {
-            color: var(--white);
-            text-decoration: underline;
-        }
-        
-        /* Main Header - Sticky & Transparent */
-        .main-header {
-            background: transparent; /* Initial transparent state */
-            backdrop-filter: blur(0px); /* No blur initially for clarity */
-            -webkit-backdrop-filter: blur(0px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px 0;
-            position: fixed; /* Sticky behavior */
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            transition: all 0.4s ease;
-        }
-
-        /* Scrolled State */
-        .main-header.header-scrolled {
-            background: rgba(255, 255, 255, 0.85); /* Milky glass on scroll */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 15px 0; /* Shrink on scroll */
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .header-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-        
-        /* Logo */
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            color: #ffffff; /* White initially for dark hero */
-            text-decoration: none;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: color 0.3s;
-        }
-        
-        .main-header.header-scrolled .logo {
-            color: var(--primary-color); /* Dark on scroll */
-        }
-        
-        .logo:hover {
-            color: #cccccc;
-        }
-        .main-header.header-scrolled .logo:hover {
-            color: var(--primary-color);
-        }
-        
-        /* Navigation */
-        .main-nav {
-            display: flex;
-            gap: 35px;
-            list-style: none;
-            margin: 0;
-            margin-left: 40px;
-        }
-        
-        .main-nav a {
-            color: #ffffff; /* White initially */
-            text-decoration: none;
-            font-size: 13px; /* Slightly refined size */
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px; /* Wider spacing like reference */
-            transition: color 0.3s;
-            position: relative;
-            padding: 5px 0;
-        }
-        
-        .main-header.header-scrolled .main-nav a {
-            color: var(--primary-color); /* Dark on scroll */
-        }
-        
-        .main-nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #ffffff;
-            transition: width 0.3s;
-        }
-
-        .main-header.header-scrolled .main-nav a::after {
-            background: var(--primary-color);
-        }
-        
-        .main-nav a:hover::after {
-            width: 100%;
-        }
-        
-        /* Header Icons */
-        .header-icons {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            margin-left: auto;
-        }
-
-        /* Inline Search Box */
-        .header-search {
-            margin-right: 20px;
-            position: relative;
-        }
-
-        .header-search-form {
-            display: flex;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 0; /* Squared connection */
-            padding: 5px 15px;
-            background: rgba(255, 255, 255, 0.1); /* Subtle fill */
-            transition: all 0.3s;
-        }
-        
-        .main-header.header-scrolled .header-search-form {
-            border-color: #ddd;
-            background: #f5f5f5;
-        }
-
-        .header-search-form:focus-within {
-            border-color: #ffffff;
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .main-header.header-scrolled .header-search-form:focus-within {
-            border-color: var(--primary-color);
-            background: #fff;
-        }
-
-        .header-search-input {
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 14px;
-            color: #ffffff;
-            width: 200px;
-            padding: 5px;
-        }
-        
-        .header-search-input::placeholder {
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .main-header.header-scrolled .header-search-input {
-            color: var(--text-primary);
-        }
-        
-        .main-header.header-scrolled .header-search-input::placeholder {
-            color: #999;
-        }
-
-        .header-search-btn {
-            border: none;
-            background: transparent;
-            color: #ffffff;
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .main-header.header-scrolled .header-search-btn {
-            color: var(--text-secondary);
-        }
-
-        .header-search-btn:hover {
-            opacity: 0.8;
-        }
-        
-        .header-icon {
-            color: #ffffff;
-            font-size: 18px;
-            text-decoration: none;
-            position: relative;
-            transition: color 0.3s;
-        }
-        
-        .main-header.header-scrolled .header-icon {
-            color: var(--text-primary);
-        }
-        
-        .header-icon:hover {
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .main-header.header-scrolled .header-icon:hover {
-            color: var(--primary-color);
-        }
-
-        /* Solid Header for non-home pages */
-        .main-header.header-solid {
-            background: #ffffff;
-            position: sticky;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .main-header.header-solid .logo,
-        .main-header.header-solid .main-nav a,
-        .main-header.header-solid .header-icon,
-        .main-header.header-solid .header-search-btn {
-            color: var(--primary-color);
-        }
-
-        .main-header.header-solid .main-nav a::after {
-            background: var(--primary-color);
-        }
-
-        .main-header.header-solid .header-search-form {
-            border-color: #ddd;
-            background: #f5f5f5;
-        }
-
-        .main-header.header-solid .header-search-input {
-            color: var(--text-primary);
-        }
-
-        .main-header.header-solid .header-search-input::placeholder {
-            color: #999;
-        }
-        
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--primary-color);
-            color: var(--white);
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        /* Mobile Menu Toggle */
-        /* Mobile Menu Toggle */
-        .mobile-toggle {
-            display: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--primary-color);
-            border: 1px solid var(--border-color);
-            padding: 8px 12px;
-            border-radius: 4px;
-        }
-        
-        .mobile-toggle:hover {
-            background: var(--bg-light);
-        }
-        
-        /* Footer - Infrastructure Design */
-        .footer {
-            background: #222222; /* Pure dark */
-            padding: 60px 0 30px; /* Reduced vertical padding */
-            margin-top: 0;
-            color: #999;
-        }
-        
-        .footer-heading {
-            font-size: 13px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
-            color: #06b6d4;
-        }
-        
-        .footer-about {
-            font-size: 14px;
-            line-height: 1.8;
-            color: #94a3b8;
-            margin-bottom: 25px;
-        }
-        
-        /* Trust Badges */
-        .footer-badges {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        
-        .trust-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            background: rgba(6, 182, 212, 0.1);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            font-size: 11px;
-            font-weight: 700;
-            color: #22d3ee;
-        }
-        
-        .trust-badge i {
-            font-size: 14px;
-        }
-        
-        /* Social Links */
-        .footer-social {
-            display: flex;
-            gap: 12px;
-        }
-        
-        .social-link {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #94a3b8;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        
-        .social-link:hover {
-            background: #06b6d4;
-            border-color: #06b6d4;
-            color: #0f172a;
-            transform: translateY(-3px);
-        }
-        
-        /* Footer Links */
-        .footer-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-        
-        .footer-links a {
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 13px;
-            transition: all 0.3s;
-            display: inline-block;
-            position: relative;
-        }
-        
-        .footer-links a::before {
-            content: '→';
-            position: absolute;
-            left: -20px;
-            opacity: 0;
-            transition: all 0.3s;
-            color: #06b6d4;
-        }
-        
-        .footer-links a:hover {
-            color: #22d3ee;
-            padding-left: 20px;
-        }
-        
-        .footer-links a:hover::before {
-            opacity: 1;
-            left: 0;
-        }
-        
-        /* Newsletter Section */
-        .footer-newsletter {
-            background: rgba(6, 182, 212, 0.05);
-            border: 1px solid rgba(6, 182, 212, 0.2);
-            border-left: none;
-            border-right: none;
-            padding: 50px 0;
-            margin: 60px 0 40px;
-        }
-        
-        .newsletter-title {
-            font-size: 16px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #ffffff;
-            margin-bottom: 10px;
-        }
-        
-        .newsletter-desc {
-            font-size: 14px;
-            color: #94a3b8;
-            margin: 0;
-        }
-        
-        .newsletter-form {
-            display: flex;
-            gap: 0;
-        }
-        
-        .newsletter-input {
-            flex: 1;
-            padding: 16px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-right: none;
-            color: #ffffff;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s;
-        }
-        
-        .newsletter-input::placeholder {
-            color: #64748b;
-        }
-        
-        .newsletter-input:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: #06b6d4;
-        }
-        
-        .newsletter-btn {
-            padding: 16px 30px;
-            background: #06b6d4;
-            border: 1px solid #06b6d4;
-            color: #0f172a;
-            font-size: 13px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            white-space: nowrap;
-        }
-        
-        .newsletter-btn:hover {
-            background: #22d3ee;
-            border-color: #22d3ee;
-        }
-        
-        .newsletter-btn i {
-            transition: transform 0.3s;
-        }
-        
-        .newsletter-btn:hover i {
-            transform: translateX(5px);
-        }
-        
-        /* Footer Bottom */
-        .footer-bottom {
-            padding: 30px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .footer-copyright {
-            font-size: 13px;
-            color: #64748b;
-            margin: 0;
-        }
-        
-        .payment-methods {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        @media (min-width: 768px) {
-            .payment-methods {
-                justify-content: flex-end;
-            }
-        }
-        
-        .payment-methods i {
-            font-size: 32px;
-            color: #475569;
-            transition: color 0.3s;
-        }
-        
-        .payment-methods i:hover {
-            color: #06b6d4;
-        }
-        
-        /* Buttons */
-        .btn-primary {
-            background: var(--primary-color);
-            color: var(--white);
-            border: 1px solid var(--primary-color);
-            padding: 12px 35px;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-primary:hover {
-            background: var(--white);
-            color: var(--primary-color);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            padding: 12px 35px;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-outline:hover {
-            background: var(--primary-color);
-            color: var(--white);
-        }
-
-        /* Mobile Menu Overlay */
-        .mobile-menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1100;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .mobile-menu-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        /* Mobile Navigation Panel */
-        .mobile-nav-panel {
-            position: fixed;
-            top: 0;
-            left: -320px;
-            width: 320px;
-            max-width: 85%;
-            height: 100%;
-            background: var(--white);
-            z-index: 1200;
-            transition: left 0.3s ease;
-            overflow-y: auto;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .mobile-nav-panel.active {
-            left: 0;
-        }
-        
-        .mobile-nav-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .mobile-nav-header .logo {
-            font-size: 24px;
-        }
-        
-        .mobile-nav-close {
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: color 0.3s;
-            background: none;
-            border: none;
-            padding: 5px;
-        }
-        
-        .mobile-nav-close:hover {
-            color: var(--text-secondary);
-        }
-        
-        .mobile-nav-menu {
-            list-style: none;
-            padding: 20px;
-            margin: 0;
-        }
-        
-        .mobile-nav-menu li {
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .mobile-nav-menu a {
-            display: block;
-            padding: 15px 0;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: color 0.3s;
-        }
-        
-        .mobile-nav-menu a:hover {
-            color: var(--text-secondary);
-        }
-        
-        .mobile-nav-icons {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .mobile-nav-icons a {
-            color: var(--text-primary);
-            font-size: 20px;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .mobile-nav-icons a:hover {
-            color: var(--text-secondary);
-        }
-        
-        /* Responsive */
-        @media (max-width: 991px) {
-            .main-nav {
-                display: none !important;
-            }
-            
-            .mobile-toggle {
-                display: block;
-            }
-            
-            .header-container {
-                padding: 0 15px;
-            }
-            
-            .logo {
-                font-size: 22px;
-            }
-            
-            .header-icons {
-                gap: 15px;
-            }
-            
-            .header-icon {
-                font-size: 18px;
-            }
-            
-            /* Hide header search on mobile, keep mobile nav search */
-            .header-search {
-                display: none;
-            }
-            
-            /* Hide some icons on mobile - they're in mobile nav */
-            .header-icons .header-icon#account-icon {
-                display: none;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .top-bar {
-                font-size: 12px;
-                padding: 8px 0;
-            }
-            
-            .main-header {
-                padding: 15px 0;
-            }
-            
-            .logo {
-                font-size: 20px;
-            }
-            
-            .header-icons {
-                gap: 12px;
-            }
-            
-            .header-icon {
-                font-size: 16px;
-            }
-            
-            .cart-count {
-                width: 16px;
-                height: 16px;
-                font-size: 10px;
-                top: -6px;
-                right: -6px;
-            }
-            
-            .mobile-nav-panel {
-                width: 280px;
-            }
-        }
-        
-        /* Prevent body scroll when mobile menu is open */
-        body.mobile-menu-open {
-            overflow: hidden;
-        }
-        .account-dropdown {
-            position: relative;
-        }
-        
-        .account-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: var(--white);
-            border: 1px solid var(--border-color);
-            min-width: 180px;
-            margin-top: 15px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .account-dropdown:hover .account-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        
-        .account-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 20px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .account-link:last-child {
-            border-bottom: none;
-        }
-        
-        .account-link:hover {
-            background: var(--bg-light);
-            color: var(--primary-color);
-        }
-        
-        .account-link i {
-            font-size: 14px;
-        }
-        
-
-        
-        /* Responsive */
-        @media (max-width: 991px) {
-            .main-nav {
-                display: none;
-            }
-            
-            .mobile-toggle {
-                display: block;
-            }
-            
-            .search-input {
-                font-size: 18px;
-                padding: 15px 20px;
-            }
-            
-            .search-submit {
-                padding: 15px 25px;
-                font-size: 18px;
-            }
-        }
-        
-        {% block extra_css %}{% endblock %}
-    </style>
+    <!-- Custom Base CSS -->
+    <link rel="stylesheet" href="{% static 'assets/css/storefront-base.css' %}">
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% comment %} <!-- Top Announcement Bar -->
-    <div class="top-bar">
-        <div class="container">
-            Limited Time Offer - Up to 60% off & Free Shipping
-        </div>
-    </div> {% endcomment %}
-    
     <!-- Main Header -->
     <header class="main-header {% if request.path != '/' and request.path != '/home/' %}header-solid{% endif %}">
         <div class="header-container">
             <!-- Logo -->
-            <a href="{% url 'home' %}" class="logo">ECOM</a>
+            <a href="{% url 'home' %}" class="logo">UOMO</a>
             
             <!-- Main Navigation -->
-            <nav>
-                <ul class="main-nav" id="main-nav">
+            <nav class="d-none d-lg-block">
+                <ul class="main-nav">
                     <li><a href="{% url 'home' %}">Home</a></li>
                     <li><a href="{% url 'shop' %}">Shop</a></li>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Pages</a></li>
+                    <li><a href="#">Collections</a></li>
                     <li><a href="#">About</a></li>
                     <li><a href="#">Contact</a></li>
                 </ul>
@@ -883,10 +47,10 @@
             
             <!-- Header Icons -->
             <div class="header-icons">
-                <!-- Search Input Box -->
-                <div class="header-search">
+                <!-- Direct Search Toggle -->
+                <div class="header-search d-none d-lg-block">
                     <form action="{% url 'shop' %}" method="get" class="header-search-form">
-                        <input type="text" name="search" placeholder="Search products..." class="header-search-input" autocomplete="off">
+                        <input type="text" name="search" placeholder="Search products..." class="header-search-input">
                         <button type="submit" class="header-search-btn">
                             <i class="fas fa-search"></i>
                         </button>
@@ -895,44 +59,51 @@
                 
                 <!-- Account Dropdown -->
                 <div class="account-dropdown">
-                    <a href="#" class="header-icon" id="account-icon">
-                        <i class="fas fa-user"></i>
+                    <a href="#" class="header-icon">
+                        <i class="far fa-user"></i>
                     </a>
-                    <div class="account-menu" id="account-menu">
+                    <div class="account-menu">
                         {% if user.is_authenticated %}
+                            <div class="px-4 py-2 border-bottom mb-2 bg-light">
+                                <span class="small text-muted d-block">Hello,</span>
+                                <span class="fw-bold">{{ user.username }}</span>
+                            </div>
                             {% if user.is_staff %}
-                            <a href="{% url 'dashboard:home' %}" class="account-link">
-                                <i class="fas fa-user-shield"></i> Admin
-                            </a>
+                                <a href="{% url 'dashboard:home' %}" class="account-link">
+                                    <i class="fas fa-user-shield"></i> Admin Panel
+                                </a>
                             {% else %}
-                            <a href="{% url 'customer_dashboard' %}" class="account-link">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
+                                <a href="{% url 'customer_dashboard' %}" class="account-link">
+                                    <i class="fas fa-tachometer-alt"></i> My Dashboard
+                                </a>
                             {% endif %}
-                            <a href="{% url 'staff_logout' %}" class="account-link">
-                                <i class="fas fa-sign-out-alt"></i> Logout
+                            <a href="{% url 'staff_logout' %}" class="account-link text-danger">
+                                <i class="fas fa-sign-out-alt"></i> Sign Out
                             </a>
                         {% else %}
                             <a href="{% url 'staff_login' %}" class="account-link">
-                                <i class="fas fa-sign-in-alt"></i> Login
+                                <i class="fas fa-sign-in-alt"></i> Sign In
                             </a>
                             <a href="{% url 'customer_register' %}" class="account-link">
-                                <i class="fas fa-user-plus"></i> Register
+                                <i class="fas fa-user-plus"></i> Create Account
                             </a>
                         {% endif %}
                     </div>
                 </div>
                 
-                <a href="#" class="header-icon">
-                    <i class="fas fa-heart"></i>
+                <a href="#" class="header-icon d-none d-sm-block">
+                    <i class="far fa-heart"></i>
                 </a>
+                
                 <a href="{% url 'cart' %}" class="header-icon">
                     <i class="fas fa-shopping-bag"></i>
                     <span class="cart-count" id="cart-count">0</span>
                 </a>
-                <div class="mobile-toggle" id="mobile-toggle">
-                    <span>MENU</span>
-                </div>
+                
+                <!-- Mobile Menu Trigger -->
+                <button class="mobile-toggle d-lg-none btn border-0 p-1" id="mobile-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -943,7 +114,7 @@
     <!-- Mobile Navigation Panel -->
     <div class="mobile-nav-panel" id="mobile-nav-panel">
         <div class="mobile-nav-header">
-            <a href="{% url 'home' %}" class="logo">ECOM</a>
+            <a href="{% url 'home' %}" class="logo">UOMO</a>
             <button class="mobile-nav-close" id="mobile-nav-close">
                 <i class="fas fa-times"></i>
             </button>
@@ -969,6 +140,11 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+    
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" id="back-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
     
     <!-- Footer - High Density Infrastructure Design -->
     <!-- Footer - Compact Minimal Design -->
@@ -1198,6 +374,21 @@
                         header.classList.remove('header-scrolled');
                     }
                 }
+            });
+
+            // Back to Top functionality
+            const backToTop = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 500) {
+                    backToTop.classList.add('active');
+                } else {
+                    backToTop.classList.remove('active');
+                }
+            });
+
+            backToTop.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         });
 
