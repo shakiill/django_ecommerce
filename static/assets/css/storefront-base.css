@@ -65,7 +65,11 @@ a {
 /* --- Layout Components --- */
 
 .section-padding {
-    padding: 100px 0;
+    padding: 50px 0;
+}
+
+.bg-soft {
+    background-color: var(--gray-100);
 }
 
 /* --- Navigation & Navbar --- */
@@ -96,9 +100,24 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 1400px;
+    max-width: 1850px;
     margin: 0 auto;
-    padding: 0 30px;
+    padding: 0 20px;
+}
+
+/* Custom Large Container */
+.container-custom {
+    max-width: 1850px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+@media (max-width: 1900px) {
+    .container-custom {
+        max-width: 95%;
+    }
 }
 
 /* Logo */

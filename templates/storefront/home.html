@@ -29,14 +29,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-5 d-none d-lg-flex justify-content-end">
-                                    <div class="hero-side-info animate-fade-up">
-                                        <div class="side-badge">
-                                            <span class="badge-year">2026</span>
-                                            <span class="badge-text">LIMITED EDITION</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                {#                                <div class="col-lg-5 d-none d-lg-flex justify-content-end">#}
+                                {#                                    <div class="hero-side-info animate-fade-up">#}
+                                {#                                        <div class="side-badge">#}
+                                {#                                            <span class="badge-year">2026</span>#}
+                                {#                                            <span class="badge-text">LIMITED EDITION</span>#}
+                                {#                                        </div>#}
+                                {#                                    </div>#}
+                                {#                                </div>#}
                             </div>
                         </div>
                     </div>
@@ -101,8 +101,8 @@
     <!-- Collections Grid -->
     <!-- Featured Categories Section -->
     <section class="collections-section">
-        <div class="container">
-            <div class="section-header text-center mb-5">
+        <div class="container-custom">
+            <div class="section-header text-center mb-3">
                 <h6 class="section-subtitle">DISCOVER</h6>
                 <h2 class="section-title">Featured Categories</h2>
             </div>
@@ -144,15 +144,43 @@
         </div>
     </section>
 
+    <!-- Hot Promo Banner -->
+    <section class="promo-banner-section bg-soft">
+        <div class="container-custom">
+            <div class="promo-banner-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <div class="promo-image animate-reveal-right">
+                            <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200" alt="Flash Sale" class="img-fluid rounded-4 shadow-lg">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="promo-text-side ps-lg-5">
+                            <h6 class="text-primary fw-bold letter-spacing-2 mb-3">LIMITED TIME ONLY</h6>
+                            <h2 class="display-3 fw-900 mb-2">FLASH SALE<br><span class="text-outline-dark">UP TO 70% OFF</span></h2>
+                            <p class="lead text-muted mb-4">Don't wait! Grab your favorites at unbeatable prices. The countdown has already started.</p>
+                            <div class="promo-countdown mb-4">
+                                <div class="time-item"><span>02</span><small>DAYS</small></div>
+                                <div class="time-item"><span>14</span><small>HOURS</small></div>
+                                <div class="time-item"><span>45</span><small>MINS</small></div>
+                            </div>
+                            <a href="{% url 'shop' %}" class="btn-modern btn-primary px-5 py-3">SHOP THE SALE</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- New Arrivals Section -->
-    <section class="new-arrivals-section">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-end mb-4">
+    <section class="new-arrivals-section section-padding">
+        <div class="container-custom">
+            <div class="d-flex justify-content-between align-items-end mb-3">
                 <div class="section-header text-start mb-0">
                     <h6 class="section-subtitle text-primary">JUST DROPPED</h6>
                     <h2 class="section-title">New Arrivals</h2>
                 </div>
-                <a href="{% url 'shop' %}" class="btn-link">View All <i class="fas fa-arrow-right ml-2"></i></a>
+                <a href="{% url 'shop' %}" class="btn-link text-dark fw-bold text-decoration-none border-bottom pb-1">Explore All <i class="fas fa-chevron-right ms-2 fs-xs"></i></a>
             </div>
             
             <!-- Swiper Slider Container -->
@@ -160,26 +188,83 @@
                 <div class="swiper new-arrivals-swiper">
                     <div class="swiper-wrapper" id="new-arrivals-slider">
                         <!-- Loaded via AJAX -->
-                        <div class="swiper-slide">
-                            <div class="text-center py-5">
-                                <div class="spinner-border text-muted"></div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <!-- Navigation Buttons -->
                 <div class="swiper-button-next new-arrivals-next"></div>
                 <div class="swiper-button-prev new-arrivals-prev"></div>
-                <!-- Pagination -->
-                <div class="swiper-pagination new-arrivals-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section bg-soft">
+        <div class="container-custom">
+            <div class="swiper testimonials-swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="testimonial-item">
+                            <i class="fas fa-quote-left author-quote"></i>
+                            <p class="testimonial-content">"The quality of the evening edit exceeded my expectations. The fit is perfect and the materials feel incredibly premium. Truly a new standard in luxury."</p>
+                            <div class="testimonial-author">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" alt="Author" class="author-img">
+                                <span class="author-name">Jonathan Reeves</span>
+                                <small class="text-muted">Platinum Member</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="testimonial-item">
+                            <i class="fas fa-quote-left author-quote"></i>
+                            <p class="testimonial-content">"Fast delivery and exceptional customer service. This is my third order from UOMO, and I am consistently impressed by the craftsmanship."</p>
+                            <div class="testimonial-author">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100" alt="Author" class="author-img">
+                                <span class="author-name">Sarah Jenkins</span>
+                                <small class="text-muted">Fashion Director</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination mt-5"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brand Identity Section -->
+    <section class="brand-story-section bg-dark text-white">
+        <div class="container-custom">
+            <div class="row align-items-center py-3">
+                <div class="col-lg-5">
+                    <div class="story-content pe-lg-5">
+                        <h6 class="subtitle-line mb-4">ESTABLISHED 2024</h6>
+                        <h2 class="display-4 fw-800 mb-4">The UOMO Art of Luxury</h2>
+                        <p class="text-white-50 mb-4">We believe that fashion is a form of self-expression. Our pieces are more than just clothing; they are meticulously crafted narratives designed to empower and inspire. From the finest Italian fabrics to modern avant-garde silhouettes, every thread reflects our commitment to excellence.</p>
+                        <ul class="story-features list-unstyled mb-5">
+                            <li class="mb-3"><i class="fas fa-gem me-3 text-primary"></i> Premium Italian Sourced Fabrics</li>
+                            <li class="mb-3"><i class="fas fa-feather me-3 text-primary"></i> Hand-Finished Details</li>
+                            <li><i class="fas fa-leaf me-3 text-primary"></i> Sustainable Luxury Practices</li>
+                        </ul>
+                        <a href="#" class="link-white fw-bold text-decoration-none border-bottom pb-2">Learn Our Heritage →</a>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="story-visuals position-relative">
+                        <div class="main-story-img rounded-4 overflow-hidden mb-4 shadow-lg">
+                            <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200" alt="Modern Luxury" class="img-fluid">
+                        </div>
+                        <div class="floating-story-img d-none d-md-block rounded-4 overflow-hidden shadow-2xl animate-float">
+                            <img src="https://images.unsplash.com/photo-1594932224528-9560c0423985?w=500" alt="Craftsmanship" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Popular Products Section -->
-    <section class="popular-products-section">
-        <div class="container">
-            <div class="section-header text-center mb-5">
+    <section class="popular-products-section section-padding">
+        <div class="container-custom">
+            <div class="section-header text-center mb-3">
                 <h6 class="section-subtitle">CUSTOMER FAVORITES</h6>
                 <h2 class="section-title">Popular This Week</h2>
                 <div class="section-divider"></div>
@@ -187,47 +272,95 @@
 
             <div class="row g-4" id="popular-products-grid">
                 <!-- Loaded via AJAX -->
-                <div class="col-12 text-center py-5">
-                    <div class="spinner-border text-muted"></div>
-                </div>
             </div>
             
             <div class="text-center mt-5">
-                <a href="{% url 'shop' %}" class="btn btn-primary btn-lg px-5 rounded-0">Discover More</a>
+                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5">Discover Full Collection</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Elite Newsletter Section -->
+    <section class="newsletter-elite-section">
+        <div class="container-custom">
+            <div class="newsletter-form-wrapper animate-fade-up">
+                <h6 class="text-primary fw-bold letter-spacing-3 mb-3">JOIN THE ELITE</h6>
+                <h2 class="display-5 fw-900 mb-4 text-white">Unlock Early Access &<br>Exclusive Collections</h2>
+                <p class="text-white-50 mb-5">Be the first to know about new drops and members-only events. Zero spam, just pure luxury lifestyle updates.</p>
+                <form class="d-flex flex-column flex-md-row gap-3">
+                    <input type="email" class="form-control newsletter-elite-input" placeholder="Your premium email address">
+                    <button class="btn-hero btn-hero-primary px-5 py-3">SUBSCRIBE NOW</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modern Social Gallery -->
+    <section class="social-gallery-section py-3">
+        <div class="container-custom">
+            <div class="section-header text-center mb-3">
+                <h6 class="section-subtitle">#UOMOSTYLE</h6>
+                <h2 class="section-title">Follow Us On Instagram</h2>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-3 col-6">
+                    <div class="gallery-item animate-fade-up">
+                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" alt="Social" class="img-fluid">
+                        <div class="gallery-overlay"><i class="fab fa-instagram"></i></div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="gallery-item animate-fade-up delay-1">
+                        <img src="https://images.unsplash.com/photo-1539109132314-d07090422d31?w=600" alt="Social" class="img-fluid">
+                        <div class="gallery-overlay"><i class="fab fa-instagram"></i></div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="gallery-item animate-fade-up delay-2">
+                        <img src="https://images.unsplash.com/photo-1529139513075-3a3b16995006?w=600" alt="Social" class="img-fluid">
+                        <div class="gallery-overlay"><i class="fab fa-instagram"></i></div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="gallery-item animate-fade-up delay-3">
+                        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600" alt="Social" class="img-fluid">
+                        <div class="gallery-overlay"><i class="fab fa-instagram"></i></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="feature-item text-center">
-                        <i class="fas fa-shipping-fast feature-icon"></i>
-                        <h5 class="feature-title">Fast And Free Delivery</h5>
-                        <p class="feature-text">Free delivery for all orders over ৳140</p>
+    <section class="features-section section-padding">
+        <div class="container-custom">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-box">
+                        <i class="fas fa-shipping-fast"></i>
+                        <h5 class="author-name mb-3">Priority Shipping</h5>
+                        <p class="text-muted small">Complimentary global delivery on all premium orders over ৳5000.</p>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="feature-item text-center">
-                        <i class="fas fa-headset feature-icon"></i>
-                        <h5 class="feature-title">24/7 Customer Support</h5>
-                        <p class="feature-text">Friendly 24/7 customer support</p>
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-box">
+                        <i class="fas fa-gem"></i>
+                        <h5 class="author-name mb-3">Lifetime Quality</h5>
+                        <p class="text-muted small">Every piece is backed by our signature quality and craftsmanship guarantee.</p>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="feature-item text-center">
-                        <i class="fas fa-shield-alt feature-icon"></i>
-                        <h5 class="feature-title">Money Back Guarantee</h5>
-                        <p class="feature-text">We return money within 30 days</p>
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-box">
+                        <i class="fas fa-undo-alt"></i>
+                        <h5 class="author-name mb-3">Elegant Returns</h5>
+                        <p class="text-muted small">Enjoy a seamless 30-day return policy for ultimate peace of mind.</p>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="feature-item text-center">
-                        <i class="fas fa-lock feature-icon"></i>
-                        <h5 class="feature-title">Secure Payment</h5>
-                        <p class="feature-text">Your money is safe with us</p>
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-box">
+                        <i class="fas fa-lock"></i>
+                        <h5 class="author-name mb-3">Encrypted Checkout</h5>
+                        <p class="text-muted small">Your security is paramount. We use bank-level encryption for all data.</p>
                     </div>
                 </div>
             </div>
@@ -259,8 +392,8 @@
         .hero-content {
             position: relative;
             z-index: 2;
-            padding: 0 8%;
-            max-width: 800px;
+            padding: 0 5%;
+            max-width: 1000px;
             color: var(--white);
         }
 
@@ -495,7 +628,7 @@
 
         /* Featured Categories Section */
         .collections-section {
-            padding: 100px 0;
+            padding: 30px 0;
             background: #ffffff;
         }
 
@@ -987,6 +1120,252 @@
                 height: 300px;
             }
         }
+
+        /* Hot Promo Banner */
+        .promo-banner-section {
+            padding: 40px 0;
+            background: #fdfdfd;
+        }
+
+        .promo-banner-content {
+            background: #f8f8f8;
+            border-radius: 20px;
+            overflow: hidden;
+            padding: 40px;
+            position: relative;
+        }
+
+        .text-outline-dark {
+            -webkit-text-stroke: 1px var(--black);
+            color: transparent;
+        }
+
+        .promo-countdown {
+            display: flex;
+            gap: 20px;
+        }
+
+        .time-item {
+            background: var(--white);
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            min-width: 90px;
+        }
+
+        .time-item span {
+            display: block;
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .time-item small {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Brand Story Section */
+        .brand-story-section {
+            padding: 60px 0;
+            overflow: hidden;
+        }
+
+        .subtitle-line {
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--primary-color);
+        }
+
+        .subtitle-line::after {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--primary-color);
+            margin-left: 15px;
+        }
+
+        .story-visuals {
+            height: 600px;
+        }
+
+        .main-story-img img {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+        }
+
+        .floating-story-img {
+            position: absolute;
+            bottom: 0;
+            left: -50px;
+            width: 250px;
+            z-index: 2;
+            border: 10px solid var(--black);
+        }
+
+        .link-white:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color) !important;
+        }
+
+        /* Social Gallery */
+        .gallery-item {
+            position: relative;
+            height: 350px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition-slow);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 30px;
+            opacity: 0;
+            transition: var(--transition-base);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 60px 0;
+            background: #fafafa;
+        }
+
+        .testimonial-item {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .testimonial-content {
+            font-size: clamp(18px, 3vw, 28px);
+            font-weight: 500;
+            line-height: 1.4;
+            color: var(--black);
+            margin-bottom: 35px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .author-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid var(--white);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .author-name {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 14px;
+        }
+
+        .author-quote {
+            color: var(--primary-color);
+            font-size: 40px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Elite Newsletter */
+        .newsletter-elite-section {
+            padding: 100px 0;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600') center/cover;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .newsletter-form-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .newsletter-elite-input {
+            background: rgba(255,255,255,0.1) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            color: var(--white) !important;
+            padding: 18px 25px !important;
+            border-radius: 50px !important;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .newsletter-elite-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Refined Features */
+        .features-section {
+            padding: 100px 0;
+            background: var(--white);
+        }
+
+        .feature-box {
+            padding: 40px;
+            border: 1px solid var(--gray-200);
+            transition: var(--transition-base);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .feature-box:hover {
+            border-color: var(--black);
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-box i {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 991px) {
+            .promo-banner-content { padding: 40px; }
+            .story-visuals { height: auto; margin-top: 50px; }
+            .floating-story-img { display: none !important; }
+        }
     </style>
 {% endblock %}
 
@@ -1169,11 +1548,30 @@
             `;
         }
 
+        // Initialize Testimonials Swiper
+        function initTestimonialsSwiper() {
+            new Swiper('.testimonials-swiper', {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                loop: true,
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                speed: 1000,
+            });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // loadHeroSlider();
             loadNewArrivals();
             loadPopularProducts();
+            initTestimonialsSwiper();
         });
     </script>
 {% endblock %}
