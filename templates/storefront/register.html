@@ -4,19 +4,19 @@
 
 {% block content %}
 <section class="modern-auth-wrapper">
-    <div class="auth-split-container">
+    <div class="auth-split-container animate-scale-in">
         <!-- Left Side: Form -->
         <div class="auth-form-side">
             <div class="form-content">
                 <div id="register-section" class="auth-section">
-                    <div class="auth-header mb-4">
+                    <div class="auth-header mb-4 animate-fade-up">
                         <h2 class="section-title">Join UOMO</h2>
                         <p class="section-subtitle">Create an account for a premium experience</p>
                     </div>
                     
                     <form id="register-form" class="modern-form">
                         {% csrf_token %}
-                        <div class="row g-3">
+                        <div class="row g-3 animate-fade-up delay-1">
                             <div class="col-md-6 form-group">
                                 <label class="form-label">Full Name</label>
                                 <div class="input-wrapper">
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         
-                        <div class="form-group">
+                        <div class="form-group animate-fade-up delay-2">
                             <label class="form-label">Email Address</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-envelope input-icon"></i>
@@ -42,7 +42,7 @@
                             </div>
                         </div>
                         
-                        <div class="row g-3">
+                        <div class="row g-3 animate-fade-up delay-3">
                             <div class="col-md-6 form-group">
                                 <label class="form-label">Password</label>
                                 <div class="input-wrapper">
@@ -60,7 +60,7 @@
                             </div>
                         </div>
                         
-                        <div class="mb-4">
+                        <div class="mb-4 animate-fade-up delay-4">
                             <label class="custom-checkbox">
                                 <input type="checkbox" id="terms" required>
                                 <span class="checkmark"></span>
@@ -70,13 +70,13 @@
                         
                         <div id="error-message" class="alert alert-danger d-none small py-2"></div>
                         
-                        <button type="submit" class="btn-modern btn-primary w-100 mb-3">
+                        <button type="submit" class="btn-modern btn-primary w-100 mb-3 animate-fade-up delay-4">
                             Create Account
                         </button>
                         
-                        <div class="text-center">
+                        <div class="text-center animate-fade-up delay-5">
                             <p class="text-muted small mb-0">Already have an account? 
-                                <a href="{% url 'staff_login' %}" class="link-primary text-decoration-none">Sign In</a>
+                                <a href="{% url 'staff_login' %}" class="link-primary text-decoration-none fw-bold">Sign In</a>
                             </p>
                         </div>
                     </form>
@@ -84,8 +84,8 @@
                 
                 <!-- OTP Section (Hidden Initially) -->
                 <div id="otp-section" class="auth-section" style="display: none;">
-                    <div class="auth-header mb-5 text-center">
-                        <div class="otp-icon-wrapper mb-4">
+                    <div class="auth-header mb-4 text-center animate-fade-up">
+                        <div class="otp-icon-wrapper mb-4 animate-float">
                             <i class="fas fa-shield-alt"></i>
                         </div>
                         <h2 class="section-title">Verify Account</h2>
@@ -94,7 +94,7 @@
                     
                     <form id="otp-form" class="modern-form">
                         {% csrf_token %}
-                        <div class="otp-inputs-container">
+                        <div class="otp-inputs-container animate-fade-up delay-1">
                             <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required>
                             <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required>
                             <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required>
@@ -104,13 +104,13 @@
                         <div id="otp-error-message" class="alert alert-danger d-none small py-2 mb-4"></div>
                         <div id="otp-success-message" class="alert alert-success d-none small py-2 mb-4"></div>
                         
-                        <button type="submit" class="btn-modern btn-primary">
+                        <button type="submit" class="btn-modern btn-primary animate-fade-up delay-2">
                             Verify & Continue
                         </button>
                         
-                        <div class="text-center mt-4">
+                        <div class="text-center mt-4 animate-fade-up delay-3">
                             <button type="button" class="btn btn-link text-muted small text-decoration-none" id="resend-otp">
-                                Didn't receive code? <span class="link-primary">Resend</span>
+                                Didn't receive code? <span class="link-primary fw-bold">Resend</span>
                             </button>
                         </div>
                     </form>
@@ -121,13 +121,15 @@
         <!-- Right Side: Visual Content -->
         <div class="auth-visual-side">
             <div class="visual-content">
-                <div class="floating-badge mb-4">
+                <div class="floating-badge mb-4 animate-float">
                    <i class="fas fa-user-plus"></i>
                 </div>
-                <h2 class="welcome-title text-white">BECOME A MEMBER</h2>
-                <p class="welcome-text">Join the elite UOMO community to unlock tailored shopping experiences and member-only rewards.</p>
+                <div class="animate-fade-up delay-2">
+                    <h2 class="welcome-title text-white">BECOME A MEMBER</h2>
+                    <p class="welcome-text">Join the elite UOMO community to unlock tailored shopping experiences and member-only rewards.</p>
+                </div>
                 
-                <div class="auth-features mt-4">
+                <div class="auth-features mt-4 animate-fade-up delay-3">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <div class="feature-icon-sm"><i class="fas fa-gift"></i></div>
                         <span class="small fw-medium">Welcome Gift for New Members</span>

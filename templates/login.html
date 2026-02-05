@@ -4,15 +4,10 @@
 
 {% block content %}
 <section class="modern-auth-wrapper">
-    <div class="auth-split-container">
+    <div class="auth-split-container animate-scale-in">
         <!-- Left Side: Form -->
         <div class="auth-form-side">
             <div class="form-content">
-                <div class="auth-header mb-5">
-                    <h2 class="section-title">Sign In</h2>
-                    <p class="section-subtitle">Welcome back to UOMO</p>
-                </div>
-                
                 <div class="auth-box">
                     {% if user.is_authenticated %}
                         <div class="text-center py-4">
@@ -41,50 +36,56 @@
                             {% endfor %}
                         {% endif %}
                         
-                        <form method="post" class="modern-form" novalidate>
-                            {% csrf_token %}
+                        <div id="login-section" class="auth-section">
+                            <div class="auth-header mb-4 animate-fade-up">
+                                <h2 class="section-title">Login to UOMO</h2>
+                                <p class="section-subtitle">Enter your credentials to access your account</p>
+                            </div>
                             
-                            <div class="form-group">
-                                <label class="form-label">Phone or Username</label>
-                                <div class="input-wrapper">
-                                    <i class="fas fa-user input-icon"></i>
-                                    {{ form.username }}
+                            <form method="post" class="modern-form" novalidate>
+                                {% csrf_token %}
+                                <div class="form-group animate-fade-up delay-1">
+                                    <label class="form-label">Username</label>
+                                    <div class="input-wrapper">
+                                        <i class="fas fa-user input-icon"></i>
+                                        <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+                                    </div>
+                                    {% if form.username.errors %}
+                                        <div class="text-danger x-small mt-1">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+                                    {% endif %}
                                 </div>
-                                {% if form.username.errors %}
-                                    <div class="text-danger x-small mt-1">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Password</label>
-                                <div class="input-wrapper">
-                                    <i class="fas fa-lock input-icon"></i>
-                                    {{ form.password }}
+                                
+                                <div class="form-group animate-fade-up delay-2">
+                                    <label class="form-label">Password</label>
+                                    <div class="input-wrapper">
+                                        <i class="fas fa-lock input-icon"></i>
+                                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                                    </div>
+                                    {% if form.password.errors %}
+                                        <div class="text-danger x-small mt-1">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
+                                    {% endif %}
                                 </div>
-                                {% if form.password.errors %}
-                                    <div class="text-danger x-small mt-1">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="mb-4 d-flex justify-content-between align-items-center">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" id="remember" name="remember">
-                                    <span class="checkmark"></span>
-                                    <span class="small text-muted fw-medium">Remember me</span>
-                                </label>
-                                <a href="#" class="link-primary small text-decoration-none">Forgot Password?</a>
-                            </div>
-                            
-                            <button type="submit" class="btn-modern btn-primary">
-                                Sign In
-                            </button>
-                            
-                            <div class="text-center mt-4">
-                                <p class="text-muted small mb-0">Don't have an account? 
-                                    <a href="{% url 'customer_register' %}" class="link-primary text-decoration-none">Create Account</a>
-                                </p>
-                            </div>
-                        </form>
+                                
+                                <div class="mb-4 d-flex justify-content-between align-items-center animate-fade-up delay-3">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" id="remember" name="remember">
+                                        <span class="checkmark"></span>
+                                        <span class="small text-muted fw-medium">Remember me</span>
+                                    </label>
+                                    <a href="#" class="link-primary small text-decoration-none">Forgot Password?</a>
+                                </div>
+                                
+                                <button type="submit" class="btn-modern btn-primary w-100 mb-3 animate-fade-up delay-4">
+                                    Sign In
+                                </button>
+                                
+                                <div class="text-center animate-fade-up delay-5">
+                                    <p class="text-muted small mb-0">Don't have an account? 
+                                        <a href="{% url 'customer_register' %}" class="link-primary text-decoration-none fw-bold">Create Account</a>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -93,24 +94,26 @@
         <!-- Right Side: Visual Content -->
         <div class="auth-visual-side">
             <div class="visual-content">
-                <div class="floating-badge mb-4">
-                   <i class="fas fa-shopping-bag"></i>
+                <div class="floating-badge mb-4 animate-float">
+                   <i class="fas fa-crown"></i>
                 </div>
-                <h2 class="welcome-title text-white">UOMO LUXURY</h2>
-                <p class="welcome-text">Experience premium shopping with our curated collections and exceptional service.</p>
+                <div class="animate-fade-up delay-2">
+                    <h2 class="welcome-title text-white">WELCOME BACK</h2>
+                    <p class="welcome-text">Sign in to continue your premium shopping journey with UOMO Luxury Store.</p>
+                </div>
                 
-                <div class="auth-features mt-5">
+                <div class="auth-features mt-5 animate-fade-up delay-3">
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <div class="feature-icon-sm"><i class="fas fa-check"></i></div>
-                        <span class="small fw-medium">Exclusive Member Discounts</span>
+                        <div class="feature-icon-sm"><i class="fas fa-shield-alt"></i></div>
+                        <span class="small fw-medium">Secure Biometric Login</span>
                     </div>
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <div class="feature-icon-sm"><i class="fas fa-check"></i></div>
-                        <span class="small fw-medium">Track Your Orders in Real-time</span>
+                        <div class="feature-icon-sm"><i class="fas fa-bolt"></i></div>
+                        <span class="small fw-medium">Fast Checkout & Checkout</span>
                     </div>
                     <div class="d-flex align-items-center gap-3">
-                        <div class="feature-icon-sm"><i class="fas fa-check"></i></div>
-                        <span class="small fw-medium">Faster Checkout Experience</span>
+                        <div class="feature-icon-sm"><i class="fas fa-heart"></i></div>
+                        <span class="small fw-medium">Exclusive Member Wishlist</span>
                     </div>
                 </div>
             </div>

@@ -5,67 +5,96 @@
 {% block content %}
     <!-- Hero Slider -->
     <section class="hero-slider">
-        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
             <div class="carousel-indicators">
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
             </div>
+            
             <div class="carousel-inner">
                 <!-- Slide 1: Occasional / Party Wear -->
                 <div class="carousel-item active">
-                    <div class="hero-slide"
-                         style="background-image: url('https://twelvebd.com/cdn/shop/files/Now_in_motion_slider_2_566d7917-d7c2-4f2e-a416-7823111c42ed.jpg?v=1767269972&width=2000');">
-                        <div class="container-fluid">
-                            <div class="hero-content">
-                                <h6 class="hero-subtitle">THE EVENING EDIT</h6>
-                                <h1 class="hero-title">Shine Bright<br>This Season</h1>
-                                <p class="hero-text">Elegant dresses and sharp suits for every special occasion.</p>
-                                <div class="hero-btns">
-                                    <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary">Shop Women</a>
-                                    <a href="{% url 'shop' %}" class="btn-hero btn-hero-outline">Shop Men</a>
+                    <div class="hero-slide" style="background-image: url('https://twelvebd.com/cdn/shop/files/Now_in_motion_slider_2_566d7917-d7c2-4f2e-a416-7823111c42ed.jpg?v=1767269972&width=2000');">
+                        <div class="container-fluid h-100">
+                            <div class="row h-100 align-items-center">
+                                <div class="col-lg-7">
+                                    <div class="hero-content animate-reveal-right">
+                                        <h6 class="hero-subtitle mb-4"><span>NEW COLLECTION</span></h6>
+                                        <h1 class="hero-title mb-4">The Evening Edit<br>Shine Bright</h1>
+                                        <p class="hero-text mb-5">Elegant dresses and sharp suits tailored for every premium occasion. Experience the new standard of luxury.</p>
+                                        <div class="hero-btns flex-wrap">
+                                            <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary me-3">Shop Women</a>
+                                            <a href="{% url 'shop' %}" class="btn-hero btn-hero-outline">Shop Men</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 d-none d-lg-flex justify-content-end">
+                                    <div class="hero-side-info animate-fade-up">
+                                        <div class="side-badge">
+                                            <span class="badge-year">2026</span>
+                                            <span class="badge-text">LIMITED EDITION</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Slide 2: Casual / Seasonal -->
+                <!-- Slide 2: Seasonal -->
                 <div class="carousel-item">
-                    <div class="hero-slide"
-                         style="background-image: url('https://cdn.rawnation.net/4/media/winter_home_2025_2026_web.jpg');">
-                        <div class="container-fluid">
-                            <div class="hero-content">
-                                <h6 class="hero-subtitle">SUMMER 2024 COLLECTION</h6>
-                                <h1 class="hero-title">New Trends <br>Are Here</h1>
-                                <p class="hero-text">Discover the latest arrivals with premium fabrics and modern cuts.</p>
-                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary">Explore Collection</a>
+                    <div class="hero-slide" style="background-image: url('https://cdn.rawnation.net/4/media/winter_home_2025_2026_web.jpg');">
+                         <div class="container-fluid h-100">
+                            <div class="row h-100 align-items-center">
+                                <div class="col-lg-8">
+                                    <div class="hero-content">
+                                        <h6 class="hero-subtitle mb-4"><span>TRENDING NOW</span></h6>
+                                        <h1 class="hero-title mb-4">Summer 2024<br>Collection</h1>
+                                        <p class="hero-text mb-5">Discover the latest arrivals with premium fabrics and modern cuts. Crafted for those who demand excellence.</p>
+                                        <div class="hero-btns">
+                                            <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary">Explore Now</a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Slide 3: Accessories / Sale -->
+                <!-- Slide 3: Sale -->
                 <div class="carousel-item">
-                    <div class="hero-slide"
-                         style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600');">
-                        <div class="container-fluid">
-                            <div class="hero-content">
-                                <h6 class="hero-subtitle">LIMITED TIME OFFER</h6>
-                                <h1 class="hero-title">Up to 50% Off<br>Selected Items</h1>
-                                <p class="hero-text">Don't miss out on our exclusive mid-season sale event.</p>
-                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-white">Shop Sale</a>
+                    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=2000');">
+                         <div class="container-fluid h-100">
+                            <div class="row h-100 align-items-center">
+                                <div class="col-lg-8">
+                                    <div class="hero-content">
+                                        <h6 class="hero-subtitle mb-4"><span>EXCLUSIVE OFFER</span></h6>
+                                        <h1 class="hero-title mb-4">Mid Season Sale<br>Up to 50% Off</h1>
+                                        <p class="hero-text mb-5">Limited time offer on selected premium items. Secure your favorites before they're gone.</p>
+                                        <div class="hero-btns">
+                                            <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary">Shop Sale</a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
             <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
+                <i class="fas fa-chevron-left"></i>
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
+                <i class="fas fa-chevron-right"></i>
             </button>
+
+            <!-- Scroll Indicator -->
+            <div class="hero-scroll-down">
+                <div class="mouse"></div>
+                <span class="text">Scroll Down</span>
+            </div>
         </div>
     </section>
 
@@ -241,23 +270,34 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             margin-bottom: 20px;
-            padding: 5px 10px;
-            backdrop-filter: blur(5px);
+            display: inline-flex;
+            align-items: center;
+            color: var(--white);
+        }
+
+        .hero-subtitle span {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .hero-title {
-            font-size: clamp(40px, 8vw, 90px);
-            font-weight: 800;
-            line-height: 1;
+            font-size: clamp(40px, 6vw, 85px);
+            font-weight: 900;
+            line-height: 1.1;
             margin-bottom: 25px;
             text-transform: uppercase;
+            letter-spacing: -2px;
         }
 
         .hero-text {
             font-size: 18px;
             margin-bottom: 40px;
-            max-width: 500px;
-            color: rgba(255,255,255,0.8);
+            max-width: 550px;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.6;
         }
 
         .hero-btns {
@@ -275,6 +315,7 @@
             transition: var(--transition-base);
             display: inline-flex;
             text-decoration: none;
+            border-radius: 4px;
         }
 
         .btn-hero-primary {
@@ -298,71 +339,143 @@
             background: var(--white);
             color: var(--black);
         }
-        
-        .btn-hero-white {
-            background: transparent;
-            border-bottom: 2px solid #fff;
-            padding: 10px 0;
-            color: #fff;
+
+        .hero-side-info {
+            position: relative;
+            padding-right: 50px;
         }
-        
-        .btn-hero-white:hover {
-            color: #ddd;
-            border-color: #ddd;
+
+        .side-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid var(--white);
+            padding: 30px 15px;
+            border-radius: 100px;
+        }
+
+        .badge-year {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        .badge-text {
+            font-size: 10px;
+            font-weight: 700;
+            writing-mode: vertical-rl;
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
 
         /* Custom Navigation */
         .carousel-control-prev,
         .carousel-control-next {
-            width: 60px;
-            height: 60px;
+            width: 55px;
+            height: 55px;
             background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(15px);
             border-radius: 50%;
             top: 50%;
             transform: translateY(-50%);
             opacity: 0;
-            transition: all 0.3s;
-            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid rgba(255,255,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 14px;
         }
 
         .hero-slider:hover .carousel-control-prev,
         .hero-slider:hover .carousel-control-next {
             opacity: 1;
         }
-        
-        .hero-slider:hover .carousel-control-prev:hover,
-        .hero-slider:hover .carousel-control-next:hover {
-            background: #ffffff;
-            color: var(--primary-color);
+
+        .carousel-control-prev { left: 50px; }
+        .carousel-control-next { right: 50px; }
+
+        .carousel-control-prev:hover,
+        .carousel-control-next:hover {
+            background: var(--white);
+            color: var(--black);
+            transform: translateY(-50%) scale(1.1);
         }
 
-        .carousel-control-prev { left: 40px; }
-        .carousel-control-next { right: 40px; }
-
-        .carousel-control-prev-icon,
-        .carousel-control-next-icon {
-            filter: invert(1); /* Ensure white arrows */
+        /* Scroll Down */
+        .hero-scroll-down {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--white);
         }
-        
+
+        .hero-scroll-down .mouse {
+            width: 26px;
+            height: 42px;
+            border: 2px solid var(--white);
+            border-radius: 20px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .hero-scroll-down .mouse::after {
+            content: '';
+            width: 4px;
+            height: 8px;
+            background: var(--white);
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: scrollDownAni 1.5s infinite;
+        }
+
+        @keyframes scrollDownAni {
+            0% { opacity: 0; transform: translate(-50%, 0); }
+            50% { opacity: 1; transform: translate(-50%, 10px); }
+            100% { opacity: 0; transform: translate(-50%, 20px); }
+        }
+
+        .hero-scroll-down .text {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
         .carousel-indicators {
-            bottom: 30px;
+            bottom: 45px;
+            right: 130px;
+            left: auto;
+            margin: 0;
+            flex-direction: column;
+            width: auto;
         }
 
         .carousel-indicators button {
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: transparent;
-            border: 2px solid #fff;
-            opacity: 0.7;
-            margin: 0 6px;
+            background: var(--white);
+            opacity: 0.3;
+            margin: 8px 0;
+            border: none;
+            transition: all 0.3s;
         }
 
         .carousel-indicators button.active {
             opacity: 1;
-            background: #fff;
-            transform: scale(1.2);
+            transform: scale(1.5);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
         
         /* Mobile Responsive */
