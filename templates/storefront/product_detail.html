@@ -1,0 +1,289 @@
+{% extends 'storefront/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - ShopHub{% endblock %}
+
+{% block content %}
+<div class="product-detail-page">
+    <div class="container px-4 px-lg-5">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="py-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'shop' %}">Shop</a></li>
+                {% if product.category %}
+                <li class="breadcrumb-item"><a href="{% url 'shop' %}?category={{ product.category.id }}">{{ product.category.name }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            </ol>
+        </nav>
+
+        <!-- Product Main Section -->
+        <div class="row g-5 mt-2">
+            <!-- Gallery -->
+            <div class="col-lg-6">
+                <div class="product-gallery sticky-top" style="top: 100px; z-index: 1;">
+                    <div class="main-image-wrapper mb-3 position-relative rounded-4 overflow-hidden shadow-sm">
+                        <span class="badge badge-sale position-absolute top-0 start-0 m-3 fs-6">Sale</span>
+                        <img id="mainImage" src="{{ product.images.first.image.url|default:product.thumbnail }}" alt="{{ product.name }}" class="img-fluid w-100" style="object-fit: cover; aspect-ratio: 1/1;">
+                        <button class="btn-zoom position-absolute bottom-0 end-0 m-3 bg-white rounded-circle shadow-sm p-2 border-0">
+                            <i class="fas fa-expand-alt"></i>
+                        </button>
+                    </div>
+                    <div class="gallery-thumbs d-flex gap-2 overflow-auto pb-2">
+                        {% for image in product.images.all %}
+                        <div class="thumb-item rounded-3 overflow-hidden border {% if forloop.first %}active-thumb{% endif %}" onclick="changeImage('{{ image.image.url }}', this)" style="width: 80px; height: 80px; cursor: pointer; flex-shrink: 0;">
+                            <img src="{{ image.image.url }}" class="w-100 h-100" style="object-fit: cover;">
+                        </div>
+                        {% empty %}
+                         <div class="thumb-item rounded-3 overflow-hidden border active-thumb" style="width: 80px; height: 80px; cursor: pointer; flex-shrink: 0;">
+                            <img src="{{ product.thumbnail }}" class="w-100 h-100" style="object-fit: cover;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-lg-6">
+                <div class="product-info-wrapper">
+                    <div class="mb-2">
+                        {% if product.category %}
+                        <a href="{% url 'shop' %}?category={{ product.category.id }}" class="text-uppercase fw-bold text-muted small text-decoration-none">{{ product.category.name }}</a>
+                        {% endif %}
+                    </div>
+                    <h1 class="display-6 fw-bold mb-3">{{ product.name }}</h1>
+                    
+                    <div class="price-rating-wrapper d-flex align-items-center gap-3 mb-4">
+                        <div class="price-box">
+                            <span class="fs-2 fw-bold text-dark me-2">৳<span id="productPrice">{{ product.price }}</span></span>
+                            {% if product.old_price %}
+                            <span class="fs-5 text-muted text-decoration-line-through">৳{{ product.old_price }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="vr"></div>
+                        <div class="rating-box text-warning small">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span class="text-muted ms-1">(4.8)</span>
+                        </div>
+                    </div>
+
+                    <div class="short-description text-muted mb-4 fs-6 lh-lg">
+                        {{ product.short_description|safe }}
+                    </div>
+
+                    <!-- Attributes Section - Simplified for Placeholder -->
+                    <div class="product-attributes mb-4">
+                        <!-- Placeholder for dynamic attributes if needed -->
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="product-actions d-flex flex-wrap gap-3 mb-5 border-bottom pb-5">
+                        <div class="quantity-selector d-flex align-items-center border rounded-pill px-3 py-2" style="width: fit-content;">
+                            <button class="btn btn-sm btn-link text-dark p-0" onclick="updateQty(-1)"><i class="fas fa-minus"></i></button>
+                            <input type="number" id="productQty" value="1" min="1" class="form-control border-0 text-center fw-bold p-0 mx-2" style="width: 40px; background: transparent;">
+                            <button class="btn btn-sm btn-link text-dark p-0" onclick="updateQty(1)"><i class="fas fa-plus"></i></button>
+                        </div>
+                        
+                        <button class="btn btn-dark rounded-pill px-5 flex-grow-1 fw-bold cart-btn" onclick="addToCart()">
+                            <span class="d-flex align-items-center justify-content-center gap-2">
+                                <i class="fas fa-shopping-bag"></i> Add to Cart
+                            </span>
+                        </button>
+                        
+                        <button class="btn btn-outline-danger rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+
+                    <!-- Meta Info -->
+                    <div class="product-meta small text-muted">
+                        <div class="mb-2"><strong>SKU:</strong> <span class="text-dark">{{ product.sku|default:"N/A" }}</span></div>
+                        <div class="mb-2"><strong>Category:</strong> <span class="text-dark">{{ product.category.name|default:"Uncategorized" }}</span></div>
+                        <div class="mb-2"><strong>Tags:</strong> 
+                            {% for tag in product.tags.all %}
+                            <a href="#" class="text-decoration-none text-muted hover-underline">#{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                            N/A
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description & Reviews Tabs -->
+        <div class="row mt-5 pt-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs border-bottom-0 mb-4 justify-content-center gap-4" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active border-0 bg-transparent fw-bold fs-5 text-dark px-0" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab" aria-selected="true">Description</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link border-0 bg-transparent fw-bold fs-5 text-muted px-0" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-selected="false">Reviews (0)</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="productTabsContent">
+                    <!-- Description Tab -->
+                    <div class="tab-pane fade show active" id="desc" role="tabpanel" aria-labelledby="desc-tab">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <div class="prose text-muted lh-lg">
+                                    {{ product.description|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                        <div class="text-center py-5 text-muted">
+                            <i class="far fa-comment-dots fs-1 mb-3"></i>
+                            <p>No reviews yet. Be the first to review this product!</p>
+                            <button class="btn btn-outline-dark rounded-pill mt-2">Write a Review</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        <div class="related-products mt-5 pt-5 mb-5">
+            <h3 class="fw-bold text-center mb-5">You Might Also Like</h3>
+            <div class="row g-4">
+                <!-- Related products will be loaded via API later or typically passed in context -->
+                 <!-- Placeholder static cards if no related products in context -->
+                 <div class="col-12 text-center text-muted">
+                     Loading related products...
+                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .product-detail-page {
+        padding-top: 20px;
+        padding-bottom: 50px;
+        background: #fff;
+    }
+    
+    .nav-tabs .nav-link {
+        position: relative;
+    }
+    
+    .nav-tabs .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #111;
+    }
+    
+    .thumb-item.active-thumb {
+        border-color: #111 !important;
+        opacity: 1;
+    }
+    
+    .thumb-item {
+        opacity: 0.7;
+        transition: all 0.2s;
+        border: 2px solid transparent !important;
+    }
+    
+    .thumb-item:hover {
+        opacity: 1;
+    }
+    
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+</style>
+{% endblock %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Gallery Image Switcher
+    function changeImage(src, element) {
+        document.getElementById('mainImage').src = src;
+        document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active-thumb'));
+        element.classList.add('active-thumb');
+    }
+
+    // Quantity Logic
+    function updateQty(change) {
+        const input = document.getElementById('productQty');
+        let newVal = parseInt(input.value) + change;
+        if (newVal < 1) newVal = 1;
+        input.value = newVal;
+    }
+
+    // Add to Cart
+    async function addToCart() {
+        const btn = document.querySelector('.cart-btn');
+        const originalText = btn.innerHTML;
+        const slug = '{{ product.slug }}';
+        const qty = document.getElementById('productQty').value;
+        const variantId = null; // Placeholder for variant logic if implemented
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+        try {
+            const formData = {
+                product_slug: slug,
+                quantity: parseInt(qty)
+            };
+            
+            // if (variantId) formData.variant_id = variantId;
+
+            const response = await apiFetch('/cart/items/', {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
+
+            // Success feedback
+            btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+            btn.classList.remove('btn-dark');
+            btn.classList.add('btn-success');
+            
+            // Update global cart count
+            updateCartCount();
+
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-dark');
+                btn.disabled = false;
+            }, 2000);
+
+        } catch (error) {
+            console.error('Cart error:', error);
+            btn.innerHTML = '<i class="fas fa-times"></i> Error';
+            btn.classList.add('btn-danger');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-danger');
+                btn.disabled = false;
+            }, 2000);
+        }
+    }
+</script>
+{% endblock %}
