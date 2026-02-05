@@ -673,7 +673,7 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
+    padding: 40px 20px;
 }
 
 .auth-split-container {
@@ -684,12 +684,12 @@ a {
     border-radius: 30px;
     overflow: hidden;
     box-shadow: var(--shadow-hover);
-    min-height: 650px;
+    min-height: 600px;
 }
 
 .auth-form-side {
     flex: 1.2;
-    padding: 60px;
+    padding: 40px 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -699,7 +699,7 @@ a {
     flex: 1;
     background: var(--black);
     color: var(--white);
-    padding: 60px;
+    padding: 40px 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -718,28 +718,28 @@ a {
 }
 
 .auth-header .section-title {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 800;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     text-transform: uppercase;
 }
 
 .auth-header .section-subtitle {
     color: var(--gray-500);
-    font-size: 15px;
+    font-size: 14px;
 }
 
 /* Auth Forms */
 .modern-form .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 15px;
 }
 
 .modern-form .form-label {
     font-weight: 700;
-    font-size: 13px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: block;
 }
 
