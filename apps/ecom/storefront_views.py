@@ -35,6 +35,62 @@ class ProductDetailView(TemplateView):
         slug = self.kwargs.get('slug')
         product = get_object_or_404(Product, slug=slug, is_active=True)
         context['product'] = product
+        
+        # Prepare variants data for frontend
+        variants = product.variants.filter(is_active=True).select_related('product').prefetch_related('attributes__attribute')
+        
+        # 1. Collect all available attributes (e.g. Color: [Red, Blue], Size: [S, M])
+        # Structure: { 'Color': { 'id': 1, 'values': [{'id': 10, 'value': 'Red', 'code': '#ff0000'}, ...] } }
+        available_attributes = {}
+        
+        # 2. Build variant map for easy lookup by attributes
+        # Structure: { '10-20': { 'id': 1, 'price': 100, 'sku': '...', 'stock': 10 } } (where 10, 20 are attribute value IDs)
+        variant_map = {}
+        
+        for variant in variants:
+            # Create a sorted key of attribute value IDs to uniquely identify this variant configuration
+            # e.g., "10-25" (ColorID-SizeID)
+            attr_values = variant.attributes.all()
+            if not attr_values:
+                continue
+                
+            attr_key_parts = []
+            for val in attr_values:
+                attr_name = val.attribute.name
+                
+                if attr_name not in available_attributes:
+                    available_attributes[attr_name] = {
+                        'name': attr_name,
+                        'id': val.attribute.id,
+                        'values': []
+                    }
+                
+                # Add value if not present
+                existing_ids = [v['id'] for v in available_attributes[attr_name]['values']]
+                if val.id not in existing_ids:
+                    available_attributes[attr_name]['values'].append({
+                        'id': val.id, 
+                        'value': val.value, 
+                        'color_code': val.color_code
+                    })
+                
+                attr_key_parts.append(val.id)
+            
+            # Sort IDs to ensure consistent key generation regardless of DB return order
+            attr_key_parts.sort()
+            attr_key = "-".join(map(str, attr_key_parts))
+            
+            variant_map[attr_key] = {
+                'id': variant.id,
+                'price': float(variant.get_effective_price()),
+                'old_price': float(variant.price) if variant.is_on_sale else None,
+                'sku': variant.sku,
+                'stock': variant.get_total_stock(),
+                'image': variant.image.url if variant.image else None
+            }
+
+        context['available_attributes'] = available_attributes
+        context['variant_map'] = variant_map
         return context
 
 
