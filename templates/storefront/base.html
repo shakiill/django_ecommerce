@@ -898,7 +898,7 @@
                     <div class="account-menu" id="account-menu">
                         {% if user.is_authenticated %}
                             {% if user.is_staff %}
-                            <a href="{% url 'admin:index' %}" class="account-link">
+                            <a href="{% url 'dashboard:home' %}" class="account-link">
                                 <i class="fas fa-user-shield"></i> Admin
                             </a>
                             {% else %}
