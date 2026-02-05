@@ -231,6 +231,15 @@
         const API_BASE_URL = '/api/v1';
         const USER_IS_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
         
+        // Initialize Guest Token if not authenticated
+        if (!USER_IS_AUTHENTICATED && !localStorage.getItem('guest_token')) {
+            localStorage.setItem('guest_token', 'guest-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36));
+        }
+        
+        function getGuestToken() {
+            return localStorage.getItem('guest_token');
+        }
+        
         function isAuthenticated() {
             return USER_IS_AUTHENTICATED;
         }
@@ -253,19 +262,20 @@
 
         // API fetch wrapper
         async function apiFetch(endpoint, options = {}) {
-            const defaultOptions = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken(),
-                },
+            const guestToken = getGuestToken();
+            const defaultHeaders = {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
             };
-            
+            if (!USER_IS_AUTHENTICATED && guestToken) {
+                defaultHeaders['X-Guest-Token'] = guestToken;
+            }
+
             const mergedOptions = {
-                ...defaultOptions,
                 ...options,
                 headers: {
-                    ...defaultOptions.headers,
-                    ...options.headers,
+                    ...defaultHeaders,
+                    ...(options.headers || {}),
                 },
             };
             

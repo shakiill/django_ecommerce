@@ -70,7 +70,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 
 class ProductDetailsSerializer(serializers.ModelSerializer):
-    # images = ProductImageSerializer(many=True, read_only=True)
+    images = ProductImageSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
     brand_name = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()

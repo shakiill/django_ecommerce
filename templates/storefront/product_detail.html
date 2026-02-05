@@ -1,632 +1,1022 @@
 {% extends 'storefront/base.html' %}
 {% load static %}
 
-{% block title %}{{ product.name }} - ShopHub{% endblock %}
+{% block title %}<span id="pageTitle">Loading...</span> - UOMO{% endblock %}
 
 {% block content %}
 <div class="product-detail-page">
-    <div class="container px-4 px-lg-5">
+    <div class="container">
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="py-3">
+        <nav aria-label="breadcrumb" class="py-3 mb-3">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
                 <li class="breadcrumb-item"><a href="{% url 'shop' %}">Shop</a></li>
-                {% if product.category %}
-                <li class="breadcrumb-item"><a href="{% url 'shop' %}?category={{ product.category.id }}">{{ product.category.name }}</a></li>
-                {% endif %}
-                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+                <li class="breadcrumb-item active" aria-current="page" id="breadcrumbName">Loading...</li>
             </ol>
         </nav>
 
+        <!-- Loading State -->
+        <div id="pdpLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading product details...</p>
+        </div>
+
         <!-- Product Main Section -->
-        <div class="row g-5 mt-2">
-            <!-- Gallery -->
+        <div class="row g-5 d-none animate-fade-in" id="pdpContent">
+            <!-- Gallery Section -->
             <div class="col-lg-6">
                 <div class="product-gallery sticky-top" style="top: 100px; z-index: 1;">
-                    <div class="main-image-wrapper mb-3 position-relative rounded-4 overflow-hidden shadow-sm">
-                        {% if product.default_variant.is_on_sale %}
-                        <span class="badge badge-sale position-absolute top-0 start-0 m-3 fs-6">Sale</span>
-                        {% endif %}
+                    <div class="pdp-image-main mb-4 position-relative overflow-hidden rounded-4">
+                        <!-- Sale Badge -->
+                        <div class="pdp-sale-badge d-none" id="pdpSaleBadge">
+                            <span>Sale</span>
+                        </div>
                         
-                        {% with first_image=product.images.first %}
-                        <img id="mainImage" 
-                             src="{% if first_image %}{{ first_image.image.url }}{% elif product.thumbnail %}{{ product.thumbnail.url }}{% else %}/static/assets/images/placeholder.png{% endif %}" 
-                             alt="{{ product.name }}" 
-                             class="img-fluid w-100" 
-                             style="object-fit: cover; aspect-ratio: 1/1;">
-                        {% endwith %}
+                        <div class="pdp-image-wrapper">
+                            <img id="mainImage" 
+                                 src="{% static 'assets/images/placeholder.png' %}" 
+                                 alt="Product Image" 
+                                 class="pdp-main-image img-fluid w-100">
+                             
+                             <div class="pdp-zoom-hint">
+                                <i class="fas fa-search-plus"></i> Hover to zoom
+                            </div>
+                        </div>
                         
-                        <button class="btn-zoom position-absolute bottom-0 end-0 m-3 bg-white rounded-circle shadow-sm p-2 border-0">
+                        <button class="btn-expand position-absolute bottom-0 end-0 m-3" onclick="openLightbox()">
                             <i class="fas fa-expand-alt"></i>
                         </button>
                     </div>
-                    <div class="gallery-thumbs d-flex gap-2 overflow-auto pb-2">
-                        {% for image in product.images.all %}
-                        <div class="thumb-item rounded-3 overflow-hidden border {% if forloop.first %}active-thumb{% endif %}" onclick="changeImage('{{ image.image.url }}', this)" style="width: 80px; height: 80px; cursor: pointer; flex-shrink: 0;">
-                            <img src="{{ image.image.url }}" class="w-100 h-100" style="object-fit: cover;">
-                        </div>
-                        {% empty %}
-                            {% if product.thumbnail %}
-                             <div class="thumb-item rounded-3 overflow-hidden border active-thumb" style="width: 80px; height: 80px; cursor: pointer; flex-shrink: 0;">
-                                <img src="{{ product.thumbnail.url }}" class="w-100 h-100" style="object-fit: cover;">
-                            </div>
-                            {% endif %}
-                        {% endfor %}
+                    
+                    <!-- Thumbnails -->
+                    <div class="gallery-thumbs d-flex gap-3 overflow-auto pb-2" id="galleryThumbs">
+                        <!-- Thumbnails injected by JS -->
                     </div>
                 </div>
             </div>
 
-            <!-- Product Info -->
+            <!-- Product Info Section -->
             <div class="col-lg-6">
-                <div class="product-info-wrapper">
-                    <div class="mb-2">
-                        {% if product.category %}
-                        <a href="{% url 'shop' %}?category={{ product.category.id }}" class="text-uppercase fw-bold text-muted small text-decoration-none">{{ product.category.name }}</a>
-                        {% endif %}
-                    </div>
-                    <h1 class="display-6 fw-bold mb-3">{{ product.name }}</h1>
-                    
-                    <div class="price-rating-wrapper d-flex align-items-center gap-3 mb-4">
-                        <div class="price-box">
-                            {% if product.default_variant %}
-                                <span class="fs-2 fw-bold text-dark me-2">৳<span id="productPrice">{{ product.default_variant.get_effective_price|floatformat:0 }}</span></span>
-                                {% if product.default_variant.is_on_sale %}
-                                <span class="fs-5 text-muted text-decoration-line-through">৳{{ product.default_variant.price|floatformat:0 }}</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="fs-2 fw-bold text-dark">৳0</span>
-                            {% endif %}
-                        </div>
-                        <div class="vr"></div>
-                        <div class="rating-box text-warning small">
+                <div class="product-info-wrapper ps-lg-4">
+                    <!-- Category & Rating -->
+                    <div class="pdp-meta mb-3">
+                        <a href="#" class="pdp-category" id="pdpCategory">CATEGORY</a>
+                        <div class="pdp-rating">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star-half-alt"></i>
-                            <span class="text-muted ms-1">(4.8)</span>
+                            <span class="rating-count ms-2 text-muted">(4.8 Reviews)</span>
+                        </div>
+                    </div>
+                    
+                    <h1 class="pdp-title mb-3" id="pdpName">Product Name</h1>
+                    
+                    <!-- Price -->
+                    <div class="pdp-price-section mb-4">
+                        <div class="pdp-price" id="pdpPrice">৳0.00</div>
+                        <div class="pdp-old-price d-none" id="pdpOldPrice">৳0.00</div>
+                        <div class="pdp-stock-status ms-auto">
+                            <i class="fas fa-check-circle"></i>
+                            <span>In Stock</span>
                         </div>
                     </div>
 
-                    <div class="short-description text-muted mb-4 fs-6 lh-lg">
-                        {{ product.short_description|default:""|safe }}
-                    </div>
+                    <div class="pdp-description text-muted mb-4" id="pdpShortDesc"></div>
+                    
+                    <div class="pdp-divider my-4"></div>
 
                     <!-- Attributes Section -->
-                    <div class="product-attributes mb-4">
-                        {% if available_attributes %}
-                            {% for attr_name, attr_data in available_attributes.items %}
-                            <div class="attribute-group mb-3">
-                                <label class="fw-bold mb-2 small text-uppercase text-muted d-block">{{ attr_name }}</label>
-                                <div class="d-flex flex-wrap gap-2 attribute-values" data-attribute-id="{{ attr_data.id }}">
-                                    {% for val in attr_data.values %}
-                                        <div class="attribute-option">
-                                            <input type="radio" 
-                                                   name="attr_{{ attr_data.id }}" 
-                                                   id="attr_{{ val.id }}" 
-                                                   value="{{ val.id }}" 
-                                                   class="btn-check attribute-input"
-                                                   autocomplete="off"
-                                                   onchange="dpCheckVariant()"
-                                                   {% if val.id in default_variant_value_ids %}checked{% endif %}>
-                                            
-                                            <label class="btn btn-outline-dark rounded-0 px-3 py-2 attribute-label {% if attr_name|lower == 'color' %}color-swatch p-0{% endif %}" 
-                                                   for="attr_{{ val.id }}"
-                                                   title="{{ val.value }}"
-                                                   style="min-width: 40px; {% if attr_name|lower == 'color' and val.color_code %}background-color: {{ val.color_code }}; border-color: #dee2e6;{% endif %}">
-                                                {% if attr_name|lower != 'color' %}
-                                                    {{ val.value }}
-                                                {% endif %}
-                                            </label>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            {% endfor %}
-                        {% endif %}
+                    <div class="product-attributes mb-4" id="pdpAttributes">
+                        <!-- Attributes injected by JS -->
                     </div>
 
                     <!-- Actions -->
-                    <div class="product-detail-actions d-flex flex-wrap gap-3 mb-5 border-bottom pb-5">
-                        <div class="quantity-selector d-flex align-items-center border rounded-pill px-2 py-1" style="width: fit-content; background: #fff; border-color: #e5e7eb !important;">
-                            <button type="button" class="btn btn-sm btn-link text-dark px-3 p-0 qty-minus border-0 text-decoration-none"><i class="fas fa-minus small"></i></button>
-                            <input type="number" id="productQty" value="1" min="1" class="form-control border-0 text-center fw-bold p-0" style="width: 45px; background: transparent; font-size: 1rem; box-shadow: none;">
-                            <button type="button" class="btn btn-sm btn-link text-dark px-3 p-0 qty-plus border-0 text-decoration-none"><i class="fas fa-plus small"></i></button>
+                    <div class="pdp-actions mb-5">
+                        <div class="pdp-quantity">
+                            <label class="pdp-label mb-2">Quantity</label>
+                            <div class="quantity-selector">
+                                <button type="button" class="qty-btn qty-minus" onclick="updatePdpQty(-1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="text" class="qty-input" id="pdpQty" value="1" readonly>
+                                <button type="button" class="qty-btn qty-plus" onclick="updatePdpQty(1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                         
-                        <button class="btn btn-outline-dark btn-buy-now rounded-pill px-5 fw-bold flex-grow-1" id="buyNowBtn" onclick="dpBuyNow()" {% if not product.default_variant %}disabled{% endif %}>
-                            <span class="d-flex align-items-center justify-content-center gap-2">
-                                <i class="fas fa-bolt"></i> Buy Now
-                            </span>
+                        <div class="d-flex flex-column flex-sm-row gap-3 flex-grow-1 w-100 mt-4 mt-sm-0">
+                            <button class="pdp-add-to-cart flex-grow-1" id="addToCartBtn" onclick="pdpAddToCart()">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span id="btnText">Add to Cart</span>
+                            </button>
+                            <button class="pdp-buy-now flex-grow-1" id="buyNowBtn" onclick="pdpBuyNow()">
+                                <i class="fas fa-bolt"></i>
+                                <span>Buy Now</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Actions -->
+                    <div class="pdp-secondary-actions d-flex gap-4 mb-4">
+                        <button class="pdp-action-btn">
+                            <i class="far fa-heart"></i> Add to Wishlist
                         </button>
-                        
-                        <button class="btn btn-dark btn-cart-main rounded-pill px-5 flex-grow-1 fw-bold cart-btn" id="addToCartBtn" onclick="dpAddToCart()" {% if not product.default_variant %}disabled{% endif %}>
-                            <span class="d-flex align-items-center justify-content-center gap-2">
-                                <i class="fas fa-shopping-bag"></i> <span id="btnText">{% if product.default_variant %}Add to Cart{% else %}Unavailable{% endif %}</span>
-                            </span>
-                        </button>
-                        
-                        <button class="btn btn-outline-danger rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                            <i class="far fa-heart"></i>
+                        <button class="pdp-action-btn">
+                            <i class="fas fa-share-alt"></i> Share
                         </button>
                     </div>
 
                     <!-- Meta Info -->
-                    <div class="product-meta small text-muted">
-                        <div class="mb-2"><strong>SKU:</strong> <span class="text-dark" id="skuDisplay">{{ product.default_variant.sku|default:"N/A" }}</span></div>
-                        <div class="mb-2"><strong>Category:</strong> <span class="text-dark">{{ product.category.name|default:"Uncategorized" }}</span></div>
-                        <div class="mb-2"><strong>Tags:</strong> 
-                            {% for tag in product.tags.all %}
-                            <a href="#" class="text-decoration-none text-muted hover-underline">#{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-                            {% empty %}
-                            N/A
-                            {% endfor %}
+                    <div class="pdp-product-meta p-4 bg-light rounded-3">
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span class="text-muted fw-bold">SKU:</span>
+                            <span class="text-dark" id="pdpSku">N/A</span>
+                        </div>
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span class="text-muted fw-bold">Category:</span>
+                            <span class="text-dark" id="pdpMetaCategory"></span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted fw-bold">Tags:</span>
+                            <span class="text-dark">Modern, Luxury, Trend</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Trust Badges -->
+                    <div class="pdp-trust-badges mt-4">
+                        <div class="trust-badge">
+                            <i class="fas fa-truck"></i>
+                            <span>Free Delivery</span>
+                        </div>
+                        <div class="trust-badge">
+                            <i class="fas fa-undo"></i>
+                            <span>Easy Returns</span>
+                        </div>
+                        <div class="trust-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure Payment</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Description & Reviews Tabs -->
-        <div class="row mt-5 pt-5">
+        <!-- Tabs Section -->
+        <div class="row mt-5 pt-5 d-none animate-up" id="pdpTabsSection">
             <div class="col-12">
-                <ul class="nav nav-tabs border-bottom-0 mb-4 justify-content-center gap-4" id="productTabs" role="tablist">
+                <ul class="nav nav-tabs pdp-tabs justify-content-center mb-5" id="productTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active border-0 bg-transparent fw-bold fs-5 text-dark px-0" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab" aria-selected="true">Description</button>
+                        <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Description</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link border-0 bg-transparent fw-bold fs-5 text-muted px-0" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-selected="false">Reviews (0)</button>
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews (0)</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Additional Info</button>
                     </li>
                 </ul>
                 <div class="tab-content" id="productTabsContent">
                     <!-- Description Tab -->
-                    <div class="tab-pane fade show active" id="desc" role="tabpanel" aria-labelledby="desc-tab">
+                    <div class="tab-pane fade show active" id="desc" role="tabpanel">
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
-                                <div class="prose text-muted lh-lg">
-                                    {{ product.description|default:"No description available."|safe }}
-                                </div>
+                                <div class="prose text-muted lh-lg" id="pdpFullDesc"></div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Reviews Tab -->
-                    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                    <div class="tab-pane fade" id="reviews" role="tabpanel">
                         <div class="text-center py-5 text-muted">
-                            <i class="far fa-comment-dots fs-1 mb-3"></i>
-                            <p>No reviews yet. Be the first to review this product!</p>
-                            <button class="btn btn-outline-dark rounded-pill mt-2">Write a Review</button>
+                            <div class="mb-4">
+                                <i class="far fa-comment-alt fa-3x text-light-gray"></i>
+                            </div>
+                            <h5>No reviews yet</h5>
+                            <p class="mb-4">Be the first to review this product!</p>
+                            <button class="btn btn-outline-dark rounded-pill px-4">Write a Review</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Info Tab -->
+                    <div class="tab-pane fade" id="info" role="tabpanel">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th class="bg-light w-25">Weight</th>
+                                            <td>0.5 kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="bg-light">Dimensions</th>
+                                            <td>20 x 10 x 5 cm</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="bg-light">Materials</th>
+                                            <td>100% Cotton</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Related Products -->
-        <div class="related-products mt-5 pt-5 mb-5">
-            <h3 class="fw-bold text-center mb-5">You Might Also Like</h3>
-            <div class="row g-4">
-                 <div class="col-12 text-center text-muted">
-                     Loading related products...
-                 </div>
-            </div>
-        </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block extra_css %}
 <style>
+    /* ============================================
+       PRODUCT DETAIL PAGE - Premium Design
+       ============================================ */
+    
     :root {
-        --uomo-primary: #111111;
-        --uomo-secondary: #767676;
-        --uomo-border: #eeeeee;
-        --uomo-bg-soft: #f9f9f9;
-        --uomo-accent: #ff4d4d;
+        --pdp-primary: #111111;
+        --pdp-accent: #ff4e50;
+        --pdp-bg-light: #f8f9fa;
+        --pdp-border-color: #e5e7eb;
     }
 
     .product-detail-page {
-        padding-top: 40px;
+        padding-top: 30px;
         padding-bottom: 80px;
         background: #fff;
-        font-family: 'Outfit', sans-serif;
+        font-family: 'Jost', sans-serif;
     }
-    
-    /* Breadcrumb Polish */
-    .breadcrumb { font-size: 0.85rem; }
-    .breadcrumb-item a { color: var(--uomo-secondary); text-decoration: none; transition: color 0.2s; }
-    .breadcrumb-item a:hover { color: var(--uomo-primary); }
-    .breadcrumb-item.active { color: var(--uomo-primary); font-weight: 500; }
 
-    /* Gallery Polish */
-    .main-image-wrapper { background: #fff; }
-    .main-image-wrapper img { transition: transform 0.5s ease; }
-    .main-image-wrapper:hover img { transform: scale(1.02); }
-    
-    .thumb-item {
-        border-radius: 8px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1.5px solid transparent !important;
-        opacity: 0.6;
-    }
-    .thumb-item.active-thumb {
-        border-color: var(--uomo-primary) !important;
-        opacity: 1;
-        transform: translateY(-2px);
-    }
-    .thumb-item:hover { opacity: 1; border-color: #ddd !important; }
-
-    /* Info Section */
-    .product-info-wrapper h1 { 
-        font-size: 2.25rem; 
-        letter-spacing: -0.02em; 
-        color: var(--uomo-primary);
-    }
-    
-    .price-box .current-price { font-size: 1.75rem; color: var(--uomo-primary); }
-    .price-box .old-price { font-size: 1.15rem; color: var(--uomo-secondary); margin-left: 8px; }
-
-    /* Attribute Swatches */
-    .attribute-label {
-        font-size: 0.9rem;
-        font-weight: 500;
-        border: 1.5px solid var(--uomo-border);
-        color: var(--uomo-primary);
-        padding: 10px 18px !important;
-        min-width: 54px;
-        text-align: center;
-        transition: all 0.25s ease;
-        cursor: pointer;
+    /* Gallery */
+    .pdp-image-main {
+        background: var(--pdp-bg-light);
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #fff;
+        padding: 40px;
+        cursor: crosshair;
     }
-    .attribute-input:checked + .attribute-label {
-        background-color: var(--uomo-primary);
+    
+    .pdp-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .pdp-main-image {
+        max-height: 600px;
+        object-fit: contain;
+        transition: transform 0.5s ease;
+        will-change: transform;
+    }
+    
+    .pdp-image-main:hover .pdp-main-image {
+        transform: scale(1.05);
+    }
+    
+    .pdp-zoom-hint {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.7);
         color: #fff;
-        border-color: var(--uomo-primary);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
     }
     
-    .color-swatch {
-        width: 36px;
-        height: 36px;
-        border-radius: 50% !important;
-        padding: 0 !important;
-        min-width: 36px;
-        border: 2px solid transparent !important;
-        box-shadow: inset 0 0 0 2px #fff;
-    }
-    .attribute-input:checked + .color-swatch {
-        border-color: var(--uomo-primary) !important;
-        background-color: transparent; /* Reset because of bg-color inline style */
-        transform: scale(1.15);
+    .pdp-image-main:hover .pdp-zoom-hint {
+        opacity: 1;
     }
     
-    /* Chrome-like Quality Selector */
-    .quantity-selector {
-        background: var(--uomo-bg-soft);
-        border: none !important;
-        height: 52px;
+    /* Sale Badge */
+    .pdp-sale-badge {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
     }
-    .quantity-selector input { font-size: 1.1rem; }
-
-    /* Buttons */
-    .btn-buy-now {
-        height: 52px;
-        font-size: 0.95rem;
-        letter-spacing: 0.05em;
+    
+    .pdp-sale-badge span {
+        background: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%);
+        color: #fff;
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
         text-transform: uppercase;
-        border: 1.5px solid var(--uomo-primary) !important;
-        background: transparent !important;
-        color: var(--uomo-primary) !important;
-        transition: all 0.3s;
-        flex: 1;
-        min-width: 180px;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 10px rgba(255, 78, 80, 0.3);
     }
-    .btn-buy-now:hover {
-        background: var(--uomo-primary) !important;
-        color: #fff !important;
-    }
-    .btn-cart-main {
-        height: 52px;
-        font-size: 0.95rem;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
+    
+    .btn-expand {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #fff;
+        border: none;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        flex: 1;
-        min-width: 180px;
+        color: #333;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
     }
-    .btn-cart-main:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    
+    .pdp-image-main:hover .btn-expand {
+        opacity: 1;
+    }
+    
+    .btn-expand:hover {
+        background: var(--pdp-primary);
+        color: #fff;
     }
 
-    /* Tabs Polish */
-    .nav-tabs .nav-link {
-        font-size: 1rem;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: var(--uomo-secondary) !important;
-        padding: 15px 30px;
+    /* Thumbnails */
+    .gallery-thumbs .thumb-item {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        border: 2px solid transparent;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0.6;
+        background: var(--pdp-bg-light);
         transition: all 0.3s;
-        border: none !important;
+        flex-shrink: 0;
+        padding: 5px;
+    }
+    
+    .gallery-thumbs .thumb-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    
+    .gallery-thumbs .thumb-item.active-thumb,
+    .gallery-thumbs .thumb-item:hover {
+        border-color: var(--pdp-primary);
+        opacity: 1;
+        transform: translateY(-2px);
+    }
+
+    /* Info Section */
+    .pdp-category {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--pdp-accent);
+        background: rgba(255, 78, 80, 0.1);
+        padding: 5px 12px;
+        border-radius: 20px;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-block;
+        margin-right: 15px;
+    }
+    
+    .pdp-category:hover {
+        background: var(--pdp-accent);
+        color: #fff;
+    }
+
+    .pdp-rating {
+        display: inline-flex;
+        align-items: center;
+        color: #fbbf24;
+        font-size: 13px;
+    }
+    
+    .pdp-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #111;
+        line-height: 1.2;
+    }
+    
+    .pdp-price-section {
+        display: flex;
+        align-items: baseline;
+        gap: 15px;
+    }
+    
+    .pdp-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #111;
+    }
+    
+    .pdp-old-price {
+        font-size: 1.25rem;
+        color: #9ca3af;
+        text-decoration: line-through;
+        font-weight: 500;
+    }
+    
+    .pdp-stock-status {
+        color: #10b981;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .pdp-description {
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+    
+    .pdp-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+    }
+
+    /* Attributes */
+    .pdp-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #4b5563;
+        display: block;
+    }
+    
+    .pdp-attr-btn {
+        padding: 10px 20px;
+        border: 1px solid var(--pdp-border-color);
+        background: #fff;
+        color: #374151;
+        font-weight: 600;
+        font-size: 14px;
+        border-radius: 8px;
+        transition: all 0.2s;
+        min-width: 48px;
+    }
+    
+    .pdp-attr-btn:hover {
+        border-color: #111;
+        background: #f9fafb;
+    }
+    
+    .pdp-attr-btn.active {
+        background: #111;
+        color: #fff;
+        border-color: #111;
+    }
+    
+    /* Actions */
+    .quantity-selector {
+        display: inline-flex;
+        align-items: center;
+        background: #f3f4f6;
+        border-radius: 8px;
+        height: 48px;
+    }
+    
+    .qty-btn {
+        width: 40px;
+        height: 100%;
+        border: none;
+        background: transparent;
+        color: #374151;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .qty-btn:hover { color: #111; }
+    
+    .qty-input {
+        width: 50px;
+        height: 100%;
+        border: none;
+        background: transparent;
+        text-align: center;
+        font-weight: 700;
+        color: #111;
+    }
+    
+    .pdp-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 20px;
+    }
+    
+    .pdp-add-to-cart {
+        height: 54px;
+        background: linear-gradient(135deg, #111 0%, #333 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        font-size: 14px;
+    }
+    
+    .pdp-add-to-cart:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        background: linear-gradient(135deg, #000 0%, #222 100%);
+    }
+    
+    .pdp-buy-now {
+        height: 54px;
+        background: transparent;
+        color: #111;
+        border: 2px solid #111;
+        border-radius: 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        transition: all 0.3s;
+        font-size: 14px;
+    }
+    
+    .pdp-buy-now:hover {
+        background: #111;
+        color: #fff;
+    }
+    
+    .pdp-action-btn {
+        background: none;
+        border: none;
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0;
+        transition: color 0.2s;
+    }
+    
+    .pdp-action-btn:hover { color: var(--pdp-accent); }
+    
+    .pdp-trust-badges {
+        display: flex;
+        gap: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--pdp-border-color);
+        flex-wrap: wrap;
+    }
+    
+    .trust-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: #4b5563;
+        font-weight: 500;
+    }
+    
+    .trust-badge i {
+        color: #10b981;
+        font-size: 16px;
+    }
+
+    /* Tabs */
+    .pdp-tabs {
+        border-bottom: 2px solid #f3f4f6;
+    }
+    
+    .pdp-tabs .nav-link {
+        border: none;
+        color: #9ca3af;
+        font-weight: 600;
+        font-size: 18px;
+        padding: 15px 30px;
+        background: transparent;
         position: relative;
     }
-    .nav-tabs .nav-link.active {
-        color: var(--uomo-primary) !important;
-    }
-    .nav-tabs .nav-link.active::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 20%;
-        width: 60%;
-        height: 2px;
-        background: var(--uomo-primary);
+    
+    .pdp-tabs .nav-link.active {
+        color: #111;
     }
     
-    /* Fade In Animation */
+    .pdp-tabs .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #111;
+    }
+
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    .product-info-wrapper > * {
+    
+    .animate-up {
         animation: fadeInUp 0.5s ease forwards;
         opacity: 0;
     }
-    .product-info-wrapper > *:nth-child(1) { animation-delay: 0.1s; }
-    .product-info-wrapper > *:nth-child(2) { animation-delay: 0.2s; }
-    .product-info-wrapper > *:nth-child(3) { animation-delay: 0.3s; }
+
+    /* Responsive */
+    @media (max-width: 991px) {
+        .pdp-title { font-size: 2rem; }
+        .pdp-image-main { padding: 20px; }
+        .pdp-price { font-size: 1.75rem; }
+    }
+</style>
+<style>
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Deserialize data from View
-    const availableAttributes = {{ available_attributes|safe|default:"{}" }};
-    const variantMap = {{ variant_map|safe|default:"{}" }};
+    const PDP_SLUG = "{{ product_slug }}";
     
-    // Initial State
-    let currentVariantId = {{ product.default_variant.id|default:"null" }};
-    
+    // State Management
+    let pdpProduct = null;
+    let pdpVariants = [];
+    let pdpSelectedAttributes = {};
+    let pdpSelectedVariant = null;
+
     document.addEventListener('DOMContentLoaded', () => {
-        try {
-            // Quantity Controls
-            const minusBtn = document.querySelector('.qty-minus');
-            const plusBtn = document.querySelector('.qty-plus');
-            const qtyInput = document.getElementById('productQty');
-
-            if (minusBtn && plusBtn && qtyInput) {
-                minusBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    dpUpdateQty(-1);
-                });
-                plusBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    dpUpdateQty(1);
-                });
-                
-                // Allow manual input but keep it within bounds
-                qtyInput.addEventListener('change', () => {
-                    let val = parseInt(qtyInput.value);
-                    if (isNaN(val) || val < 1) val = 1;
-                    
-                    // Check stock if variant selected
-                    const variant = dpGetSelectedVariant();
-                    if (variant && variant.stock && val > variant.stock) {
-                        val = variant.stock;
-                    }
-                    qtyInput.value = val;
-                });
-            }
-
-            // Initial display update
-            dpUpdateActionButtons();
-        } catch (err) {
-            console.error("Initialization error:", err);
+        if(PDP_SLUG) {
+            initPDP(PDP_SLUG);
+        } else {
+            showError('Product not found.', document.getElementById('pdpLoading'));
         }
     });
 
-    // Gallery Image Switcher
-    function changeImage(src, element) {
-        const mainImg = document.getElementById('mainImage');
-        if (!mainImg) return;
-        
-        mainImg.style.opacity = '0';
-        setTimeout(() => {
-            mainImg.src = src;
-            mainImg.style.opacity = '1';
-        }, 200);
-        document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active-thumb'));
-        element.classList.add('active-thumb');
-    }
-
-    // Helper to get currently selected variant data
-    function dpGetSelectedVariant() {
-        const selectedIds = [];
-        const attributeGroups = document.querySelectorAll('.attribute-values');
-        let allSelected = true;
-        
-        attributeGroups.forEach(group => {
-            const checked = group.querySelector('input:checked');
-            if (checked) selectedIds.push(parseInt(checked.value));
-            else allSelected = false;
-        });
-
-        if (!allSelected) return null;
-        
-        selectedIds.sort((a, b) => a - b);
-        const key = selectedIds.join('-');
-        return variantMap[key] || null;
-    }
-
-    // Update quantity button states (enable/disable based on bounds)
-    function dpUpdateQtyBtnStates() {
-        const minusBtn = document.querySelector('.qty-minus');
-        const plusBtn = document.querySelector('.qty-plus');
-        const qtyInput = document.getElementById('productQty');
-        if (!qtyInput) return;
-
-        let val = parseInt(qtyInput.value);
-        if (isNaN(val)) val = 1;
-
-        if (minusBtn) minusBtn.disabled = (val <= 1);
-        
-        const variant = dpGetSelectedVariant();
-        if (plusBtn && variant && variant.stock !== undefined) {
-            plusBtn.disabled = (val >= variant.stock);
-            plusBtn.title = (val >= variant.stock) ? `Only ${variant.stock} items in stock` : "";
-        } else if (plusBtn) {
-            plusBtn.disabled = false;
+    async function initPDP(slug) {
+        try {
+            const data = await apiFetch(`/products/${slug}/`);
+            pdpProduct = data;
+            pdpVariants = data.variant_list || [];
+            
+            renderPDP();
+        } catch (error) {
+            console.error('Error loading PDP:', error);
+            showError(`
+                Failed to load product details. <br>
+                <button class="btn btn-sm btn-outline-danger mt-2" onclick="location.reload()">Retry</button>
+            `, document.getElementById('pdpLoading'));
         }
     }
 
-    // Quantity Logic
-    function dpUpdateQty(change) {
-        const input = document.getElementById('productQty');
-        if (!input) return;
+    function renderPDP() {
+        if (!pdpProduct) return;
+
+        // Hide loader, show content
+        document.getElementById('pdpLoading').classList.add('d-none');
+        document.getElementById('pdpContent').classList.remove('d-none');
+        document.getElementById('pdpTabsSection').classList.remove('d-none');
         
-        let newVal = parseInt(input.value) + change;
-        if (newVal < 1) newVal = 1;
+        // Populate Meta
+        document.title = `${pdpProduct.name} - UOMO`;
+        document.getElementById('pageTitle').textContent = pdpProduct.name;
+        document.getElementById('breadcrumbName').textContent = pdpProduct.name;
+        
+        document.getElementById('pdpName').textContent = pdpProduct.name;
+        document.getElementById('pdpCategory').textContent = pdpProduct.category_name || "Uncategorized";
+        document.getElementById('pdpCategory').href = `/shop/?category=${pdpProduct.category || ''}`;
+        document.getElementById('pdpMetaCategory').textContent = pdpProduct.category_name || "Uncategorized";
+        
+        // Description
+        document.getElementById('pdpShortDesc').innerHTML = pdpProduct.short_description || "No short description available.";
+        document.getElementById('pdpFullDesc').innerHTML = pdpProduct.description || "<p>No detailed description available.</p>";
+
+        // Attributes
+        const attributes = pdpProduct.attributes_list || [];
+        renderAttributes(attributes);
+
+        // Variant Selection / Price Init
+        const defaultVarId = pdpProduct.default_variant;
+        let initialVariant = null;
+
+        if (defaultVarId) {
+            initialVariant = pdpVariants.find(v => v.id === defaultVarId);
+        }
+        if (!initialVariant && pdpVariants.length > 0) {
+            initialVariant = pdpVariants[0];
+        }
+
+        if (attributes.length > 0 && initialVariant) {
+            preSelectVariant(initialVariant, attributes);
+        } else {
+            // No attributes or no variant found, just show product price
+            updatePrice(pdpProduct.price, null, false);
+            // Images (if no variant specific images, just show product thumb)
+            if(pdpProduct.thumbnail) updateImages(pdpProduct.thumbnail, [pdpProduct.thumbnail]);
+        }
+
+        // Animation Entrance
+        document.querySelectorAll('.product-info-wrapper > *').forEach((el, idx) => {
+            el.style.opacity = '0';
+            el.style.animation = `fadeInUp 0.5s ease ${idx * 0.05}s forwards`;
+        });
+    }
+
+    function renderAttributes(attributes) {
+        const container = document.getElementById('pdpAttributes');
+        container.innerHTML = '';
+
+        attributes.forEach(attr => {
+            const group = document.createElement('div');
+            group.className = 'mb-4';
+            
+            const label = document.createElement('label');
+            label.className = 'pdp-label mb-2';
+            label.textContent = attr.name;
+            group.appendChild(label);
+
+            const valuesContainer = document.createElement('div');
+            valuesContainer.className = 'd-flex flex-wrap gap-2';
+
+            attr.values.forEach(val => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'pdp-attr-btn';
+                btn.textContent = val.value;
+                btn.dataset.attrId = attr.id;
+                btn.dataset.valId = val.id;
+                
+                // Special Color Handling
+                if(attr.name.toLowerCase() === 'color' && val.color_code) {
+                    btn.textContent = '';
+                    btn.style.backgroundColor = val.color_code;
+                    btn.style.width = '32px';
+                    btn.style.height = '32px';
+                    btn.style.padding = '0';
+                    btn.style.borderRadius = '50%';
+                    btn.style.border = '1px solid #ddd'; // subtle border for light colors
+                    btn.title = val.value;
+                    btn.dataset.isColor = 'true';
+                }
+
+                btn.onclick = () => selectAttribute(attr.id, val.id, btn);
+                valuesContainer.appendChild(btn);
+            });
+
+            group.appendChild(valuesContainer);
+            container.appendChild(group);
+        });
+    }
+
+    function selectAttribute(attrId, valId, btnElement) {
+        // Handle visual selection
+        const siblings = btnElement.parentElement.children;
+        for (let sib of siblings) {
+            sib.classList.remove('active');
+            if(sib.dataset.isColor) {
+               sib.style.transform = 'scale(1)';
+               sib.style.borderColor = '#ddd';
+               sib.style.boxShadow = 'none';
+            }
+        }
+
+        btnElement.classList.add('active');
+        if(btnElement.dataset.isColor) {
+            btnElement.style.transform = 'scale(1.15)';
+            btnElement.style.borderColor = '#111';
+            btnElement.style.boxShadow = '0 0 0 2px #fff, 0 0 0 4px #111';
+        }
+
+        pdpSelectedAttributes[attrId] = parseInt(valId);
+        checkVariantMatch();
+    }
+
+    function checkVariantMatch() {
+        const requiredCount = document.querySelectorAll('#pdpAttributes .mb-4').length;
+        // Don't check until all are selected? Or partial updates?
+        // Let's wait for all selections for strict matching.
+        if(Object.keys(pdpSelectedAttributes).length < requiredCount) return;
+
+        const match = pdpVariants.find(v => {
+            const variantAttrs = v.attributes; 
+            const selectedAttrs = Object.values(pdpSelectedAttributes);
+            return selectedAttrs.every(id => variantAttrs.includes(id));
+        });
+
+        if (match) {
+            pdpSelectedVariant = match;
+            updatePrice(match.price, match.discount_price, match.is_discount);
+            document.getElementById('pdpSku').textContent = match.sku || pdpProduct.sku || 'N/A';
+            
+            // Update images if available
+            if (match.image_list && match.image_list.length > 0) {
+                updateImages(match.image_list[0], match.image_list);
+            }
+            
+            setButtonsState(true, 'Add to Cart');
+        } else {
+            pdpSelectedVariant = null;
+            setButtonsState(false, 'Unavailable');
+        }
+    }
+
+    function updatePrice(price, discountPrice, isDiscount) {
+        const priceEl = document.getElementById('pdpPrice');
+        const oldPriceEl = document.getElementById('pdpOldPrice');
+        const badge = document.getElementById('pdpSaleBadge');
+
+        const p = parseFloat(price);
+        const dp = discountPrice ? parseFloat(discountPrice) : null;
+
+        if (dp && dp < p) {
+            priceEl.textContent = `৳${dp.toFixed(0)}`;
+            oldPriceEl.textContent = `৳${p.toFixed(0)}`;
+            oldPriceEl.classList.remove('d-none');
+            badge.classList.remove('d-none');
+            priceEl.classList.add('text-danger');
+        } else {
+            priceEl.textContent = `৳${p.toFixed(0)}`;
+            oldPriceEl.classList.add('d-none');
+            badge.classList.add('d-none');
+            priceEl.classList.remove('text-danger');
+        }
+    }
+
+    function updateImages(mainSrc, imageList) {
+        if(mainSrc) {
+            const main = document.getElementById('mainImage');
+            main.style.opacity = 0;
+            setTimeout(() => {
+                main.src = mainSrc;
+                main.style.opacity = 1;
+            }, 200);
+        }
+
+        const thumbs = document.getElementById('galleryThumbs');
+        thumbs.innerHTML = '';
+        
+        if(!imageList || imageList.length === 0) {
+            if(pdpProduct.thumbnail) imageList = [pdpProduct.thumbnail];
+            else imageList = [];
+        }
+
+        imageList.forEach((src, idx) => {
+            const thumb = document.createElement('div');
+            thumb.className = `thumb-item ${idx === 0 ? 'active-thumb' : ''}`;
+            thumb.innerHTML = `<img src="${src}">`;
+            thumb.onclick = () => {
+                document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active-thumb'));
+                thumb.classList.add('active-thumb');
+                
+                const main = document.getElementById('mainImage');
+                main.style.opacity = 0;
+                setTimeout(() => {
+                    main.src = src;
+                    main.style.opacity = 1;
+                }, 200);
+            };
+            thumbs.appendChild(thumb);
+        });
+    }
+
+    function preSelectVariant(variant, attributes) {
+        if(!variant || !variant.attributes) return;
+
+        attributes.forEach(attr => {
+            const matchingValId = variant.attributes.find(id => 
+                attr.values.some(v => v.id === id)
+            );
+            
+            if(matchingValId) {
+                const btn = document.querySelector(`.pdp-attr-btn[data-attr-id="${attr.id}"][data-val-id="${matchingValId}"]`);
+                if(btn) selectAttribute(attr.id, matchingValId, btn);
+            }
+        });
+    }
+
+    function updatePdpQty(change) {
+        const input = document.getElementById('pdpQty');
+        let val = parseInt(input.value) + change;
+        if(val < 1) val = 1;
         
         // Check stock if variant selected
-        const variant = dpGetSelectedVariant();
-        if (variant && variant.stock && newVal > variant.stock) {
-            newVal = variant.stock;
+        if(pdpSelectedVariant && pdpSelectedVariant.stock && val > pdpSelectedVariant.stock) {
+            val = pdpSelectedVariant.stock;
         }
-        
-        input.value = newVal;
-        dpUpdateQtyBtnStates();
+        input.value = val;
     }
 
-    // Standard way to update buttons and price
-    function dpUpdateActionButtons() {
-        dpCheckVariant();
-        dpUpdateQtyBtnStates();
-    }
+    async function pdpAddToCart(redirect = false) {
+        let variantId = pdpSelectedVariant ? pdpSelectedVariant.id : pdpProduct?.default_variant;
+        
+        // Auto-select if only 1 variant exists
+        if(!variantId && pdpVariants.length === 1) variantId = pdpVariants[0].id;
+        
+        // Validation
+        if(!variantId && pdpVariants.length > 0) {
+            const attrDiv = document.getElementById('pdpAttributes');
+            attrDiv.style.animation = 'none';
+            attrDiv.offsetHeight; 
+            attrDiv.style.animation = 'shake 0.5s';
+            
+            // Optional toast or alert
+            // alert("Please select all options.");
+            return;
+        }
 
-    // Variant Selection Logic
-    function dpCheckVariant() {
-        const selectedIds = [];
-        const attributeGroups = document.querySelectorAll('.attribute-values');
-        
-        let allSelected = true;
-        
-        attributeGroups.forEach(group => {
-            const checked = group.querySelector('input:checked');
-            if (checked) {
-                selectedIds.push(parseInt(checked.value));
-            } else {
-                allSelected = false;
-            }
-        });
-        
+        const qty = parseInt(document.getElementById('pdpQty').value);
+        const payload = {
+            product_id: pdpProduct.id,
+            variant_id: variantId,
+            quantity: qty
+        };
+
+        // UI Feedback
         const btn = document.getElementById('addToCartBtn');
         const buyBtn = document.getElementById('buyNowBtn');
         const btnText = document.getElementById('btnText');
-        
-        if (!allSelected) return;
+        const originalText = btnText ? btnText.innerText : 'Add to Cart';
 
-        selectedIds.sort((a, b) => a - b);
-        const key = selectedIds.join('-');
-        
-        const variant = variantMap[key];
-        
-        if (variant) {
-            currentVariantId = variant.id;
-            const priceEl = document.getElementById('productPrice');
-            if (priceEl) priceEl.innerText = Math.floor(variant.price);
-            
-            const skuEl = document.getElementById('skuDisplay');
-            if (skuEl) skuEl.innerText = variant.sku || 'N/A';
-            
-            const mainImg = document.getElementById('mainImage');
-            if (variant.image && mainImg) mainImg.src = variant.image;
-            
-            if (btn) btn.disabled = false;
-            if (buyBtn) buyBtn.disabled = false;
-            if (btnText) btnText.innerText = 'Add to Cart';
-
-            // Sync quantity with new variant stock
-            const qtyInput = document.getElementById('productQty');
-            if (qtyInput && variant.stock !== undefined) {
-                if (parseInt(qtyInput.value) > variant.stock) {
-                    qtyInput.value = variant.stock || 1;
+        try {
+            if(!redirect) {
+                if(btn) {
+                    btn.disabled = true;
+                    if(btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                }
+            } else {
+                if(buyBtn) {
+                    buyBtn.disabled = true;
+                    buyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
                 }
             }
-            dpUpdateQtyBtnStates();
-        } else {
-            currentVariantId = null;
-            if (btn) btn.disabled = true;
-            if (buyBtn) buyBtn.disabled = true;
-            if (btnText) btnText.innerText = 'Unavailable';
-        }
-    }
 
-    // Add to Cart Logic
-    async function dpAddToCart(redirect = false) {
-        const authOk = typeof isAuthenticated === 'function' ? isAuthenticated() : (typeof USER_IS_AUTHENTICATED !== 'undefined' ? USER_IS_AUTHENTICATED : false);
-        if (!authOk) {
-            alert("Please log in to add items to your cart.");
-            window.location.href = '/user/login/?next=' + window.location.pathname;
-            return;
-        }
+            await apiFetch('/cart/', { method: 'POST', body: JSON.stringify(payload) });
 
-        if (!currentVariantId) {
-            alert('Please select all options first.');
-            return;
-        }
-    
-        const btn = document.getElementById('addToCartBtn');
-        const btnText = document.getElementById('btnText');
-        const buyBtn = document.getElementById('buyNowBtn');
-        const qtyInput = document.getElementById('productQty');
-        const qty = qtyInput ? qtyInput.value : 1;
-
-        if (btn) btn.disabled = true;
-        if (buyBtn) buyBtn.disabled = true;
-        
-        try {
-            if (!redirect && btnText) btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-            else if (buyBtn) buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-            const payload = { variant_id: currentVariantId, quantity: parseInt(qty) };
-            const response = await apiFetch('/cart/', { method: 'POST', body: JSON.stringify(payload) });
-            
-            if (redirect) {
+            if(redirect) {
                 window.location.href = '/cart/';
                 return;
             }
 
-            if (btnText) btnText.innerHTML = '<i class="fas fa-check"></i> Added!';
-            if (btn) btn.classList.replace('btn-dark', 'btn-success');
+            // Success State
+            if(btnText) btnText.innerHTML = 'Added!';
+            if(btn) btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)'; // Success Green
             
-            if (typeof updateCartCount === 'function') updateCartCount();
+            if(window.updateCartCount) window.updateCartCount();
 
             setTimeout(() => {
-                if (btnText) btnText.innerText = 'Add to Cart';
-                if (btn) btn.classList.replace('btn-success', 'btn-dark');
-                if (btn) btn.disabled = false;
-                if (buyBtn) buyBtn.disabled = false;
+                if(btn) {
+                    btn.disabled = false;
+                    btn.style.background = ''; // Revert to CSS default
+                }
+                if(btnText) btnText.innerText = originalText;
+                if(buyBtn) buyBtn.disabled = false;
             }, 2000);
 
-        } catch (error) {
-            console.error('Cart error:', error);
-            if (btnText) btnText.innerHTML = '<i class="fas fa-times"></i> Error';
-            if (btn) btn.classList.add('btn-danger');
-            setTimeout(() => {
-                if (btnText) btnText.innerText = 'Add to Cart';
-                if (btn) btn.classList.remove('btn-danger');
-                if (btn) btn.classList.add('btn-dark');
-                if (btn) btn.disabled = false;
-                if (buyBtn) buyBtn.disabled = false;
-            }, 2000);
+        } catch(error) {
+            console.error(error);
+            if(btn) btn.disabled = false;
+            if(buyBtn) buyBtn.disabled = false;
+            if(btnText) btnText.innerText = 'Error';
+            if(buyBtn) buyBtn.innerText = 'Buy Now';
+            alert("Failed to add to cart.");
         }
     }
+
+    function pdpBuyNow() {
+        pdpAddToCart(true);
+    }
+
+    function setButtonsState(enabled, text) {
+        const btn = document.getElementById('addToCartBtn');
+        const btnText = document.getElementById('btnText');
+        if(btn) btn.disabled = !enabled;
+        if(enabled && btnText) btnText.textContent = text;
+        if(!enabled && btnText) btnText.textContent = text; 
+    }
     
-    function dpBuyNow() { dpAddToCart(true); }
+    // Lightbox placeholder (optional)
+    function openLightbox() {
+        // Implement full screen gallery if desired
+    }
+
 </script>
 {% endblock %}
