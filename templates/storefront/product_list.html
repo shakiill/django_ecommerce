@@ -1012,8 +1012,11 @@
             const data = await apiFetch('/categories/?is_active=true');
             const container = document.getElementById('category-filters');
             
-            if (data.results && data.results.length > 0) {
-                container.innerHTML = data.results.map(cat => `
+            // Handle both paginated (data.results) and non-paginated (data is array) responses
+            const categories = Array.isArray(data) ? data : (data.results || []);
+            
+            if (categories.length > 0) {
+                container.innerHTML = categories.map(cat => `
                     <label class="filter-checkbox">
                         <input type="checkbox" id="cat-${cat.id}" value="${cat.id}" class="category-filter" 
                             ${filters.category.includes(cat.id.toString()) ? 'checked' : ''}>
@@ -1029,6 +1032,7 @@
                 container.innerHTML = '<p class="text-muted small p-2">No categories</p>';
             }
         } catch (error) {
+            console.error('Failed to load categories:', error);
             document.getElementById('category-filters').innerHTML = '<p class="text-danger small p-2">Error</p>';
         }
     }
@@ -1038,8 +1042,11 @@
             const data = await apiFetch('/brands/?is_active=true');
             const container = document.getElementById('brand-filters');
             
-            if (data.results && data.results.length > 0) {
-                container.innerHTML = data.results.map(brand => `
+            // Handle both paginated (data.results) and non-paginated (data is array) responses
+            const brands = Array.isArray(data) ? data : (data.results || []);
+            
+            if (brands.length > 0) {
+                container.innerHTML = brands.map(brand => `
                     <label class="filter-checkbox">
                         <input type="checkbox" id="brand-${brand.id}" value="${brand.id}" class="brand-filter"
                             ${filters.brand.includes(brand.id.toString()) ? 'checked' : ''}>
@@ -1055,6 +1062,7 @@
                 container.innerHTML = '<p class="text-muted small p-2">No brands</p>';
             }
         } catch (error) {
+            console.error('Failed to load brands:', error);
             document.getElementById('brand-filters').innerHTML = '<p class="text-danger small p-2">Error</p>';
         }
     }
