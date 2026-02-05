@@ -1,21 +1,687 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Logged Out</title>
-</head>
-<body>
-  {% extends "base_auth.html" %}
-  {% block title %}Logged Out{% endblock %}
-  {% block content %}
-  <a class="top-link" href="/">Home</a>
-  <h1>Signed out</h1>
-  <p class="sub">You have been securely logged out.</p>
-  <form action="{% url 'staff_login' %}">
-    <button class="primary" type="submit">Return to Login</button>
-  </form>
-  <hr class="divider">
-  <p style="text-align:center;font-size:.75rem;opacity:.65;">Need help? <a href="mailto:support@django_ecommerce.com">Contact support</a></p>
-  {% endblock %}
-</body>
-</html>
+{% extends 'storefront/base.html' %}
+
+{% block title %}Logged Out - ShopHub{% endblock %}
+
+{% block content %}
+<div class="modern-auth-wrapper">
+    <div class="auth-split-container">
+        <!-- Left Side: Content -->
+        <div class="auth-form-side">
+            <div class="form-content">
+                <div class="auth-logo mb-5">
+                    <h1 class="brand-name">ShopHub</h1>
+                    <div class="brand-tagline">Your Premium Shopping Destination</div>
+                </div>
+                
+                <div class="auth-section text-center">
+                    <div class="logout-icon-wrapper mb-4">
+                        <div class="success-circle">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="success-ring"></div>
+                            <div class="success-ring-2"></div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="section-title">Successfully Logged Out</h2>
+                    <p class="section-subtitle mb-4">You have been securely signed out of your account</p>
+                    
+                    <div class="logout-message mb-4">
+                        <div class="message-icon">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <p>Thank you for using ShopHub. Your session has been terminated and all your data is secure.</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="{% url 'staff_login' %}" class="btn-modern btn-primary w-100 mb-3">
+                            <i class="fas fa-sign-in-alt btn-icon-left"></i>
+                            <span class="btn-text">Sign In Again</span>
+                            <div class="btn-shine"></div>
+                        </a>
+                        
+                        <a href="/" class="btn-modern btn-secondary w-100 mb-4">
+                            <i class="fas fa-home btn-icon-left"></i>
+                            <span class="btn-text">Back to Home</span>
+                        </a>
+                    </div>
+                    
+                    <div class="help-section">
+                        <p class="small text-muted mb-2">Need assistance?</p>
+                        <a href="mailto:support@shophub.com" class="link-primary">
+                            <i class="fas fa-envelope me-1"></i> Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side: Visual Content -->
+        <div class="auth-visual-side">
+            <div class="visual-content">
+                <div class="gradient-orbs">
+                    <div class="orb orb-1"></div>
+                    <div class="orb orb-2"></div>
+                    <div class="orb orb-3"></div>
+                </div>
+                
+                <div class="content-overlay">
+                    <div class="welcome-content">
+                        <div class="goodbye-badge mb-4">
+                            <div class="wave-hand">
+                                👋
+                            </div>
+                        </div>
+                        <h2 class="welcome-title">See You Soon!</h2>
+                        <p class="welcome-text">We hope you had a great shopping experience. Come back anytime!</p>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon-wrapper">
+                                    <i class="fas fa-shield-check"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h4>Secure</h4>
+                                    <p>Your data is protected</p>
+                                </div>
+                                <div class="stat-glow"></div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon-wrapper">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h4>24/7 Access</h4>
+                                    <p>Shop anytime you want</p>
+                                </div>
+                                <div class="stat-glow"></div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon-wrapper">
+                                    <i class="fas fa-gift"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h4>New Deals</h4>
+                                    <p>Fresh offers daily</p>
+                                </div>
+                                <div class="stat-glow"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* Modern Auth Wrapper */
+    .modern-auth-wrapper {
+        min-height: 90vh;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        font-family: 'Inter', sans-serif;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-split-container {
+        display: flex;
+        min-height: 90vh;
+        position: relative;
+    }
+    
+    /* Left Side - Content */
+    .auth-form-side {
+        flex: 1;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 40px;
+        position: relative;
+        overflow-y: auto;
+        box-shadow: 20px 0 60px rgba(196, 74, 74, 0.1);
+        z-index: 2;
+    }
+    
+    .form-content {
+        width: 100%;
+        max-width: 480px;
+        animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .auth-logo {
+        text-align: center;
+    }
+    
+    .auth-logo .brand-name {
+        font-size: 42px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+        letter-spacing: -1px;
+    }
+    
+    .brand-tagline {
+        font-size: 13px;
+        color: #9ca3af;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .section-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+    
+    .section-subtitle {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+    
+    /* Logout Icon */
+    .logout-icon-wrapper {
+        display: inline-block;
+        animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .success-circle {
+        width: 110px;
+        height: 110px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 56px;
+        color: white;
+        box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        position: relative;
+    }
+    
+    .success-ring {
+        position: absolute;
+        inset: -12px;
+        border: 3px solid rgba(16, 185, 129, 0.3);
+        border-radius: 50%;
+        animation: ringPulse 2s infinite;
+    }
+    
+    .success-ring-2 {
+        position: absolute;
+        inset: -22px;
+        border: 3px solid rgba(16, 185, 129, 0.2);
+        border-radius: 50%;
+        animation: ringPulse 2s infinite 0.5s;
+    }
+    
+    .logout-message {
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        border-left: 4px solid #8b5cf6;
+        padding: 20px 24px;
+        border-radius: 14px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        text-align: left;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .message-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    
+    .logout-message p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    /* Modern Button */
+    .btn-modern {
+        padding: 18px 28px;
+        border: none;
+        border-radius: 14px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+        letter-spacing: 0.3px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+    }
+    
+    .btn-shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .btn-primary:hover .btn-shine {
+        left: 100%;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
+        color: white;
+    }
+    
+    .btn-primary:active {
+        transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 2px solid #e5e7eb;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .btn-secondary:hover {
+        background: #e5e7eb;
+        transform: translateY(-2px);
+        color: #374151;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-icon-left {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .btn-primary:hover .btn-icon-left {
+        transform: scale(1.15);
+    }
+    
+    .help-section {
+        padding-top: 24px;
+        border-top: 2px solid #f3f4f6;
+    }
+    
+    .link-primary {
+        color: #8b5cf6;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        position: relative;
+    }
+    
+    .link-primary::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+        transition: width 0.3s ease;
+    }
+    
+    .link-primary:hover::after {
+        width: 100%;
+    }
+    
+    .link-primary:hover {
+        color: #7c3aed;
+    }
+    
+    /* Right Side - Visual Content */
+    .auth-visual-side {
+        flex: 1;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .visual-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Gradient Orbs */
+    .gradient-orbs {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+    
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.6;
+        animation: floatOrb 20s infinite ease-in-out;
+    }
+    
+    .orb-1 {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(167, 139, 250, 0.8), transparent);
+        top: -10%;
+        left: -10%;
+        animation-delay: 0s;
+    }
+    
+    .orb-2 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(196, 181, 253, 0.6), transparent);
+        bottom: -10%;
+        right: -10%;
+        animation-delay: 3s;
+    }
+    
+    .orb-3 {
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.7), transparent);
+        top: 40%;
+        left: 40%;
+        animation-delay: 6s;
+    }
+    
+    /* Content Overlay */
+    .content-overlay {
+        position: relative;
+        z-index: 10;
+        padding: 60px;
+        max-width: 600px;
+    }
+    
+    .welcome-content {
+        color: white;
+        text-align: center;
+    }
+    
+    .goodbye-badge {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        animation: floatBadge 3s infinite ease-in-out;
+    }
+    
+    .wave-hand {
+        font-size: 72px;
+        animation: wave 2s infinite;
+        display: inline-block;
+    }
+    
+    .welcome-title {
+        font-size: 52px;
+        font-weight: 900;
+        margin-bottom: 20px;
+        line-height: 1.1;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        letter-spacing: -1px;
+    }
+    
+    .welcome-text {
+        font-size: 19px;
+        margin-bottom: 50px;
+        opacity: 0.95;
+        line-height: 1.6;
+        font-weight: 500;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        padding: 24px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-glow {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .stat-card:hover .stat-glow {
+        left: 100%;
+    }
+    
+    .stat-card:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateX(15px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .stat-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        flex-shrink: 0;
+        transition: transform 0.4s ease;
+    }
+    
+    .stat-card:hover .stat-icon-wrapper {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .stat-content h4 {
+        font-size: 19px;
+        font-weight: 800;
+        margin-bottom: 6px;
+        letter-spacing: -0.3px;
+    }
+    
+    .stat-content p {
+        font-size: 14px;
+        opacity: 0.9;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    /* Animations */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes bounceIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        70% {
+            transform: scale(0.9);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    
+    @keyframes ringPulse {
+        0%, 100% {
+            opacity: 0.3;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.6;
+            transform: scale(1.05);
+        }
+    }
+    
+    @keyframes wave {
+        0%, 100% {
+            transform: rotate(0deg);
+        }
+        10%, 30% {
+            transform: rotate(14deg);
+        }
+        20%, 40% {
+            transform: rotate(-8deg);
+        }
+        50% {
+            transform: rotate(14deg);
+        }
+        60% {
+            transform: rotate(0deg);
+        }
+    }
+    
+    @keyframes floatOrb {
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+        33% {
+            transform: translate(30px, -30px) scale(1.1);
+        }
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
+    }
+    
+    @keyframes floatBadge {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .auth-visual-side {
+            display: none;
+        }
+        
+        .auth-form-side {
+            flex: 1;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .auth-form-side {
+            padding: 30px 20px;
+        }
+        
+        .section-title {
+            font-size: 28px;
+        }
+        
+        .success-circle {
+            width: 90px;
+            height: 90px;
+            font-size: 44px;
+        }
+        
+        .welcome-title {
+            font-size: 38px;
+        }
+        
+        .wave-hand {
+            font-size: 60px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Optional: Auto-redirect after a few seconds
+    // Uncomment if you want auto-redirect to home
+    /*
+    setTimeout(() => {
+        window.location.href = '/';
+    }, 5000); // Redirect after 5 seconds
+    */
+</script>
+{% endblock %}
