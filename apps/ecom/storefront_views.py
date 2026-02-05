@@ -89,8 +89,15 @@ class ProductDetailView(TemplateView):
                 'image': variant.image.url if variant.image else None
             }
 
-        context['available_attributes'] = available_attributes
-        context['variant_map'] = variant_map
+        # Pre-select default variant attributes
+        default_variant_value_ids = []
+        if product.default_variant:
+            default_variant_value_ids = list(product.default_variant.attributes.values_list('id', flat=True))
+        
+        import json
+        context['available_attributes'] = json.dumps(available_attributes)
+        context['variant_map'] = json.dumps(variant_map)
+        context['default_variant_value_ids'] = default_variant_value_ids
         return context
 
 

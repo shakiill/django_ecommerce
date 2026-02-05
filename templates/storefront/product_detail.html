@@ -107,7 +107,8 @@
                                                    value="{{ val.id }}" 
                                                    class="btn-check attribute-input"
                                                    autocomplete="off"
-                                                   onchange="checkVariant()">
+                                                   onchange="checkVariant()"
+                                                   {% if val.id in default_variant_value_ids %}checked{% endif %}>
                                             
                                             <label class="btn btn-outline-dark rounded-0 px-3 py-2 attribute-label {% if attr_name|lower == 'color' %}color-swatch p-0{% endif %}" 
                                                    for="attr_{{ val.id }}"
@@ -127,10 +128,10 @@
 
                     <!-- Actions -->
                     <div class="product-detail-actions d-flex flex-wrap gap-3 mb-5 border-bottom pb-5">
-                        <div class="quantity-selector d-flex align-items-center border rounded-pill px-3 py-2" style="width: fit-content;">
-                            <button type="button" class="btn btn-sm btn-link text-dark px-2 p-0" onclick="updateQty(-1)"><i class="fas fa-minus"></i></button>
-                            <input type="number" id="productQty" value="1" min="1" class="form-control border-0 text-center fw-bold p-0 mx-2" style="width: 40px; background: transparent;">
-                            <button type="button" class="btn btn-sm btn-link text-dark px-2 p-0" onclick="updateQty(1)"><i class="fas fa-plus"></i></button>
+                        <div class="quantity-selector d-flex align-items-center border rounded-pill px-2 py-1" style="width: fit-content; background: #fff; border-color: #e5e7eb !important;">
+                            <button type="button" class="btn btn-sm btn-link text-dark px-3 p-0 qty-minus border-0 text-decoration-none"><i class="fas fa-minus small"></i></button>
+                            <input type="number" id="productQty" value="1" min="1" class="form-control border-0 text-center fw-bold p-0" style="width: 45px; background: transparent; font-size: 1rem; box-shadow: none;">
+                            <button type="button" class="btn btn-sm btn-link text-dark px-3 p-0 qty-plus border-0 text-decoration-none"><i class="fas fa-plus small"></i></button>
                         </div>
                         
                         <button class="btn btn-outline-dark btn-buy-now rounded-pill px-5 fw-bold flex-grow-1" id="buyNowBtn" onclick="buyNow()" {% if not product.default_variant %}disabled{% endif %}>
@@ -322,6 +323,8 @@
         background: transparent !important;
         color: var(--uomo-primary) !important;
         transition: all 0.3s;
+        flex: 1;
+        min-width: 180px;
     }
     .btn-buy-now:hover {
         background: var(--uomo-primary) !important;
@@ -333,6 +336,8 @@
         letter-spacing: 0.05em;
         text-transform: uppercase;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        flex: 1;
+        min-width: 180px;
     }
     .btn-cart-main:hover:not(:disabled) {
         transform: translateY(-2px);
@@ -383,33 +388,124 @@
     // Deserialize data from View
     const availableAttributes = {{ available_attributes|safe|default:"{}" }};
     const variantMap = {{ variant_map|safe|default:"{}" }};
-    const defaultVariantSku = "{{ product.default_variant.sku|default:'' }}";
     
     // Initial State
     let currentVariantId = {{ product.default_variant.id|default:"null" }};
     
-    // Auto-select attributes for default variant if exists
     document.addEventListener('DOMContentLoaded', () => {
-        // Find attributes for the default variant if possible
+        try {
+            // Quantity Controls
+            const minusBtn = document.querySelector('.qty-minus');
+            const plusBtn = document.querySelector('.qty-plus');
+            const qtyInput = document.getElementById('productQty');
+
+            if (minusBtn && plusBtn && qtyInput) {
+                minusBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    updateQty(-1);
+                });
+                plusBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    updateQty(1);
+                });
+                
+                // Allow manual input but keep it within bounds
+                qtyInput.addEventListener('change', () => {
+                    let val = parseInt(qtyInput.value);
+                    if (isNaN(val) || val < 1) val = 1;
+                    
+                    // Check stock if variant selected
+                    const variant = getSelectedVariant();
+                    if (variant && variant.stock && val > variant.stock) {
+                        val = variant.stock;
+                    }
+                    qtyInput.value = val;
+                });
+            }
+
+            // Initial display update
+            updateActionButtons();
+        } catch (err) {
+            console.error("Initialization error:", err);
+        }
     });
 
     // Gallery Image Switcher
     function changeImage(src, element) {
-        document.getElementById('mainImage').style.opacity = '0';
+        const mainImg = document.getElementById('mainImage');
+        if (!mainImg) return;
+        
+        mainImg.style.opacity = '0';
         setTimeout(() => {
-            document.getElementById('mainImage').src = src;
-            document.getElementById('mainImage').style.opacity = '1';
+            mainImg.src = src;
+            mainImg.style.opacity = '1';
         }, 200);
         document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active-thumb'));
         element.classList.add('active-thumb');
     }
 
+    // Helper to get currently selected variant data
+    function getSelectedVariant() {
+        const selectedIds = [];
+        const attributeGroups = document.querySelectorAll('.attribute-values');
+        let allSelected = true;
+        
+        attributeGroups.forEach(group => {
+            const checked = group.querySelector('input:checked');
+            if (checked) selectedIds.push(parseInt(checked.value));
+            else allSelected = false;
+        });
+
+        if (!allSelected) return null;
+        
+        selectedIds.sort((a, b) => a - b);
+        const key = selectedIds.join('-');
+        return variantMap[key] || null;
+    }
+
+    // Update quantity button states (enable/disable based on bounds)
+    function updateQtyBtnStates() {
+        const minusBtn = document.querySelector('.qty-minus');
+        const plusBtn = document.querySelector('.qty-plus');
+        const qtyInput = document.getElementById('productQty');
+        if (!qtyInput) return;
+
+        let val = parseInt(qtyInput.value);
+        if (isNaN(val)) val = 1;
+
+        if (minusBtn) minusBtn.disabled = (val <= 1);
+        
+        const variant = getSelectedVariant();
+        if (plusBtn && variant && variant.stock !== undefined) {
+            plusBtn.disabled = (val >= variant.stock);
+            plusBtn.title = (val >= variant.stock) ? `Only ${variant.stock} items in stock` : "";
+        } else if (plusBtn) {
+            plusBtn.disabled = false;
+        }
+    }
+
     // Quantity Logic
     function updateQty(change) {
         const input = document.getElementById('productQty');
+        if (!input) return;
+        
         let newVal = parseInt(input.value) + change;
         if (newVal < 1) newVal = 1;
+        
+        // Check stock if variant selected
+        const variant = getSelectedVariant();
+        if (variant && variant.stock && newVal > variant.stock) {
+            newVal = variant.stock;
+        }
+        
         input.value = newVal;
+        updateQtyBtnStates();
+    }
+
+    // Standard way to update buttons and price
+    function updateActionButtons() {
+        checkVariant();
+        updateQtyBtnStates();
     }
 
     // Variant Selection Logic
@@ -441,23 +537,39 @@
         
         if (variant) {
             currentVariantId = variant.id;
-            document.getElementById('productPrice').innerText = Math.floor(variant.price);
-            document.getElementById('skuDisplay').innerText = variant.sku || 'N/A';
-            if (variant.image) document.getElementById('mainImage').src = variant.image;
-            btn.disabled = false;
-            buyBtn.disabled = false;
-            btnText.innerText = 'Add to Cart';
+            const priceEl = document.getElementById('productPrice');
+            if (priceEl) priceEl.innerText = Math.floor(variant.price);
+            
+            const skuEl = document.getElementById('skuDisplay');
+            if (skuEl) skuEl.innerText = variant.sku || 'N/A';
+            
+            const mainImg = document.getElementById('mainImage');
+            if (variant.image && mainImg) mainImg.src = variant.image;
+            
+            if (btn) btn.disabled = false;
+            if (buyBtn) buyBtn.disabled = false;
+            if (btnText) btnText.innerText = 'Add to Cart';
+
+            // Sync quantity with new variant stock
+            const qtyInput = document.getElementById('productQty');
+            if (qtyInput && variant.stock !== undefined) {
+                if (parseInt(qtyInput.value) > variant.stock) {
+                    qtyInput.value = variant.stock || 1;
+                }
+            }
+            updateQtyBtnStates();
         } else {
             currentVariantId = null;
-            btn.disabled = true;
-            buyBtn.disabled = true;
-            btnText.innerText = 'Unavailable';
+            if (btn) btn.disabled = true;
+            if (buyBtn) buyBtn.disabled = true;
+            if (btnText) btnText.innerText = 'Unavailable';
         }
     }
 
     // Add to Cart Logic
     async function addToCart(redirect = false) {
-        if (!USER_IS_AUTHENTICATED) {
+        const authOk = typeof isAuthenticated === 'function' ? isAuthenticated() : (typeof USER_IS_AUTHENTICATED !== 'undefined' ? USER_IS_AUTHENTICATED : false);
+        if (!authOk) {
             alert("Please log in to add items to your cart.");
             window.location.href = '/user/login/?next=' + window.location.pathname;
             return;
@@ -470,20 +582,17 @@
     
         const btn = document.getElementById('addToCartBtn');
         const btnText = document.getElementById('btnText');
-        const originalText = btnText.innerText;
         const buyBtn = document.getElementById('buyNowBtn');
-        const qty = document.getElementById('productQty').value;
+        const qtyInput = document.getElementById('productQty');
+        const qty = qtyInput ? qtyInput.value : 1;
 
-        btn.disabled = true;
-        buyBtn.disabled = true;
+        if (btn) btn.disabled = true;
+        if (buyBtn) buyBtn.disabled = true;
         
-        if (!redirect) {
-            btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-        } else {
-             buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        }
-
         try {
+            if (!redirect && btnText) btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            else if (buyBtn) buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
             const payload = { variant_id: currentVariantId, quantity: parseInt(qty) };
             const response = await apiFetch('/cart/', { method: 'POST', body: JSON.stringify(payload) });
             
@@ -492,27 +601,28 @@
                 return;
             }
 
-            btnText.innerHTML = '<i class="fas fa-check"></i> Added!';
-            btn.classList.replace('btn-dark', 'btn-success');
-            updateCartCount();
+            if (btnText) btnText.innerHTML = '<i class="fas fa-check"></i> Added!';
+            if (btn) btn.classList.replace('btn-dark', 'btn-success');
+            
+            if (typeof updateCartCount === 'function') updateCartCount();
 
             setTimeout(() => {
-                btnText.innerText = originalText;
-                btn.classList.replace('btn-success', 'btn-dark');
-                btn.disabled = false;
-                buyBtn.disabled = false;
+                if (btnText) btnText.innerText = 'Add to Cart';
+                if (btn) btn.classList.replace('btn-success', 'btn-dark');
+                if (btn) btn.disabled = false;
+                if (buyBtn) buyBtn.disabled = false;
             }, 2000);
 
         } catch (error) {
             console.error('Cart error:', error);
-            btnText.innerHTML = '<i class="fas fa-times"></i> Error';
-            btn.classList.add('btn-danger');
+            if (btnText) btnText.innerHTML = '<i class="fas fa-times"></i> Error';
+            if (btn) btn.classList.add('btn-danger');
             setTimeout(() => {
-                btnText.innerHTML = originalText;
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-dark');
-                btn.disabled = false;
-                buyBtn.disabled = false;
+                if (btnText) btnText.innerText = 'Add to Cart';
+                if (btn) btn.classList.remove('btn-danger');
+                if (btn) btn.classList.add('btn-dark');
+                if (btn) btn.disabled = false;
+                if (buyBtn) buyBtn.disabled = false;
             }, 2000);
         }
     }
