@@ -71,39 +71,81 @@
     </section>
 
     <!-- FLASH SALE Section -->
-    <section class="promo-banner-section">
+    <section class="promo-banner-section flash-sale-animated">
         <div class="container-custom">
             <div class="promo-banner-content flash-sale-bd">
                 <div class="row align-items-center">
                     <div class="col-lg-5">
-                        <div class="promo-image animate-reveal-right">
-                            <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200" alt="Flash Sale" class="img-fluid rounded-4 shadow-lg">
-                            <div class="sale-badge-floating">70% OFF</div>
+                        <div class="promo-image animate-slide-in-left">
+                            <div class="image-shimmer-wrapper">
+                                <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200" alt="Flash Sale" class="img-fluid rounded-4 shadow-lg flash-sale-img">
+                                <div class="image-shimmer"></div>
+                            </div>
+                            <div class="sale-badge-floating animate-bounce-in">70% OFF</div>
+                            <div class="sale-sparkles">
+                                <span class="sparkle sparkle-1">✨</span>
+                                <span class="sparkle sparkle-2">⭐</span>
+                                <span class="sparkle sparkle-3">✨</span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-7">
                         <div class="promo-text-side ps-lg-5">
-                            <div class="live-orders-badge mb-3">
+                            <div class="live-orders-badge mb-3 animate-fade-in-down" style="animation-delay: 0.2s;">
                                 <span class="pulse-dot"></span>
-                                <span>23 people viewing • 57 orders today</span>
+                                <span class="live-text-typing">23 people viewing • 57 orders today</span>
                             </div>
-                            <h6 class="text-danger fw-bold letter-spacing-2 mb-2">⏰ LIMITED TIME OFFER!</h6>
-                            <h2 class="display-4 fw-900 mb-3">FLASH SALE<br><span class="text-danger">Up to 70% Off!</span></h2>
-                            <p class="lead text-muted mb-3">Don't miss this opportunity! Order now and save big.</p>
-                            <div class="promo-countdown mb-4" id="flash-countdown">
-                                <div class="time-item"><span id="days">02</span><small>DAYS</small></div>
-                                <div class="time-item"><span id="hours">14</span><small>HOURS</small></div>
-                                <div class="time-item"><span id="mins">45</span><small>MINS</small></div>
-                                <div class="time-item"><span id="secs">00</span><small>SECS</small></div>
+                            <h6 class="text-danger fw-bold letter-spacing-2 mb-2 animate-fade-in-up flash-urgency" style="animation-delay: 0.3s;">
+                                <span class="urgency-icon">⏰</span> LIMITED TIME OFFER!
+                            </h6>
+                            <h2 class="display-4 fw-900 mb-3 animate-fade-in-up" style="animation-delay: 0.4s;">
+                                <span class="flash-title-text">FLASH SALE</span><br>
+                                <span class="text-danger flash-discount-text">Up to 70% Off!</span>
+                            </h2>
+                            <p class="lead text-muted mb-3 animate-fade-in-up" style="animation-delay: 0.5s;">Don't miss this opportunity! Order now and save big.</p>
+                            <div class="promo-countdown mb-4 animate-fade-in-up" id="flash-countdown" style="animation-delay: 0.6s;">
+                                <div class="time-item time-item-animated">
+                                    <span id="days" class="countdown-digit">02</span>
+                                    <small>DAYS</small>
+                                    <div class="time-item-glow"></div>
+                                </div>
+                                <div class="time-item time-item-animated">
+                                    <span id="hours" class="countdown-digit">14</span>
+                                    <small>HOURS</small>
+                                    <div class="time-item-glow"></div>
+                                </div>
+                                <div class="time-item time-item-animated">
+                                    <span id="mins" class="countdown-digit">45</span>
+                                    <small>MINS</small>
+                                    <div class="time-item-glow"></div>
+                                </div>
+                                <div class="time-item time-item-animated time-item-seconds">
+                                    <span id="secs" class="countdown-digit countdown-seconds">00</span>
+                                    <small>SECS</small>
+                                    <div class="time-item-glow"></div>
+                                </div>
                             </div>
-                            <div class="d-flex flex-wrap gap-3 align-items-center">
-                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5">Shop Now</a>
-                                <div class="stock-warning">
-                                    <i class="fas fa-exclamation-triangle text-warning"></i>
-                                    <span>Only 12 left!</span>
+                            <div class="d-flex flex-wrap gap-3 align-items-center animate-fade-in-up" style="animation-delay: 0.7s;">
+                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5 btn-flash-cta">
+                                    <span class="btn-text">Shop Now</span>
+                                    <span class="btn-shine"></span>
+                                </a>
+                                <div class="stock-warning stock-warning-animated">
+                                    <i class="fas fa-exclamation-triangle text-warning warning-shake"></i>
+                                    <span class="stock-text-blink">Only 12 left!</span>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <!-- Background decoration elements -->
+                <div class="flash-sale-decorations">
+                    <div class="decoration-circle decoration-circle-1"></div>
+                    <div class="decoration-circle decoration-circle-2"></div>
+                    <div class="floating-shapes">
+                        <div class="shape shape-1"></div>
+                        <div class="shape shape-2"></div>
+                        <div class="shape shape-3"></div>
                     </div>
                 </div>
             </div>
@@ -2029,6 +2071,504 @@
             color: #dc2626;
             font-weight: 600;
             font-size: 14px;
+        }
+
+        /* ============================================
+           FLASH SALE ANIMATIONS - Premium Effects
+           ============================================ */
+
+        /* Base Animation Classes */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-80px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(80px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) rotate(-10deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(5deg);
+            }
+            70% {
+                transform: scale(0.9) rotate(-3deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 200%;
+            }
+        }
+
+        @keyframes sparkleFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg) scale(1.2);
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-40px) rotate(360deg) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 0 40px rgba(239, 68, 68, 0.3);
+            }
+        }
+
+        @keyframes countdownTick {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes shineSlide {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 200%;
+            }
+        }
+
+        @keyframes warningShake {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: rotate(-5deg);
+            }
+            20%, 40%, 60%, 80% {
+                transform: rotate(5deg);
+            }
+        }
+
+        @keyframes textBlink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes floatShape {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        @keyframes urgencyPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                text-shadow: 0 0 0 transparent;
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        @keyframes circleExpand {
+            0% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.1;
+            }
+        }
+
+        /* Flash Sale Animated Section */
+        .flash-sale-animated {
+            overflow: hidden;
+        }
+
+        .flash-sale-animated .promo-banner-content {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Slide in animations */
+        .animate-slide-in-left {
+            animation: slideInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .animate-slide-in-right {
+            animation: slideInRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .animate-fade-in-up {
+            opacity: 0;
+            animation: fadeInUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .animate-fade-in-down {
+            opacity: 0;
+            animation: fadeInDown 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .animate-bounce-in {
+            animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+
+        /* Image shimmer effect wrapper */
+        .image-shimmer-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+
+        .flash-sale-img {
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .flash-sale-img:hover {
+            transform: scale(1.05);
+        }
+
+        .image-shimmer {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 3s infinite;
+            animation-delay: 1s;
+        }
+
+        /* Sale badge enhanced */
+        .sale-badge-floating {
+            animation: pulse-badge 2s infinite, glowPulse 2s infinite;
+            box-shadow: 0 5px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Sparkle effects */
+        .sale-sparkles {
+            position: absolute;
+            top: 10px;
+            right: 60px;
+            pointer-events: none;
+        }
+
+        .sparkle {
+            position: absolute;
+            font-size: 16px;
+            animation: sparkleFloat 2s infinite;
+        }
+
+        .sparkle-1 {
+            animation-delay: 0s;
+            top: 0;
+            left: 0;
+        }
+
+        .sparkle-2 {
+            animation-delay: 0.5s;
+            top: 20px;
+            left: 30px;
+            font-size: 20px;
+        }
+
+        .sparkle-3 {
+            animation-delay: 1s;
+            top: -10px;
+            left: 50px;
+        }
+
+        /* Urgency text animation */
+        .flash-urgency {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .urgency-icon {
+            display: inline-block;
+            animation: urgencyPulse 1s infinite;
+        }
+
+        /* Flash title animations */
+        .flash-title-text {
+            display: inline-block;
+            background: linear-gradient(90deg, #1a1a1a, #333, #1a1a1a);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: titleGlow 3s infinite;
+        }
+
+        .flash-discount-text {
+            display: inline-block;
+            animation: titleGlow 2s infinite;
+            animation-delay: 0.5s;
+        }
+
+        /* Countdown timer animations */
+        .time-item-animated {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .time-item-animated:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .time-item-glow {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+        }
+
+        .time-item-animated:hover .time-item-glow {
+            opacity: 1;
+        }
+
+        .time-item-seconds {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+        }
+
+        .time-item-seconds .countdown-digit {
+            color: #ef4444;
+        }
+
+        .countdown-seconds {
+            animation: countdownTick 1s infinite;
+        }
+
+        .countdown-digit {
+            transition: transform 0.2s ease;
+        }
+
+        /* CTA Button with shine effect */
+        .btn-flash-cta {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .btn-flash-cta:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-flash-cta .btn-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-flash-cta .btn-shine {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shineSlide 3s infinite;
+        }
+
+        /* Stock warning animations */
+        .stock-warning-animated {
+            animation: fadeInUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .warning-shake {
+            animation: warningShake 2s infinite;
+            animation-delay: 2s;
+        }
+
+        .stock-text-blink {
+            animation: textBlink 1.5s infinite;
+        }
+
+        /* Background decorations */
+        .flash-sale-decorations {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .decoration-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
+        }
+
+        .decoration-circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -100px;
+            animation: circleExpand 4s infinite alternate;
+        }
+
+        .decoration-circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            left: 10%;
+            animation: circleExpand 5s infinite alternate;
+            animation-delay: 1s;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            inset: 0;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+            animation: floatShape 6s infinite ease-in-out;
+        }
+
+        .shape-1 {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            right: 15%;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 40px;
+            height: 40px;
+            bottom: 30%;
+            right: 25%;
+            animation-delay: 1s;
+        }
+
+        .shape-3 {
+            width: 25px;
+            height: 25px;
+            top: 40%;
+            left: 45%;
+            animation-delay: 2s;
+        }
+
+        /* Live orders badge enhanced */
+        .live-orders-badge {
+            animation-fill-mode: forwards;
+        }
+
+        .live-text-typing {
+            display: inline;
+        }
+
+        /* Responsive animation adjustments */
+        @media (max-width: 991px) {
+            .animate-slide-in-left {
+                animation-name: fadeInUp;
+            }
+            
+            .sale-sparkles {
+                display: none;
+            }
+            
+            .decoration-circle-1,
+            .decoration-circle-2 {
+                display: none;
+            }
+            
+            .shape {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .floating-shapes {
+                display: none;
+            }
+            
+            .time-item-animated:hover {
+                transform: none;
+            }
         }
 
         /* Category Badges */
