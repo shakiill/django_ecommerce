@@ -10,6 +10,12 @@ class UserLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
+        # 1. Check for 'next' parameter in URL
+        next_url = self.request.GET.get('next')
+        if next_url:
+            return next_url
+            
+        # 2. Default logic based on role
         user = self.request.user
         if user.is_staff:
             return reverse_lazy('dashboard:home')
@@ -41,6 +47,11 @@ class UserLoginView(LoginView):
             
             # Store in session
             self.request.session['pending_verification_username'] = user.username
+            
+            # Store 'next' in session if provided
+            next_url = self.request.GET.get('next')
+            if next_url:
+                self.request.session['login_next_url'] = next_url
             
             # Redirect to verify page
             return redirect('verify_otp')

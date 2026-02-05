@@ -25,6 +25,11 @@ class CustomerRegistrationView(View):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             # AJAX request
             try:
+                # Store 'next' in session if provided
+                next_url = request.GET.get('next')
+                if next_url:
+                    request.session['login_next_url'] = next_url
+                
                 data = json.loads(request.body)
                 name = data.get('name')
                 username = data.get('username')
@@ -91,6 +96,12 @@ class OtpVerificationView(View):
     def get(self, request):
         if 'pending_verification_username' not in request.session:
             return redirect('staff_login')
+            
+        # Capture next param if present in URL
+        next_url = request.GET.get('next')
+        if next_url:
+            request.session['login_next_url'] = next_url
+            
         return render(request, self.template_name)
 
     def post(self, request):
@@ -133,14 +144,19 @@ class OtpVerificationView(View):
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
                 login(request, user)
                 
-                # Clear pending verification from session
+                # Determine redirect URL
+                redirect_url = request.session.get('login_next_url', '/my-account/')
+                
+                # Clear pending verification and next url from session
                 if 'pending_verification_username' in request.session:
                     del request.session['pending_verification_username']
+                if 'login_next_url' in request.session:
+                    del request.session['login_next_url']
                 
                 return JsonResponse({
                     'success': True,
                     'message': 'OTP verified successfully. You are now logged in!',
-                    'redirect_url': '/my-account/'
+                    'redirect_url': redirect_url
                 })
                 
             except Exception as e:

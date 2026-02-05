@@ -81,7 +81,7 @@
                                 
                                 <div class="text-center animate-fade-up delay-5">
                                     <p class="text-muted small mb-0">Don't have an account? 
-                                        <a href="{% url 'customer_register' %}" class="link-primary text-decoration-none fw-bold">Create Account</a>
+                                        <a href="{% url 'customer_register' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="link-primary text-decoration-none fw-bold">Create Account</a>
                                     </p>
                                 </div>
                             </form>
