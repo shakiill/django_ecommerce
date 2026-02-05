@@ -1,7 +1,7 @@
 {% extends 'storefront/base.html' %}
 {% load static %}
 
-{% block title %}<span id="pageTitle">Loading...</span> - UOMO{% endblock %}
+{% block title %}Loading... - UOMO{% endblock %}
 
 {% block content %}
 <div class="product-detail-page">
@@ -673,6 +673,12 @@
     });
 
     async function initPDP(slug) {
+        // Reset State
+        pdpProduct = null;
+        pdpVariants = [];
+        pdpSelectedAttributes = {};
+        pdpSelectedVariant = null;
+
         try {
             const data = await apiFetch(`/products/${slug}/`);
             pdpProduct = data;
@@ -690,131 +696,115 @@
 
     function renderPDP() {
         if (!pdpProduct) return;
-
-        // Hide loader, show content
-        document.getElementById('pdpLoading').classList.add('d-none');
-        document.getElementById('pdpContent').classList.remove('d-none');
-        document.getElementById('pdpTabsSection').classList.remove('d-none');
         
-        // Populate Meta
-        document.title = `${pdpProduct.name} - UOMO`;
-        document.getElementById('pageTitle').textContent = pdpProduct.name;
-        document.getElementById('breadcrumbName').textContent = pdpProduct.name;
-        
-        document.getElementById('pdpName').textContent = pdpProduct.name;
-        document.getElementById('pdpCategory').textContent = pdpProduct.category_name || "Uncategorized";
-        document.getElementById('pdpCategory').href = `/shop/?category=${pdpProduct.category || ''}`;
-        document.getElementById('pdpMetaCategory').textContent = pdpProduct.category_name || "Uncategorized";
-        
-        // Description
-        document.getElementById('pdpShortDesc').innerHTML = pdpProduct.short_description || "No short description available.";
-        document.getElementById('pdpFullDesc').innerHTML = pdpProduct.description || "<p>No detailed description available.</p>";
+        console.log("Rendering PDP with product:", pdpProduct);
 
-        // Attributes
-        const attributes = pdpProduct.attributes_list || [];
-        renderAttributes(attributes);
-
-        // Variant Selection / Price Init
-        const defaultVarId = pdpProduct.default_variant;
-        let initialVariant = null;
-
-        if (defaultVarId) {
-            initialVariant = pdpVariants.find(v => v.id === defaultVarId);
-        }
-        if (!initialVariant && pdpVariants.length > 0) {
-            initialVariant = pdpVariants[0];
-        }
-
-        if (attributes.length > 0 && initialVariant) {
-            preSelectVariant(initialVariant, attributes);
-        } else {
-            // No attributes or no variant found, just show product price
-            updatePrice(pdpProduct.price, null, false);
-            // Images (if no variant specific images, just show product thumb)
-            if(pdpProduct.thumbnail) updateImages(pdpProduct.thumbnail, [pdpProduct.thumbnail]);
-        }
-
-        // Animation Entrance
-        document.querySelectorAll('.product-info-wrapper > *').forEach((el, idx) => {
-            el.style.opacity = '0';
-            el.style.animation = `fadeInUp 0.5s ease ${idx * 0.05}s forwards`;
-        });
-    }
-
-    function renderAttributes(attributes) {
-        const container = document.getElementById('pdpAttributes');
-        container.innerHTML = '';
-
-        attributes.forEach(attr => {
-            const group = document.createElement('div');
-            group.className = 'mb-4';
+        try {
+            // Hide loader, show content
+            document.getElementById('pdpLoading').classList.add('d-none');
+            document.getElementById('pdpContent').classList.remove('d-none');
+            document.getElementById('pdpTabsSection').classList.remove('d-none');
             
-            const label = document.createElement('label');
-            label.className = 'pdp-label mb-2';
-            label.textContent = attr.name;
-            group.appendChild(label);
+            // Populate Meta
+            document.title = `${pdpProduct.name} - UOMO`;
+            
+            const breadcrumb = document.getElementById('breadcrumbName');
+            if(breadcrumb) breadcrumb.textContent = pdpProduct.name;
+            
+            const titleEl = document.getElementById('pdpName');
+            if(titleEl) titleEl.textContent = pdpProduct.name;
 
-            const valuesContainer = document.createElement('div');
-            valuesContainer.className = 'd-flex flex-wrap gap-2';
-
-            attr.values.forEach(val => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'pdp-attr-btn';
-                btn.textContent = val.value;
-                btn.dataset.attrId = attr.id;
-                btn.dataset.valId = val.id;
-                
-                // Special Color Handling
-                if(attr.name.toLowerCase() === 'color' && val.color_code) {
-                    btn.textContent = '';
-                    btn.style.backgroundColor = val.color_code;
-                    btn.style.width = '32px';
-                    btn.style.height = '32px';
-                    btn.style.padding = '0';
-                    btn.style.borderRadius = '50%';
-                    btn.style.border = '1px solid #ddd'; // subtle border for light colors
-                    btn.title = val.value;
-                    btn.dataset.isColor = 'true';
-                }
-
-                btn.onclick = () => selectAttribute(attr.id, val.id, btn);
-                valuesContainer.appendChild(btn);
-            });
-
-            group.appendChild(valuesContainer);
-            container.appendChild(group);
-        });
-    }
-
-    function selectAttribute(attrId, valId, btnElement) {
-        // Handle visual selection
-        const siblings = btnElement.parentElement.children;
-        for (let sib of siblings) {
-            sib.classList.remove('active');
-            if(sib.dataset.isColor) {
-               sib.style.transform = 'scale(1)';
-               sib.style.borderColor = '#ddd';
-               sib.style.boxShadow = 'none';
+            const catEl = document.getElementById('pdpCategory');
+            if(catEl) {
+                catEl.textContent = pdpProduct.category_name || "Uncategorized";
+                catEl.href = `/shop/?category=${pdpProduct.category || ''}`;
             }
-        }
 
-        btnElement.classList.add('active');
-        if(btnElement.dataset.isColor) {
-            btnElement.style.transform = 'scale(1.15)';
-            btnElement.style.borderColor = '#111';
-            btnElement.style.boxShadow = '0 0 0 2px #fff, 0 0 0 4px #111';
-        }
+            const metaCatEl = document.getElementById('pdpMetaCategory');
+            if(metaCatEl) metaCatEl.textContent = pdpProduct.category_name || "Uncategorized";
+            
+            // Description
+            const shortDesc = document.getElementById('pdpShortDesc');
+            if(shortDesc) shortDesc.innerHTML = pdpProduct.short_description || "No short description available.";
 
-        pdpSelectedAttributes[attrId] = parseInt(valId);
-        checkVariantMatch();
+            const fullDesc = document.getElementById('pdpFullDesc');
+            if(fullDesc) fullDesc.innerHTML = pdpProduct.description || "<p>No detailed description available.</p>";
+
+            // Images - Always set initial product image/thumbnail first
+            let initialImages = [];
+            if(pdpProduct.images && pdpProduct.images.length > 0) {
+                 // Assuming product.images is list of objects with .image url
+                 initialImages = pdpProduct.images.map(i => i.image);
+            } else if(pdpProduct.thumbnail) {
+                 initialImages = [pdpProduct.thumbnail];
+            }
+            // Fallback placeholder if absolutely nothing
+            if(initialImages.length === 0) initialImages = ['/static/assets/images/placeholder.png'];
+            
+            updateImages(initialImages[0], initialImages);
+
+            // Attributes
+            const attributes = pdpProduct.attributes_list || [];
+            renderAttributes(attributes);
+
+            // Variant Selection / Price Init
+            const defaultVarId = pdpProduct.default_variant;
+            let initialVariant = null;
+
+            if (defaultVarId) {
+                initialVariant = pdpVariants.find(v => v.id === defaultVarId);
+            }
+            if (!initialVariant && pdpVariants.length > 0) {
+                initialVariant = pdpVariants[0];
+            }
+
+            if (attributes.length > 0) {
+                // If we have attributes, try to pre-select
+                if (initialVariant) {
+                    preSelectVariant(initialVariant, attributes);
+                } else {
+                    // No variant found matching? show base price
+                    updatePrice(pdpProduct.price, null, false);
+                }
+            } else {
+                // No attributes (Single variant or Simple product)
+                if (initialVariant) {
+                    // We found a variant (e.g. the single one), set it as selected
+                    pdpSelectedVariant = initialVariant;
+                    updatePrice(initialVariant.price, initialVariant.discount_price, initialVariant.is_discount);
+                    if(initialVariant.sku) document.getElementById('pdpSku').textContent = initialVariant.sku;
+                    
+                    // If this single variant has images, use them, otherwise we keep base images
+                    if (initialVariant.image_list && initialVariant.image_list.length > 0) {
+                        updateImages(initialVariant.image_list[0], initialVariant.image_list);
+                    }
+                    setButtonsState(true, 'Add to Cart');
+                } else {
+                    // Fallback to product info
+                    updatePrice(pdpProduct.price, null, false);
+                    setButtonsState(true, 'Add to Cart');
+                }
+            }
+
+            // Animation Entrance
+            document.querySelectorAll('.product-info-wrapper > *').forEach((el, idx) => {
+                el.style.opacity = '0';
+                el.style.animation = `fadeInUp 0.5s ease ${idx * 0.05}s forwards`;
+            });
+            
+        } catch (err) {
+            console.error("Error in renderPDP:", err);
+            // alert("Render Error: " + err.message);
+        }
     }
+
+    // ... renderAttributes ...
+
+    // ... selectAttribute ...
 
     function checkVariantMatch() {
         const requiredCount = document.querySelectorAll('#pdpAttributes .mb-4').length;
-        // Don't check until all are selected? Or partial updates?
-        // Let's wait for all selections for strict matching.
-        if(Object.keys(pdpSelectedAttributes).length < requiredCount) return;
+        if(requiredCount > 0 && Object.keys(pdpSelectedAttributes).length < requiredCount) return;
 
         const match = pdpVariants.find(v => {
             const variantAttrs = v.attributes; 
@@ -827,10 +817,14 @@
             updatePrice(match.price, match.discount_price, match.is_discount);
             document.getElementById('pdpSku').textContent = match.sku || pdpProduct.sku || 'N/A';
             
-            // Update images if available
+            // Only update images if the variant explicitly has them
             if (match.image_list && match.image_list.length > 0) {
                 updateImages(match.image_list[0], match.image_list);
-            }
+            } 
+            // Else: Keep showing the product level images, which is usually correct for "Color: Black -> shows main black jacket" 
+            // if that main image was the product thumbnail. 
+            // If the variation should change image (e.g. Color Red) but has no image in API, 
+            // we can't do much but show previous image.
             
             setButtonsState(true, 'Add to Cart');
         } else {
@@ -926,24 +920,33 @@
     }
 
     async function pdpAddToCart(redirect = false) {
-        let variantId = pdpSelectedVariant ? pdpSelectedVariant.id : pdpProduct?.default_variant;
+        const qty = parseInt(document.getElementById('pdpQty').value);
         
-        // Auto-select if only 1 variant exists
-        if(!variantId && pdpVariants.length === 1) variantId = pdpVariants[0].id;
-        
-        // Validation
-        if(!variantId && pdpVariants.length > 0) {
-            const attrDiv = document.getElementById('pdpAttributes');
-            attrDiv.style.animation = 'none';
-            attrDiv.offsetHeight; 
-            attrDiv.style.animation = 'shake 0.5s';
-            
-            // Optional toast or alert
-            // alert("Please select all options.");
-            return;
+        // Validation: Verify if attributes need strictly to be selected
+        // Matches Quick View logic
+        if (pdpVariants.length > 0 && !pdpSelectedVariant) {
+             const attrDiv = document.getElementById('pdpAttributes');
+             // If attributes are displayed but no variant resolved => incomplete selection
+             if (attrDiv && attrDiv.children.length > 0) {
+                 attrDiv.style.animation = 'none';
+                 attrDiv.offsetHeight; // trigger reflow
+                 attrDiv.style.animation = 'shake 0.5s';
+                 
+                 // Show toast or tooltip could be added here
+                 return; 
+             }
         }
 
-        const qty = parseInt(document.getElementById('pdpQty').value);
+        // Resolve Target Variant ID
+        let variantId = pdpSelectedVariant ? pdpSelectedVariant.id : null;
+        
+        // Fallback Logic (Only if validation passed, meaning no attributes required or single variant handled)
+        if(!variantId && pdpProduct.default_variant) {
+            variantId = pdpProduct.default_variant;
+        } else if(!variantId && pdpVariants.length === 1) {
+            variantId = pdpVariants[0].id;
+        }
+
         const payload = {
             product_id: pdpProduct.id,
             variant_id: variantId,
@@ -996,8 +999,8 @@
             if(btn) btn.disabled = false;
             if(buyBtn) buyBtn.disabled = false;
             if(btnText) btnText.innerText = 'Error';
-            if(buyBtn) buyBtn.innerText = 'Buy Now';
-            alert("Failed to add to cart.");
+            if(buyBtn) buyBtn.innerHTML = '<i class="fas fa-bolt"></i> <span>Buy Now</span>';
+            alert("Failed to add to cart: " + error.message);
         }
     }
 
