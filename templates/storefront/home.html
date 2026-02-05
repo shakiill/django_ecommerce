@@ -111,45 +111,54 @@
     </section>
 
     <!-- Featured Categories -->
-    <section class="collections-section">
+    <section class="categories-section">
         <div class="container-custom">
-            <div class="section-header text-center mb-3">
-                <h6 class="section-subtitle">DISCOVER</h6>
-                <h2 class="section-title">Featured Categories</h2>
-            </div>
-            
-            <div class="featured-grid">
-                <div class="featured-item large-item">
-                    <a href="{% url 'shop' %}" class="featured-link">
+            <div class="categories-grid">
+                <a href="{% url 'shop' %}" class="category-card category-large">
+                    <div class="category-image">
                         <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop" alt="Women's Collection">
-                        <div class="featured-content">
-                            <span class="category-badge">🔥 Trending</span>
-                            <h3 class="featured-title">Women's Collection</h3>
-                            <span class="featured-btn">Shop Now →</span>
-                        </div>
-                    </a>
-                </div>
+                    </div>
+                    <div class="category-overlay">
+                        <span class="category-tag">🔥 Trending</span>
+                        <h3 class="category-name">Women's Collection</h3>
+                        <span class="category-count">150+ Products</span>
+                        <span class="category-cta">Shop Now <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
 
-                <div class="featured-item">
-                    <a href="{% url 'shop' %}" class="featured-link">
+                <a href="{% url 'shop' %}" class="category-card">
+                    <div class="category-image">
                         <img src="https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=2070&auto=format&fit=crop" alt="Men's Collection">
-                        <div class="featured-content">
-                            <h3 class="featured-title">Men's Collection</h3>
-                            <span class="featured-btn">Shop Now →</span>
-                        </div>
-                    </a>
-                </div>
+                    </div>
+                    <div class="category-overlay">
+                        <h3 class="category-name">Men's Collection</h3>
+                        <span class="category-count">120+ Products</span>
+                        <span class="category-cta">Shop Now <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
 
-                <div class="featured-item">
-                    <a href="{% url 'shop' %}" class="featured-link">
+                <a href="{% url 'shop' %}" class="category-card">
+                    <div class="category-image">
                         <img src="https://images.unsplash.com/photo-1576053139778-7e32f2ae3cfd?q=80&w=2070&auto=format&fit=crop" alt="Accessories">
-                        <div class="featured-content">
-                            <span class="category-badge">New</span>
-                            <h3 class="featured-title">Accessories</h3>
-                            <span class="featured-btn">Shop Now →</span>
-                        </div>
-                    </a>
-                </div>
+                    </div>
+                    <div class="category-overlay">
+                        <span class="category-tag">New</span>
+                        <h3 class="category-name">Accessories</h3>
+                        <span class="category-count">80+ Products</span>
+                        <span class="category-cta">Shop Now <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+
+                <a href="{% url 'shop' %}" class="category-card">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop" alt="Traditional Wear">
+                    </div>
+                    <div class="category-overlay">
+                        <h3 class="category-name">Traditional Wear</h3>
+                        <span class="category-count">90+ Products</span>
+                        <span class="category-cta">Shop Now <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
@@ -631,96 +640,183 @@
             display: inline-block;
         }
 
-        /* Featured Grid */
-        .featured-grid {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            grid-template-rows: 350px 350px;
-            gap: 30px;
+        /* ============================================
+           CATEGORIES SECTION - Modern Grid
+           ============================================ */
+        .categories-section {
+            padding: 60px 0;
+            background: #f8f9fa;
         }
 
-        .featured-item {
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .category-card {
             position: relative;
             overflow: hidden;
-            border-radius: 12px;
-            box-shadow: var(--shadow-soft);
+            border-radius: 16px;
+            text-decoration: none;
+            display: block;
+            height: 320px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Large item spans 2 rows */
-        .large-item { grid-row: 1 / 3; }
+        .category-card.category-large {
+            grid-column: span 2;
+            grid-row: span 2;
+            height: 100%;
+        }
 
-        .featured-link { display: block; height: 100%; width: 100%; }
+        .category-image {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0;
+        }
 
-        .featured-link img {
+        .category-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 1.2s cubic-bezier(0.2, 1, 0.3, 1);
+            transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        
-        .featured-item:hover img { transform: scale(1.1); }
 
-        .featured-content {
+        .category-card:hover .category-image img {
+            transform: scale(1.1);
+        }
+
+        .category-overlay {
             position: absolute;
-            bottom: 0; left: 0; width: 100%;
-            padding: 40px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            z-index: 2;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+            transition: background 0.3s ease;
         }
-        
-        .featured-title {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--white);
-            margin-bottom: 15px;
+
+        .category-card:hover .category-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.1) 100%);
         }
-        
-        .featured-btn {
-            font-size: 12px;
+
+        .category-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            color: var(--white);
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 5px;
-            position: relative;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            align-self: flex-start;
         }
-        
-        .featured-btn::after {
-            content: ' →';
+
+        .category-name {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 8px 0;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card.category-large .category-name {
+            font-size: 32px;
+        }
+
+        .category-count {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 15px;
+        }
+
+        .category-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            padding: 10px 0;
+            border-bottom: 2px solid transparent;
             opacity: 0;
-            transition: opacity 0.3s;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
         }
-        
-        /* Hover Effects */
-        .featured-item:hover .featured-title {
-            transform: translateY(0);
-        }
-        
-        .featured-item:hover .featured-btn {
+
+        .category-card:hover .category-cta {
             opacity: 1;
             transform: translateY(0);
             border-color: #fff;
         }
-        
-        .featured-item:hover .featured-btn::after {
-            opacity: 1;
+
+        .category-cta i {
+            transition: transform 0.3s ease;
         }
 
-        /* Responsive Grid */
-        @media (max-width: 991px) {
-            .featured-grid {
+        .category-card:hover .category-cta i {
+            transform: translateX(5px);
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .category-card:hover .category-name {
+            transform: translateY(-5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .category-card.category-large {
+                grid-column: span 2;
+                grid-row: span 1;
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .categories-section {
+                padding: 40px 0;
+            }
+            
+            .categories-grid {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto;
+                gap: 15px;
             }
             
-            .large-item {
-                grid-column: auto;
-                grid-row: auto;
-                height: 500px;
+            .category-card {
+                height: 280px;
             }
             
-            .featured-item {
+            .category-card.category-large {
+                grid-column: span 1;
                 height: 350px;
+            }
+            
+            .category-name {
+                font-size: 22px;
+            }
+            
+            .category-card.category-large .category-name {
+                font-size: 26px;
+            }
+            
+            .category-overlay {
+                padding: 20px;
             }
         }
 
