@@ -126,7 +126,7 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="product-actions d-flex flex-wrap gap-3 mb-5 border-bottom pb-5">
+                    <div class="product-detail-actions d-flex flex-wrap gap-3 mb-5 border-bottom pb-5">
                         <div class="quantity-selector d-flex align-items-center border rounded-pill px-3 py-2" style="width: fit-content;">
                             <button class="btn btn-sm btn-link text-dark p-0" onclick="updateQty(-1)"><i class="fas fa-minus"></i></button>
                             <input type="number" id="productQty" value="1" min="1" class="form-control border-0 text-center fw-bold p-0 mx-2" style="width: 40px; background: transparent;">
@@ -392,6 +392,14 @@
 
     // Add to Cart
     async function addToCart(redirect = false) {
+        // Authentication Check
+        if (!USER_IS_AUTHENTICATED) {
+            // Optional: Use a nicer modal or toast here if available
+            alert("Please log in to add items to your cart.");
+            window.location.href = '/user/login/?next=' + window.location.pathname;
+            return;
+        }
+
         if (!currentVariantId) {
             alert('Please select all options first.');
             return;
