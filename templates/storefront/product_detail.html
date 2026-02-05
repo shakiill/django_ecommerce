@@ -107,7 +107,7 @@
                                                    value="{{ val.id }}" 
                                                    class="btn-check attribute-input"
                                                    autocomplete="off"
-                                                   onchange="checkVariant()"
+                                                   onchange="dpCheckVariant()"
                                                    {% if val.id in default_variant_value_ids %}checked{% endif %}>
                                             
                                             <label class="btn btn-outline-dark rounded-0 px-3 py-2 attribute-label {% if attr_name|lower == 'color' %}color-swatch p-0{% endif %}" 
@@ -134,13 +134,13 @@
                             <button type="button" class="btn btn-sm btn-link text-dark px-3 p-0 qty-plus border-0 text-decoration-none"><i class="fas fa-plus small"></i></button>
                         </div>
                         
-                        <button class="btn btn-outline-dark btn-buy-now rounded-pill px-5 fw-bold flex-grow-1" id="buyNowBtn" onclick="buyNow()" {% if not product.default_variant %}disabled{% endif %}>
+                        <button class="btn btn-outline-dark btn-buy-now rounded-pill px-5 fw-bold flex-grow-1" id="buyNowBtn" onclick="dpBuyNow()" {% if not product.default_variant %}disabled{% endif %}>
                             <span class="d-flex align-items-center justify-content-center gap-2">
                                 <i class="fas fa-bolt"></i> Buy Now
                             </span>
                         </button>
                         
-                        <button class="btn btn-dark btn-cart-main rounded-pill px-5 flex-grow-1 fw-bold cart-btn" id="addToCartBtn" onclick="addToCart()" {% if not product.default_variant %}disabled{% endif %}>
+                        <button class="btn btn-dark btn-cart-main rounded-pill px-5 flex-grow-1 fw-bold cart-btn" id="addToCartBtn" onclick="dpAddToCart()" {% if not product.default_variant %}disabled{% endif %}>
                             <span class="d-flex align-items-center justify-content-center gap-2">
                                 <i class="fas fa-shopping-bag"></i> <span id="btnText">{% if product.default_variant %}Add to Cart{% else %}Unavailable{% endif %}</span>
                             </span>
@@ -402,11 +402,11 @@
             if (minusBtn && plusBtn && qtyInput) {
                 minusBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    updateQty(-1);
+                    dpUpdateQty(-1);
                 });
                 plusBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    updateQty(1);
+                    dpUpdateQty(1);
                 });
                 
                 // Allow manual input but keep it within bounds
@@ -415,7 +415,7 @@
                     if (isNaN(val) || val < 1) val = 1;
                     
                     // Check stock if variant selected
-                    const variant = getSelectedVariant();
+                    const variant = dpGetSelectedVariant();
                     if (variant && variant.stock && val > variant.stock) {
                         val = variant.stock;
                     }
@@ -424,7 +424,7 @@
             }
 
             // Initial display update
-            updateActionButtons();
+            dpUpdateActionButtons();
         } catch (err) {
             console.error("Initialization error:", err);
         }
@@ -445,7 +445,7 @@
     }
 
     // Helper to get currently selected variant data
-    function getSelectedVariant() {
+    function dpGetSelectedVariant() {
         const selectedIds = [];
         const attributeGroups = document.querySelectorAll('.attribute-values');
         let allSelected = true;
@@ -464,7 +464,7 @@
     }
 
     // Update quantity button states (enable/disable based on bounds)
-    function updateQtyBtnStates() {
+    function dpUpdateQtyBtnStates() {
         const minusBtn = document.querySelector('.qty-minus');
         const plusBtn = document.querySelector('.qty-plus');
         const qtyInput = document.getElementById('productQty');
@@ -475,7 +475,7 @@
 
         if (minusBtn) minusBtn.disabled = (val <= 1);
         
-        const variant = getSelectedVariant();
+        const variant = dpGetSelectedVariant();
         if (plusBtn && variant && variant.stock !== undefined) {
             plusBtn.disabled = (val >= variant.stock);
             plusBtn.title = (val >= variant.stock) ? `Only ${variant.stock} items in stock` : "";
@@ -485,7 +485,7 @@
     }
 
     // Quantity Logic
-    function updateQty(change) {
+    function dpUpdateQty(change) {
         const input = document.getElementById('productQty');
         if (!input) return;
         
@@ -493,23 +493,23 @@
         if (newVal < 1) newVal = 1;
         
         // Check stock if variant selected
-        const variant = getSelectedVariant();
+        const variant = dpGetSelectedVariant();
         if (variant && variant.stock && newVal > variant.stock) {
             newVal = variant.stock;
         }
         
         input.value = newVal;
-        updateQtyBtnStates();
+        dpUpdateQtyBtnStates();
     }
 
     // Standard way to update buttons and price
-    function updateActionButtons() {
-        checkVariant();
-        updateQtyBtnStates();
+    function dpUpdateActionButtons() {
+        dpCheckVariant();
+        dpUpdateQtyBtnStates();
     }
 
     // Variant Selection Logic
-    function checkVariant() {
+    function dpCheckVariant() {
         const selectedIds = [];
         const attributeGroups = document.querySelectorAll('.attribute-values');
         
@@ -557,7 +557,7 @@
                     qtyInput.value = variant.stock || 1;
                 }
             }
-            updateQtyBtnStates();
+            dpUpdateQtyBtnStates();
         } else {
             currentVariantId = null;
             if (btn) btn.disabled = true;
@@ -567,7 +567,7 @@
     }
 
     // Add to Cart Logic
-    async function addToCart(redirect = false) {
+    async function dpAddToCart(redirect = false) {
         const authOk = typeof isAuthenticated === 'function' ? isAuthenticated() : (typeof USER_IS_AUTHENTICATED !== 'undefined' ? USER_IS_AUTHENTICATED : false);
         if (!authOk) {
             alert("Please log in to add items to your cart.");
@@ -627,6 +627,6 @@
         }
     }
     
-    function buyNow() { addToCart(true); }
+    function dpBuyNow() { dpAddToCart(true); }
 </script>
 {% endblock %}
