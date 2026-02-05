@@ -5,7 +5,7 @@
 {% block content %}
     <!-- Hero Slider -->
     <section class="hero-slider">
-        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
             <div class="carousel-indicators">
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
@@ -13,70 +13,48 @@
             </div>
             
             <div class="carousel-inner">
-                <!-- Slide 1: Occasional / Party Wear -->
+                <!-- Slide 1: New Collection -->
                 <div class="carousel-item active">
                     <div class="hero-slide" style="background-image: url('https://twelvebd.com/cdn/shop/files/Now_in_motion_slider_2_566d7917-d7c2-4f2e-a416-7823111c42ed.jpg?v=1767269972&width=2000');">
-                        <div class="container-fluid h-100">
-                            <div class="row h-100 align-items-center">
-                                <div class="col-lg-7">
-                                    <div class="hero-content animate-reveal-right">
-                                        <h6 class="hero-subtitle mb-4"><span>NEW COLLECTION</span></h6>
-                                        <h1 class="hero-title mb-4">The Evening Edit<br>Shine Bright</h1>
-                                        <p class="hero-text mb-5">Elegant dresses and sharp suits tailored for every premium occasion. Experience the new standard of luxury.</p>
-                                        <div class="hero-btns flex-wrap">
-                                            <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary me-3">Shop Women</a>
-                                            <a href="{% url 'shop' %}" class="btn-hero btn-hero-outline">Shop Men</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                {#                                <div class="col-lg-5 d-none d-lg-flex justify-content-end">#}
-                                {#                                    <div class="hero-side-info animate-fade-up">#}
-                                {#                                        <div class="side-badge">#}
-                                {#                                            <span class="badge-year">2026</span>#}
-                                {#                                            <span class="badge-text">LIMITED EDITION</span>#}
-                                {#                                        </div>#}
-                                {#                                    </div>#}
-                                {#                                </div>#}
+                        <div class="hero-content">
+                            <h6 class="hero-subtitle mb-3"><span>🎉 NEW COLLECTION 2026</span></h6>
+                            <h1 class="hero-title mb-3">Premium<br>Collection</h1>
+                            <p class="hero-text mb-4">Elevate your style with our exclusive premium collection.<br>Premium fabrics and modern designs crafted for you.</p>
+                            <div class="hero-price-tag mb-4">
+                                <span class="starting-from">Starting from</span>
+                                <span class="price">৳1,299</span>
+                            </div>
+                            <div class="hero-btns flex-wrap">
+                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary me-3">Shop Now</a>
+                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-outline">View All</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Slide 2: Seasonal -->
+                <!-- Slide 2: Flash Sale -->
                 <div class="carousel-item">
-                    <div class="hero-slide" style="background-image: url('https://cdn.rawnation.net/4/media/winter_home_2025_2026_web.jpg');">
-                         <div class="container-fluid h-100">
-                            <div class="row h-100 align-items-center">
-                                <div class="col-lg-8">
-                                    <div class="hero-content">
-                                        <h6 class="hero-subtitle mb-4"><span>TRENDING NOW</span></h6>
-                                        <h1 class="hero-title mb-4">Summer 2024<br>Collection</h1>
-                                        <p class="hero-text mb-5">Discover the latest arrivals with premium fabrics and modern cuts. Crafted for those who demand excellence.</p>
-                                        <div class="hero-btns">
-                                            <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary">Explore Now</a>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=2000');">
+                        <div class="hero-content">
+                            <h6 class="hero-subtitle mb-3"><span>🔥 LIMITED TIME</span></h6>
+                            <h1 class="hero-title mb-3">MEGA SALE<br>Up to 70% Off!</h1>
+                            <p class="hero-text mb-4">Limited time offer. Order your favorite items now!</p>
+                            <div class="hero-btns">
+                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary">Shop Now</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Slide 3: Sale -->
+                <!-- Slide 3: New Arrivals -->
                 <div class="carousel-item">
-                    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=2000');">
-                         <div class="container-fluid h-100">
-                            <div class="row h-100 align-items-center">
-                                <div class="col-lg-8">
-                                    <div class="hero-content">
-                                        <h6 class="hero-subtitle mb-4"><span>EXCLUSIVE OFFER</span></h6>
-                                        <h1 class="hero-title mb-4">Mid Season Sale<br>Up to 50% Off</h1>
-                                        <p class="hero-text mb-5">Limited time offer on selected premium items. Secure your favorites before they're gone.</p>
-                                        <div class="hero-btns">
-                                            <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary">Shop Sale</a>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="hero-slide" style="background-image: url('https://cdn.rawnation.net/4/media/winter_home_2025_2026_web.jpg');">
+                        <div class="hero-content">
+                            <h6 class="hero-subtitle mb-3"><span>✨ NEW ARRIVAL</span></h6>
+                            <h1 class="hero-title mb-3">Summer<br>Collection '26</h1>
+                            <p class="hero-text mb-4">Comfortable fabrics and trendy designs. Perfect for summer.</p>
+                            <div class="hero-btns">
+                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary">Explore Now</a>
                             </div>
                         </div>
                     </div>
@@ -89,17 +67,50 @@
             <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
                 <i class="fas fa-chevron-right"></i>
             </button>
+        </div>
+    </section>
 
-            <!-- Scroll Indicator -->
-            <div class="hero-scroll-down">
-                <div class="mouse"></div>
-                <span class="text">Scroll Down</span>
+    <!-- FLASH SALE Section -->
+    <section class="promo-banner-section">
+        <div class="container-custom">
+            <div class="promo-banner-content flash-sale-bd">
+                <div class="row align-items-center">
+                    <div class="col-lg-5">
+                        <div class="promo-image animate-reveal-right">
+                            <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200" alt="Flash Sale" class="img-fluid rounded-4 shadow-lg">
+                            <div class="sale-badge-floating">70% OFF</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="promo-text-side ps-lg-5">
+                            <div class="live-orders-badge mb-3">
+                                <span class="pulse-dot"></span>
+                                <span>23 people viewing • 57 orders today</span>
+                            </div>
+                            <h6 class="text-danger fw-bold letter-spacing-2 mb-2">⏰ LIMITED TIME OFFER!</h6>
+                            <h2 class="display-4 fw-900 mb-3">FLASH SALE<br><span class="text-danger">Up to 70% Off!</span></h2>
+                            <p class="lead text-muted mb-3">Don't miss this opportunity! Order now and save big.</p>
+                            <div class="promo-countdown mb-4" id="flash-countdown">
+                                <div class="time-item"><span id="days">02</span><small>DAYS</small></div>
+                                <div class="time-item"><span id="hours">14</span><small>HOURS</small></div>
+                                <div class="time-item"><span id="mins">45</span><small>MINS</small></div>
+                                <div class="time-item"><span id="secs">00</span><small>SECS</small></div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-3 align-items-center">
+                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5">Shop Now</a>
+                                <div class="stock-warning">
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                    <span>Only 12 left!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Collections Grid -->
-    <!-- Featured Categories Section -->
+    <!-- Featured Categories -->
     <section class="collections-section">
         <div class="container-custom">
             <div class="section-header text-center mb-3">
@@ -108,65 +119,36 @@
             </div>
             
             <div class="featured-grid">
-                <!-- Large Item: Women -->
                 <div class="featured-item large-item">
                     <a href="{% url 'shop' %}" class="featured-link">
                         <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop" alt="Women's Collection">
                         <div class="featured-content">
+                            <span class="category-badge">🔥 Trending</span>
                             <h3 class="featured-title">Women's Collection</h3>
-                            <span class="featured-btn">Shop Now</span>
+                            <span class="featured-btn">Shop Now →</span>
                         </div>
                     </a>
                 </div>
 
-                <!-- Regular Item: Men -->
                 <div class="featured-item">
                     <a href="{% url 'shop' %}" class="featured-link">
                         <img src="https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=2070&auto=format&fit=crop" alt="Men's Collection">
                         <div class="featured-content">
                             <h3 class="featured-title">Men's Collection</h3>
-                            <span class="featured-btn">Shop Now</span>
+                            <span class="featured-btn">Shop Now →</span>
                         </div>
                     </a>
                 </div>
 
-                <!-- Regular Item: Accessories -->
                 <div class="featured-item">
                     <a href="{% url 'shop' %}" class="featured-link">
                         <img src="https://images.unsplash.com/photo-1576053139778-7e32f2ae3cfd?q=80&w=2070&auto=format&fit=crop" alt="Accessories">
                         <div class="featured-content">
+                            <span class="category-badge">New</span>
                             <h3 class="featured-title">Accessories</h3>
-                            <span class="featured-btn">Shop Now</span>
+                            <span class="featured-btn">Shop Now →</span>
                         </div>
                     </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Hot Promo Banner -->
-    <section class="promo-banner-section bg-soft">
-        <div class="container-custom">
-            <div class="promo-banner-content">
-                <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <div class="promo-image animate-reveal-right">
-                            <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200" alt="Flash Sale" class="img-fluid rounded-4 shadow-lg">
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="promo-text-side ps-lg-5">
-                            <h6 class="text-primary fw-bold letter-spacing-2 mb-3">LIMITED TIME ONLY</h6>
-                            <h2 class="display-3 fw-900 mb-2">FLASH SALE<br><span class="text-outline-dark">UP TO 70% OFF</span></h2>
-                            <p class="lead text-muted mb-4">Don't wait! Grab your favorites at unbeatable prices. The countdown has already started.</p>
-                            <div class="promo-countdown mb-4">
-                                <div class="time-item"><span>02</span><small>DAYS</small></div>
-                                <div class="time-item"><span>14</span><small>HOURS</small></div>
-                                <div class="time-item"><span>45</span><small>MINS</small></div>
-                            </div>
-                            <a href="{% url 'shop' %}" class="btn-modern btn-primary px-5 py-3">SHOP THE SALE</a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -180,83 +162,17 @@
                     <h6 class="section-subtitle text-primary">JUST DROPPED</h6>
                     <h2 class="section-title">New Arrivals</h2>
                 </div>
-                <a href="{% url 'shop' %}" class="btn-link text-dark fw-bold text-decoration-none border-bottom pb-1">Explore All <i class="fas fa-chevron-right ms-2 fs-xs"></i></a>
+                <a href="{% url 'shop' %}" class="btn-link text-dark fw-bold text-decoration-none border-bottom pb-1">View All <i class="fas fa-chevron-right ms-2 fs-xs"></i></a>
             </div>
             
-            <!-- Swiper Slider Container -->
             <div class="new-arrivals-slider-wrapper">
                 <div class="swiper new-arrivals-swiper">
                     <div class="swiper-wrapper" id="new-arrivals-slider">
                         <!-- Loaded via AJAX -->
                     </div>
                 </div>
-                <!-- Navigation Buttons -->
                 <div class="swiper-button-next new-arrivals-next"></div>
                 <div class="swiper-button-prev new-arrivals-prev"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials-section bg-soft">
-        <div class="container-custom">
-            <div class="swiper testimonials-swiper">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide">
-                        <div class="testimonial-item">
-                            <i class="fas fa-quote-left author-quote"></i>
-                            <p class="testimonial-content">"The quality of the evening edit exceeded my expectations. The fit is perfect and the materials feel incredibly premium. Truly a new standard in luxury."</p>
-                            <div class="testimonial-author">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" alt="Author" class="author-img">
-                                <span class="author-name">Jonathan Reeves</span>
-                                <small class="text-muted">Platinum Member</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="testimonial-item">
-                            <i class="fas fa-quote-left author-quote"></i>
-                            <p class="testimonial-content">"Fast delivery and exceptional customer service. This is my third order from UOMO, and I am consistently impressed by the craftsmanship."</p>
-                            <div class="testimonial-author">
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100" alt="Author" class="author-img">
-                                <span class="author-name">Sarah Jenkins</span>
-                                <small class="text-muted">Fashion Director</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-pagination mt-5"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Brand Identity Section -->
-    <section class="brand-story-section bg-dark text-white">
-        <div class="container-custom">
-            <div class="row align-items-center py-3">
-                <div class="col-lg-5">
-                    <div class="story-content pe-lg-5">
-                        <h6 class="subtitle-line mb-4">ESTABLISHED 2024</h6>
-                        <h2 class="display-4 fw-800 mb-4">The UOMO Art of Luxury</h2>
-                        <p class="text-white-50 mb-4">We believe that fashion is a form of self-expression. Our pieces are more than just clothing; they are meticulously crafted narratives designed to empower and inspire. From the finest Italian fabrics to modern avant-garde silhouettes, every thread reflects our commitment to excellence.</p>
-                        <ul class="story-features list-unstyled mb-5">
-                            <li class="mb-3"><i class="fas fa-gem me-3 text-primary"></i> Premium Italian Sourced Fabrics</li>
-                            <li class="mb-3"><i class="fas fa-feather me-3 text-primary"></i> Hand-Finished Details</li>
-                            <li><i class="fas fa-leaf me-3 text-primary"></i> Sustainable Luxury Practices</li>
-                        </ul>
-                        <a href="#" class="link-white fw-bold text-decoration-none border-bottom pb-2">Learn Our Heritage →</a>
-                    </div>
-                </div>
-                <div class="col-lg-7">
-                    <div class="story-visuals position-relative">
-                        <div class="main-story-img rounded-4 overflow-hidden mb-4 shadow-lg">
-                            <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200" alt="Modern Luxury" class="img-fluid">
-                        </div>
-                        <div class="floating-story-img d-none d-md-block rounded-4 overflow-hidden shadow-2xl animate-float">
-                            <img src="https://images.unsplash.com/photo-1594932224528-9560c0423985?w=500" alt="Craftsmanship" class="img-fluid">
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -265,8 +181,8 @@
     <section class="popular-products-section section-padding">
         <div class="container-custom">
             <div class="section-header text-center mb-3">
-                <h6 class="section-subtitle">CUSTOMER FAVORITES</h6>
-                <h2 class="section-title">Popular This Week</h2>
+                <h6 class="section-subtitle">BEST SELLERS</h6>
+                <h2 class="section-title">Most Popular</h2>
                 <div class="section-divider"></div>
             </div>
 
@@ -274,57 +190,111 @@
                 <!-- Loaded via AJAX -->
             </div>
             
-            <div class="text-center mt-5">
-                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5">Discover Full Collection</a>
+            <div class="text-center mt-4">
+                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5">View More</a>
             </div>
         </div>
     </section>
 
-    <!-- Elite Newsletter Section -->
-    <section class="newsletter-elite-section">
+    <!-- TESTIMONIALS Section -->
+    <section class="testimonials-section bg-soft">
         <div class="container-custom">
-            <div class="newsletter-form-wrapper animate-fade-up">
-                <h6 class="text-primary fw-bold letter-spacing-3 mb-3">JOIN THE ELITE</h6>
-                <h2 class="display-5 fw-900 mb-4 text-white">Unlock Early Access &<br>Exclusive Collections</h2>
-                <p class="text-white-50 mb-5">Be the first to know about new drops and members-only events. Zero spam, just pure luxury lifestyle updates.</p>
-                <form class="d-flex flex-column flex-md-row gap-3">
-                    <input type="email" class="form-control newsletter-elite-input" placeholder="Your premium email address">
-                    <button class="btn-hero btn-hero-primary px-5 py-3">SUBSCRIBE NOW</button>
-                </form>
+            <div class="section-header text-center mb-4">
+                <h6 class="section-subtitle">CUSTOMER REVIEWS</h6>
+                <h2 class="section-title">What Our Customers Say</h2>
+            </div>
+            <div class="swiper testimonials-swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="testimonial-item">
+                            <div class="rating mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+                            <p class="testimonial-content">"Excellent quality! The product matched the pictures perfectly. Fast delivery and amazing packaging. Will definitely order again. 👍"</p>
+                            <div class="testimonial-author">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" alt="Author" class="author-img">
+                                <span class="author-name">Rafi Ahmed</span>
+                                <small class="text-muted">Dhaka • Verified Buyer ✓</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="testimonial-item">
+                            <div class="rating mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+                            <p class="testimonial-content">"This is my go-to shop for fashion. COD option made it very convenient. The quality and fitting are perfect. ❤️"</p>
+                            <div class="testimonial-author">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100" alt="Author" class="author-img">
+                                <span class="author-name">Tania Akter</span>
+                                <small class="text-muted">Chittagong • Verified Buyer ✓</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="testimonial-item">
+                            <div class="rating mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            </div>
+                            <p class="testimonial-content">"Paid via bKash, no issues at all. Received the product in just 2 days. Great value for money. Highly Recommended!"</p>
+                            <div class="testimonial-author">
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100" alt="Author" class="author-img">
+                                <span class="author-name">Sakib Hassan</span>
+                                <small class="text-muted">Sylhet • Verified Buyer ✓</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination mt-4"></div>
             </div>
         </div>
     </section>
 
-    <!-- Modern Social Gallery -->
-    <section class="social-gallery-section py-3">
+    <!-- PAYMENT & TRUST SECTION -->
+    <section class="payment-trust-section">
         <div class="container-custom">
-            <div class="section-header text-center mb-3">
-                <h6 class="section-subtitle">#UOMOSTYLE</h6>
-                <h2 class="section-title">Follow Us On Instagram</h2>
-            </div>
-            <div class="row g-2">
-                <div class="col-md-3 col-6">
-                    <div class="gallery-item animate-fade-up">
-                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" alt="Social" class="img-fluid">
-                        <div class="gallery-overlay"><i class="fab fa-instagram"></i></div>
+            <div class="payment-trust-grid">
+                <div class="payment-methods">
+                    <h6 class="mb-3">Payment Methods</h6>
+                    <div class="payment-icons">
+                        <div class="payment-icon" title="bKash">
+                            <img src="https://www.logo.wine/a/logo/BKash/BKash-Icon-Logo.wine.svg" alt="bKash" height="40">
+                        </div>
+                        <div class="payment-icon" title="Nagad">
+                            <img src="https://nagad.com.bd/wp-content/uploads/2020/09/nagad-logo-white.png" alt="Nagad" height="30" style="background:#f7690a; padding:5px; border-radius:4px;">
+                        </div>
+                        <div class="payment-icon" title="Cash on Delivery">
+                            <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+                        </div>
+                        <div class="payment-icon" title="Card">
+                            <i class="fas fa-credit-card fa-2x text-primary"></i>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-6">
-                    <div class="gallery-item animate-fade-up delay-1">
-                        <img src="https://images.unsplash.com/photo-1539109132314-d07090422d31?w=600" alt="Social" class="img-fluid">
-                        <div class="gallery-overlay"><i class="fab fa-instagram"></i></div>
+                <div class="trust-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">50,000+</span>
+                        <span class="stat-label">Happy Customers</span>
                     </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="gallery-item animate-fade-up delay-2">
-                        <img src="https://images.unsplash.com/photo-1529139513075-3a3b16995006?w=600" alt="Social" class="img-fluid">
-                        <div class="gallery-overlay"><i class="fab fa-instagram"></i></div>
+                    <div class="stat-item">
+                        <span class="stat-number">4.8/5</span>
+                        <span class="stat-label">Rating</span>
                     </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="gallery-item animate-fade-up delay-3">
-                        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600" alt="Social" class="img-fluid">
-                        <div class="gallery-overlay"><i class="fab fa-instagram"></i></div>
+                    <div class="stat-item">
+                        <span class="stat-number">98%</span>
+                        <span class="stat-label">Positive Reviews</span>
                     </div>
                 </div>
             </div>
@@ -334,38 +304,55 @@
     <!-- Features Section -->
     <section class="features-section section-padding">
         <div class="container-custom">
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-6">
+            <div class="row g-3">
+                <div class="col-lg-3 col-md-6 col-6">
                     <div class="feature-box">
-                        <i class="fas fa-shipping-fast"></i>
-                        <h5 class="author-name mb-3">Priority Shipping</h5>
-                        <p class="text-muted small">Complimentary global delivery on all premium orders over ৳5000.</p>
+                        <i class="fas fa-truck"></i>
+                        <h5 class="feature-title-bd">Free Delivery</h5>
+                        <p class="text-muted small mb-0">Free in Dhaka, ৳60 nationwide</p>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-6 col-6">
                     <div class="feature-box">
-                        <i class="fas fa-gem"></i>
-                        <h5 class="author-name mb-3">Lifetime Quality</h5>
-                        <p class="text-muted small">Every piece is backed by our signature quality and craftsmanship guarantee.</p>
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h5 class="feature-title-bd">Cash on Delivery</h5>
+                        <p class="text-muted small mb-0">Pay when you receive</p>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-6 col-6">
                     <div class="feature-box">
                         <i class="fas fa-undo-alt"></i>
-                        <h5 class="author-name mb-3">Elegant Returns</h5>
-                        <p class="text-muted small">Enjoy a seamless 30-day return policy for ultimate peace of mind.</p>
+                        <h5 class="feature-title-bd">7-Day Returns</h5>
+                        <p class="text-muted small mb-0">Easy return policy</p>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-6 col-6">
                     <div class="feature-box">
-                        <i class="fas fa-lock"></i>
-                        <h5 class="author-name mb-3">Encrypted Checkout</h5>
-                        <p class="text-muted small">Your security is paramount. We use bank-level encryption for all data.</p>
+                        <i class="fas fa-check-circle"></i>
+                        <h5 class="feature-title-bd">100% Original</h5>
+                        <p class="text-muted small mb-0">Guaranteed quality</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/8801XXXXXXXXX?text=Hello, I want to place an order from UOMO" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+        <span class="whatsapp-tooltip">Message us on WhatsApp</span>
+    </a>
+
+    <!-- Live Order Notification (Toast) -->
+    <div class="live-order-toast" id="liveOrderToast">
+        <div class="toast-content">
+            <img src="https://via.placeholder.com/50" alt="Product" class="toast-img" id="toastImg">
+            <div class="toast-info">
+                <p class="toast-text" id="toastText">Someone just placed an order</p>
+                <small class="toast-time" id="toastTime">2 minutes ago • Dhaka</small>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block extra_css %}
@@ -392,8 +379,8 @@
         .hero-content {
             position: relative;
             z-index: 2;
-            padding: 0 5%;
-            max-width: 1000px;
+            padding: 0 8%;
+            max-width: 800px;
             color: var(--white);
         }
 
@@ -411,26 +398,27 @@
         .hero-subtitle span {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
-            padding: 8px 20px;
+            padding: 10px 25px;
             border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
         }
 
         .hero-title {
-            font-size: clamp(40px, 6vw, 85px);
+            font-size: clamp(48px, 7vw, 100px);
             font-weight: 900;
-            line-height: 1.1;
+            line-height: 1.05;
             margin-bottom: 25px;
             text-transform: uppercase;
-            letter-spacing: -2px;
+            letter-spacing: -3px;
         }
 
         .hero-text {
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 40px;
-            max-width: 550px;
-            color: rgba(255,255,255,0.85);
-            line-height: 1.6;
+            max-width: 600px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.7;
+            font-weight: 400;
         }
 
         .hero-btns {
@@ -1366,6 +1354,338 @@
             .story-visuals { height: auto; margin-top: 50px; }
             .floating-story-img { display: none !important; }
         }
+
+        /* ============================================
+           BANGLADESH MARKET SPECIFIC STYLES
+           ============================================ */
+
+        /* Trust Bar - Top Announcement */
+        .trust-bar-bd {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            padding: 12px 0;
+            color: #fff;
+            font-size: 13px;
+            overflow: hidden;
+        }
+
+        .trust-bar-inner {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .trust-item i {
+            color: #4ade80;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .trust-bar-inner {
+                gap: 15px;
+                font-size: 11px;
+            }
+            .trust-item:nth-child(n+4) {
+                display: none;
+            }
+        }
+
+        /* Hero Price Tag */
+        .hero-price-tag {
+            display: inline-flex;
+            flex-direction: column;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hero-price-tag .starting-from {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .hero-price-tag .price {
+            font-size: 32px;
+            font-weight: 900;
+            color: #fbbf24;
+        }
+
+        /* Flash Sale BD Enhancements */
+        .flash-sale-bd {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+            border: 2px solid #fee2e2;
+        }
+
+        .sale-badge-floating {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 18px;
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .live-orders-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .stock-warning {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #dc2626;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Category Badges */
+        .category-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #ef4444;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            z-index: 5;
+        }
+
+        .featured-content {
+            position: relative;
+        }
+
+        /* Payment & Trust Section */
+        .payment-trust-section {
+            padding: 40px 0;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .payment-trust-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .payment-methods h6 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+        }
+
+        .payment-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .payment-icon {
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .payment-icon:hover {
+            opacity: 1;
+        }
+
+        .trust-stats {
+            display: flex;
+            gap: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .payment-trust-grid {
+                flex-direction: column;
+                text-align: center;
+            }
+            .trust-stats {
+                gap: 25px;
+            }
+            .stat-number {
+                font-size: 22px;
+            }
+        }
+
+        /* BD Feature Titles */
+        .feature-title-bd {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .feature-box {
+            padding: 25px 15px;
+        }
+
+        .feature-box i {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        /* WhatsApp Floating Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: #25d366;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            background: #128c7e;
+            color: #fff;
+        }
+
+        .whatsapp-tooltip {
+            position: absolute;
+            right: 70px;
+            background: #333;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .whatsapp-float:hover .whatsapp-tooltip {
+            opacity: 1;
+        }
+
+        /* Live Order Toast Notification */
+        .live-order-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 25px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 15px;
+            z-index: 998;
+            transform: translateX(-150%);
+            transition: transform 0.5s ease;
+            max-width: 300px;
+        }
+
+        .live-order-toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .toast-text {
+            font-size: 13px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .toast-time {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        /* Testimonials BD Updates */
+        .testimonial-content {
+            font-size: clamp(16px, 2.5vw, 22px);
+            font-style: normal;
+            margin-bottom: 25px;
+        }
+
+        .rating i {
+            font-size: 16px;
+        }
     </style>
 {% endblock %}
 
@@ -1566,12 +1886,100 @@
             });
         }
 
+        // ============================================
+        // BANGLADESH MARKET FEATURES
+        // ============================================
+
+        // Flash Sale Countdown Timer
+        function initFlashCountdown() {
+            // Set countdown to 2 days, 14 hours, 45 mins from now
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + 2);
+            endDate.setHours(endDate.getHours() + 14);
+            endDate.setMinutes(endDate.getMinutes() + 45);
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = endDate - now;
+
+                if (distance < 0) {
+                    // Reset countdown
+                    endDate.setDate(endDate.getDate() + 3);
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const daysEl = document.getElementById('days');
+                const hoursEl = document.getElementById('hours');
+                const minsEl = document.getElementById('mins');
+                const secsEl = document.getElementById('secs');
+
+                if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+                if (minsEl) minsEl.textContent = String(minutes).padStart(2, '0');
+                if (secsEl) secsEl.textContent = String(seconds).padStart(2, '0');
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        // Live Order Notification System (Social Proof)
+        function initLiveOrderNotifications() {
+            const notifications = [
+                { product: 'Premium Panjabi', location: 'Dhaka', time: '2 mins ago', img: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=80' },
+                { product: 'Designer Saree', location: 'Chittagong', time: '5 mins ago', img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=80' },
+                { product: 'Formal Shirt', location: 'Sylhet', time: '8 mins ago', img: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=80' },
+                { product: 'Cotton Kurti', location: 'Rajshahi', time: '10 mins ago', img: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=80' },
+                { product: 'Casual T-Shirt', location: 'Khulna', time: '12 mins ago', img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80' },
+            ];
+
+            const toast = document.getElementById('liveOrderToast');
+            const toastImg = document.getElementById('toastImg');
+            const toastText = document.getElementById('toastText');
+            const toastTime = document.getElementById('toastTime');
+
+            if (!toast) return;
+
+            let currentIndex = 0;
+
+            function showNotification() {
+                const notification = notifications[currentIndex];
+                
+                if (toastImg) toastImg.src = notification.img;
+                if (toastText) toastText.textContent = `${notification.product} just ordered!`;
+                if (toastTime) toastTime.textContent = `${notification.time} • ${notification.location}`;
+
+                toast.classList.add('show');
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 5000);
+
+                currentIndex = (currentIndex + 1) % notifications.length;
+            }
+
+            // Show first notification after 10 seconds
+            setTimeout(() => {
+                showNotification();
+                // Then show every 30 seconds
+                setInterval(showNotification, 30000);
+            }, 10000);
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // loadHeroSlider();
             loadNewArrivals();
             loadPopularProducts();
             initTestimonialsSwiper();
+            
+            // BD Market Features
+            initFlashCountdown();
+            initLiveOrderNotifications();
         });
     </script>
 {% endblock %}
