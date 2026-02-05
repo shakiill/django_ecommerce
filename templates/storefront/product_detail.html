@@ -24,8 +24,18 @@
             <div class="col-lg-6">
                 <div class="product-gallery sticky-top" style="top: 100px; z-index: 1;">
                     <div class="main-image-wrapper mb-3 position-relative rounded-4 overflow-hidden shadow-sm">
+                        {% if product.default_variant.is_on_sale %}
                         <span class="badge badge-sale position-absolute top-0 start-0 m-3 fs-6">Sale</span>
-                        <img id="mainImage" src="{{ product.images.first.image.url|default:product.thumbnail }}" alt="{{ product.name }}" class="img-fluid w-100" style="object-fit: cover; aspect-ratio: 1/1;">
+                        {% endif %}
+                        
+                        {% with first_image=product.images.first %}
+                        <img id="mainImage" 
+                             src="{% if first_image %}{{ first_image.image.url }}{% elif product.thumbnail %}{{ product.thumbnail.url }}{% else %}/static/assets/images/placeholder.png{% endif %}" 
+                             alt="{{ product.name }}" 
+                             class="img-fluid w-100" 
+                             style="object-fit: cover; aspect-ratio: 1/1;">
+                        {% endwith %}
+                        
                         <button class="btn-zoom position-absolute bottom-0 end-0 m-3 bg-white rounded-circle shadow-sm p-2 border-0">
                             <i class="fas fa-expand-alt"></i>
                         </button>
@@ -36,9 +46,11 @@
                             <img src="{{ image.image.url }}" class="w-100 h-100" style="object-fit: cover;">
                         </div>
                         {% empty %}
-                         <div class="thumb-item rounded-3 overflow-hidden border active-thumb" style="width: 80px; height: 80px; cursor: pointer; flex-shrink: 0;">
-                            <img src="{{ product.thumbnail }}" class="w-100 h-100" style="object-fit: cover;">
-                        </div>
+                            {% if product.thumbnail %}
+                             <div class="thumb-item rounded-3 overflow-hidden border active-thumb" style="width: 80px; height: 80px; cursor: pointer; flex-shrink: 0;">
+                                <img src="{{ product.thumbnail.url }}" class="w-100 h-100" style="object-fit: cover;">
+                            </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>
@@ -56,9 +68,13 @@
                     
                     <div class="price-rating-wrapper d-flex align-items-center gap-3 mb-4">
                         <div class="price-box">
-                            <span class="fs-2 fw-bold text-dark me-2">৳<span id="productPrice">{{ product.price }}</span></span>
-                            {% if product.old_price %}
-                            <span class="fs-5 text-muted text-decoration-line-through">৳{{ product.old_price }}</span>
+                            {% if product.default_variant %}
+                                <span class="fs-2 fw-bold text-dark me-2">৳<span id="productPrice">{{ product.default_variant.get_effective_price|floatformat:0 }}</span></span>
+                                {% if product.default_variant.is_on_sale %}
+                                <span class="fs-5 text-muted text-decoration-line-through">৳{{ product.default_variant.price|floatformat:0 }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="fs-2 fw-bold text-dark">৳0</span>
                             {% endif %}
                         </div>
                         <div class="vr"></div>
@@ -73,12 +89,14 @@
                     </div>
 
                     <div class="short-description text-muted mb-4 fs-6 lh-lg">
-                        {{ product.short_description|safe }}
+                        {{ product.short_description|default:""|safe }}
                     </div>
 
                     <!-- Attributes Section - Simplified for Placeholder -->
                     <div class="product-attributes mb-4">
-                        <!-- Placeholder for dynamic attributes if needed -->
+                        {% if product.default_variant.sku %}
+                        <small class="d-block text-muted">Variant: {{ product.default_variant.variant_name }}</small>
+                        {% endif %}
                     </div>
 
                     <!-- Actions -->
@@ -102,7 +120,7 @@
 
                     <!-- Meta Info -->
                     <div class="product-meta small text-muted">
-                        <div class="mb-2"><strong>SKU:</strong> <span class="text-dark">{{ product.sku|default:"N/A" }}</span></div>
+                        <div class="mb-2"><strong>SKU:</strong> <span class="text-dark">{{ product.default_variant.sku|default:"N/A" }}</span></div>
                         <div class="mb-2"><strong>Category:</strong> <span class="text-dark">{{ product.category.name|default:"Uncategorized" }}</span></div>
                         <div class="mb-2"><strong>Tags:</strong> 
                             {% for tag in product.tags.all %}
@@ -133,7 +151,7 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <div class="prose text-muted lh-lg">
-                                    {{ product.description|safe }}
+                                    {{ product.description|default:"No description available."|safe }}
                                 </div>
                             </div>
                         </div>
