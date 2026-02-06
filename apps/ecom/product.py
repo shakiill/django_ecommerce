@@ -221,6 +221,10 @@ class ProductStep1EditView(View):
         except (TypeError, ValueError):
             max_order_quantity = product.max_order_quantity
 
+        # Add track_inventory and allow_backorder (use helper)
+        track_inventory = to_bool(request.POST.get('track_inventory'))
+        allow_backorder = to_bool(request.POST.get('allow_backorder'))
+
         category = Category.objects.get(id=category_id) if category_id else None
         brand = Brand.objects.get(id=brand_id) if brand_id else None
         unit = None
@@ -245,6 +249,8 @@ class ProductStep1EditView(View):
         product.is_active = is_active
         product.min_order_quantity = min_order_quantity
         product.max_order_quantity = max_order_quantity
+        product.track_inventory = track_inventory
+        product.allow_backorder = allow_backorder
         if new_thumb:
             product.thumbnail = new_thumb
         if new_thumbnail_hover:
