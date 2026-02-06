@@ -126,7 +126,7 @@
 
                     <!-- Secondary Actions -->
                     <div class="qv-secondary-actions mb-5 pb-4 border-bottom">
-                        <button class="qv-action-btn" id="detail-wishlist-btn" onclick="if(detailProduct) toggleWishlist(detailProduct.id, this)">
+                        <button class="qv-action-btn" id="detail-wishlist-btn" data-product-id="" onclick="if(detailProduct) toggleWishlist(detailProduct.id, this)">
                             <i class="far fa-heart"></i> <span>Add to Wishlist</span>
                         </button>
                         <button class="qv-action-btn">
@@ -546,11 +546,19 @@
             
             // Check Wishlist Status
             if (isAuthenticated()) {
-                 try {
-                     const wRes = await apiFetch(`/wishlist/check/${data.id}/`);
-                     const wBtn = document.getElementById('detail-wishlist-btn');
-                     if (wBtn) updateWishlistBtnState(wBtn, wRes.is_in_wishlist);
-                 } catch(e) { console.warn('Wishlist check failed', e); }
+                 const wBtn = document.getElementById('detail-wishlist-btn');
+                 if (wBtn) {
+                     wBtn.setAttribute('data-product-id', data.id);
+                     if (data.is_in_wishlist !== undefined) {
+                         updateWishlistBtnState(data.id, data.is_in_wishlist);
+                     } else {
+                         // Fallback for safety
+                         try {
+                             const wRes = await apiFetch(`/wishlist/check/${data.id}/`);
+                             updateWishlistBtnState(data.id, wRes.is_in_wishlist);
+                         } catch(e) { console.warn('Wishlist check failed', e); }
+                     }
+                 }
             }
             
         } catch (error) {

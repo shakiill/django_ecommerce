@@ -1242,7 +1242,7 @@
                         <button class="action-btn btn-cart" onclick="showQuickView('${product.slug}')">
                             <i class="fas fa-shopping-bag"></i> Quick View
                         </button>
-                        <button class="action-btn" title="Wishlist" onclick="toggleWishlist(${product.id}, this)">
+                        <button class="action-btn" title="Wishlist" data-product-id="${product.id}" onclick="toggleWishlist(${product.id}, this)">
                             <i class="${wishlistIconClass}"></i>
                         </button>
                     </div>

@@ -95,7 +95,7 @@
                             
                             <!-- Secondary Actions -->
                             <div class="qv-secondary-actions">
-                                <button class="qv-action-btn" id="qv-wishlist">
+                                <button class="qv-action-btn" id="qv-wishlist" data-product-id="">
                                     <i class="far fa-heart"></i>
                                     <span>Add to Wishlist</span>
                                 </button>
@@ -784,7 +784,8 @@
             // Handle Wishlist Button
             const wishBtn = document.getElementById('qv-wishlist');
             if (wishBtn) {
-                updateWishlistBtnState(wishBtn, data.is_in_wishlist);
+                wishBtn.setAttribute('data-product-id', data.id);
+                updateWishlistBtnState(data.id, data.is_in_wishlist);
                 wishBtn.onclick = () => toggleWishlist(data.id, wishBtn);
             }
             

@@ -134,8 +134,9 @@
                     </div>
                 </div>
                 
-                <a href="{% url 'wishlist' %}" class="header-icon d-none d-sm-block">
+                <a href="{% url 'wishlist' %}" class="header-icon d-none d-sm-block position-relative">
                     <i class="far fa-heart"></i>
+                    <span class="cart-count" id="wishlist-count">0</span>
                 </a>
                 
                 <a href="{% url 'cart' %}" class="header-icon">
@@ -179,7 +180,10 @@
         <div class="mobile-nav-icons">
             <a href="{% url 'shop' %}">Search</a>
             <a href="{% if user.is_authenticated %}{% url 'customer_dashboard' %}{% else %}{% url 'staff_login' %}{% endif %}">Account</a>
-            <a href="{% url 'wishlist' %}">Wishlist</a>
+            <a href="{% url 'wishlist' %}" class="position-relative">
+                Wishlist
+                <span class="cart-count" id="mobile-wishlist-count" style="top: -5px; right: -15px;">0</span>
+            </a>
             <a href="{% url 'cart' %}">Cart</a>
         </div>
     </div>
@@ -566,6 +570,7 @@
             }
             
             updateCartCount();
+            updateWishlistCount();
 
             // Sticky Header Script
             window.addEventListener('scroll', function() {
@@ -644,8 +649,10 @@
                     newState = true;
                 }
                 
+                updateWishlistCount();
+                
                 if (btnElement) {
-                     updateWishlistBtnState(btnElement, newState);
+                     updateWishlistBtnState(productId, newState);
                      btnElement.disabled = false;
                 }
                 
@@ -658,25 +665,56 @@
             }
         }
 
-        function updateWishlistBtnState(btn, isSaved) {
-            // Handles both button with span and icon-only links
-            const icon = btn.querySelector('i');
-            if (!icon) return;
+        function updateWishlistBtnState(productId, isSaved) {
+            // Find all buttons for this product
+            const buttons = document.querySelectorAll(`[data-product-id="${productId}"]`);
             
-            if (isSaved) {
-                icon.classList.remove('far');
-                icon.classList.add('fas', 'text-danger');
-                const span = btn.querySelector('span');
-                if (span && span.textContent.includes('Wishlist')) {
-                     span.textContent = 'Saved to Wishlist';
+            buttons.forEach(btn => {
+                const icon = btn.querySelector('i');
+                if (!icon) return;
+                
+                if (isSaved) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas', 'text-danger');
+                    const span = btn.querySelector('span');
+                    if (span && span.textContent.includes('Wishlist')) {
+                         span.textContent = 'Saved to Wishlist';
+                    }
+                } else {
+                    icon.classList.remove('fas', 'text-danger');
+                    icon.classList.add('far');
+                    const span = btn.querySelector('span');
+                    if (span && span.textContent.includes('Wishlist')) {
+                         span.textContent = 'Add to Wishlist';
+                    }
                 }
-            } else {
-                icon.classList.remove('fas', 'text-danger');
-                icon.classList.add('far');
-                const span = btn.querySelector('span');
-                if (span && span.textContent.includes('Wishlist')) {
-                     span.textContent = 'Add to Wishlist';
-                }
+            });
+        }
+
+        async function updateWishlistCount() {
+            if (!isAuthenticated()) {
+                const countEl = document.getElementById('wishlist-count');
+                const mCountEl = document.getElementById('mobile-wishlist-count');
+                if (countEl) countEl.style.display = 'none';
+                if (mCountEl) mCountEl.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const data = await apiFetch('/wishlist/');
+                const count = (data.count !== undefined) ? data.count : 
+                              (Array.isArray(data) ? data.length : 0);
+                
+                const countEls = ['wishlist-count', 'mobile-wishlist-count'];
+                countEls.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.textContent = count;
+                        el.style.display = count > 0 ? 'flex' : 'none';
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to update wishlist count:', error);
             }
         }
 

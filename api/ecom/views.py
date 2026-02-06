@@ -32,6 +32,11 @@ class CachedReadOnlyMixin:
     def list(self, request, *args, **kwargs):
         if not getattr(settings, 'PUBLIC_API_CACHE_ENABLED', True):
             return super().list(request, *args, **kwargs)
+        
+        # Bypass cache for authenticated users to show personalized data (e.g. wishlist status)
+        if request.user.is_authenticated:
+            return super().list(request, *args, **kwargs)
+
         key = _build_cache_key(self.__class__.__name__, request, 'list')
         data = cache.get(key)
         if data is None:
@@ -43,6 +48,11 @@ class CachedReadOnlyMixin:
     def retrieve(self, request, *args, **kwargs):
         if not getattr(settings, 'PUBLIC_API_CACHE_ENABLED', True):
             return super().retrieve(request, *args, **kwargs)
+            
+        # Bypass cache for authenticated users
+        if request.user.is_authenticated:
+            return super().retrieve(request, *args, **kwargs)
+
         # Include object identifier and attributes param variations
         obj_id = kwargs.get(self.lookup_field, '') or kwargs.get('pk', '')
         key = _build_cache_key(self.__class__.__name__, request, f"retrieve:{obj_id}")
@@ -71,7 +81,8 @@ class ProductFilter(django_filters.FilterSet):
 class ProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
     queryset = Product.objects.all()
     permission_classes = [AllowAny]
-    authentication_classes = []
+    permission_classes = [AllowAny]
+    # authentication_classes = []  # Removed to allow request.user to be populated
     http_method_names = ['get']
     lookup_field = 'slug'
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -88,7 +99,7 @@ class ProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         # Override custom retrieve logic but keep caching wrapper executed above by calling parent if cache miss
-        if not getattr(settings, 'PUBLIC_API_CACHE_ENABLED', True):
+        if not getattr(settings, 'PUBLIC_API_CACHE_ENABLED', True) or request.user.is_authenticated:
             return super().retrieve(request, *args, **kwargs)
         obj_id = kwargs.get(self.lookup_field, '') or kwargs.get('pk', '')
         key = _build_cache_key(self.__class__.__name__, request, f"retrieve:{obj_id}")
@@ -135,7 +146,8 @@ class ProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
 class PopularProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
     queryset = Product.objects.filter(is_active=True)
     permission_classes = [AllowAny]
-    authentication_classes = []
+    permission_classes = [AllowAny]
+    # authentication_classes = []
     http_method_names = ['get']
     lookup_field = 'slug'
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -152,7 +164,8 @@ class PopularProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
 class NewArrivalProductViewSet(CachedReadOnlyMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = NewProductSerializer
     permission_classes = [AllowAny]
-    authentication_classes = []
+    permission_classes = [AllowAny]
+    # authentication_classes = []
     http_method_names = ['get']
     lookup_field = 'slug'
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
