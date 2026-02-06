@@ -265,7 +265,7 @@
 
 
                 <div data-kt-menu-trigger="click"
-                     class="menu-item menu-accordion {% if request.resolver_match.url_name == 'slider_list' %}here show{% endif %}">
+                     class="menu-item menu-accordion {% if request.resolver_match.url_name == 'slider_list' or request.resolver_match.url_name == 'mega_menu' or request.resolver_match.url_name == 'contact_list' or request.resolver_match.url_name == 'site_settings'  %}here show{% endif %}">
                     <!--begin:Menu link-->
                     <span class="menu-link">
                        <span class="menu-icon">
@@ -311,6 +311,16 @@
                                href="{% url 'cms:contact_list' %}">
                                 <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                                 <span class="menu-title">Contact Submissions</span>
+                            </a>
+                        </div>
+
+
+                        <!--begin:Menu item - Site Settings-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'site_settings' %}active{% endif %}"
+                               href="{% url 'cms:site_settings' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Site Settings</span>
                             </a>
                         </div>
 

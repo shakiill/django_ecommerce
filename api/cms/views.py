@@ -4,8 +4,21 @@ from rest_framework.response import Response
 from django.core.cache import cache
 from django.conf import settings
 
-from api.cms.serializers import MainSliderSerializer, ContactSerializer, ContactListSerializer, build_mega_menu_structure
-from apps.cms.models import MainSlider, MenuSection, Contact, MEGA_MENU_CACHE_KEY
+from api.cms.serializers import (
+    MainSliderSerializer, ContactSerializer, ContactListSerializer, 
+    build_mega_menu_structure, SiteSettingSerializer
+)
+from apps.cms.models import MainSlider, MenuSection, Contact, MEGA_MENU_CACHE_KEY, SiteSetting
+
+
+class SiteSettingView(views.APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request, *args, **kwargs):
+        settings = SiteSetting.objects.first()
+        serializer = SiteSettingSerializer(settings, context={'request': request})
+        return Response(serializer.data)
 
 
 class MainSliderViewSet(viewsets.ModelViewSet):

@@ -1,6 +1,12 @@
 from rest_framework import serializers
 
-from apps.cms.models import MainSlider, MenuSection, MenuGroup, MenuItem, Contact
+from apps.cms.models import MainSlider, MenuSection, MenuGroup, MenuItem, Contact, SiteSetting
+
+
+class SiteSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteSetting
+        fields = '__all__'
 
 
 class MainSliderSerializer(serializers.ModelSerializer):

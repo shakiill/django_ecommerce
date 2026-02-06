@@ -66,6 +66,7 @@ urlpatterns = [
     # Public docs endpoint (share this link)
     path('docs/', public_api_md, name='public_api_docs'),
     path('mega-menu/', cms_views.MegaMenuView.as_view(), name='public_mega_menu'),
+    path('site-settings/', cms_views.SiteSettingView.as_view(), name='public_site_settings'),
     re_path(
         r'^cart/items/(?P<pk>[^/]+)/?$',
         CartViewSet.as_view({'patch': 'update_item', 'put': 'update_item', 'delete': 'delete_item', 'DELETE': 'delete_item'})

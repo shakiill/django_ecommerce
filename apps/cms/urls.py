@@ -2,6 +2,7 @@ from django.urls import path
 from . import slider as slider_views
 from . import menu as menu_views
 from . import contact as contact_views
+from . import site_settings as settings_views
 
 app_name = "cms"
 
@@ -23,4 +24,5 @@ urlpatterns = [
     path("mega-menu/items/create/", menu_views.item_create, name="item_create"),
     path("mega-menu/items/<int:pk>/edit/", menu_views.item_edit, name="item_edit"),
     path("mega-menu/items/<int:pk>/delete/", menu_views.item_delete, name="item_delete"),
+    path("settings/", settings_views.site_settings_update, name="site_settings"),
 ]

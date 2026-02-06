@@ -1,7 +1,7 @@
 {% extends 'storefront/base.html' %}
 {% load static %}
 
-{% block title %}Contact Us - UOMO{% endblock %}
+{% block title %}Contact Us - {{ site_settings.business_name|default:"ECOM" }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -86,7 +86,7 @@
                         <i class="fas fa-location-dot"></i>
                         <div>
                             <h5>Headquarters</h5>
-                            <p>123 Fashion Street, Suite 456<br>New York, NY 10001</p>
+                            <p>{{ site_settings.address|linebreaksbr|default:"123 Fashion Street, Suite 456<br>New York, NY 10001" }}</p>
                         </div>
                     </div>
                     
@@ -94,7 +94,7 @@
                         <i class="fas fa-phone"></i>
                         <div>
                             <h5>Phone</h5>
-                            <p>+1 (555) 123-4567</p>
+                            <p>{{ site_settings.phone|default:"+1 (555) 123-4567" }}</p>
                         </div>
                     </div>
                     
@@ -102,7 +102,7 @@
                         <i class="fas fa-envelope"></i>
                         <div>
                             <h5>Email</h5>
-                            <p>hello@uomo.com</p>
+                            <p>{{ site_settings.email|default:"hello@ECOM.com" }}</p>
                         </div>
                     </div>
                     
@@ -110,7 +110,7 @@
                         <i class="fas fa-clock"></i>
                         <div>
                             <h5>Working Hours</h5>
-                            <p>Mon - Fri: 9am - 6pm<br>Sat: 10am - 4pm</p>
+                            <p>{{ site_settings.working_hours|linebreaksbr|default:"Mon - Fri: 9am - 6pm<br>Sat: 10am - 4pm" }}</p>
                         </div>
                     </div>
                 </div>

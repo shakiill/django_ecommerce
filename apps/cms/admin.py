@@ -1,5 +1,20 @@
 from django.contrib import admin
-from .models import MainSlider, MenuSection, MenuGroup, MenuItem, HomeSection, Contact
+from .models import MainSlider, MenuSection, MenuGroup, MenuItem, HomeSection, Contact, SiteSetting
+
+
+@admin.register(SiteSetting)
+class SiteSettingAdmin(admin.ModelAdmin):
+    list_display = ('business_name', 'email', 'phone', 'updated_at')
+
+    def has_add_permission(self, request):
+        # Allow adding only if no settings exist
+        if SiteSetting.objects.exists():
+            return False
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        # Prevent deletion of settings
+        return False
 
 
 @admin.register(MainSlider)

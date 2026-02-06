@@ -150,3 +150,43 @@ class Contact(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.subject}"
+
+
+class SiteSetting(models.Model):
+    """Global site settings for storefront and CMS."""
+    business_name = models.CharField(max_length=200, default="My Store")
+    logo = models.ImageField(upload_to='site_settings/', blank=True, null=True)
+    favicon = models.ImageField(upload_to='site_settings/', blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    working_hours = models.TextField(blank=True, null=True)
+
+    # Social links
+    facebook_url = models.URLField(blank=True, null=True)
+    twitter_url = models.URLField(blank=True, null=True)
+    instagram_url = models.URLField(blank=True, null=True)
+    youtube_url = models.URLField(blank=True, null=True)
+
+    # Meta / SEO
+    footer_text = models.TextField(blank=True, null=True)
+    meta_title = models.CharField(max_length=200, blank=True, null=True)
+    meta_description = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Site Setting"
+        verbose_name_plural = "Site Settings"
+
+    def __str__(self):
+        return self.business_name
+
+    def save(self, *args, **kwargs):
+        # Optional: enforce singleton pattern at model level
+        if not self.pk and SiteSetting.objects.exists():
+            # You could raise an error or just update the existing one
+            # For simplicity in admin, we'll let the admin handle it or just return
+            return
+        super().save(*args, **kwargs)
