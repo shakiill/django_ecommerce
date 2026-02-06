@@ -4053,7 +4053,7 @@
         // Load Popular Products
         async function loadPopularProducts() {
             try {
-                const data = await apiFetch('/popular-products/?page_size=8');
+                const data = await apiFetch('/popular-products/');
                 const products = data.results || data;
                 const container = document.getElementById('popular-products-grid');
 

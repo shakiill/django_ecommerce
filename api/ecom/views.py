@@ -144,10 +144,8 @@ class ProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
 
 
 class PopularProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
-    queryset = Product.objects.filter(is_active=True)
     permission_classes = [AllowAny]
-    permission_classes = [AllowAny]
-    # authentication_classes = []
+    pagination_class = None
     http_method_names = ['get']
     lookup_field = 'slug'
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -160,10 +158,12 @@ class PopularProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
     ]
     serializer_class = ProductListSerializer
 
+    def get_queryset(self):
+        return Product.objects.filter(is_active=True).order_by('-id')[:8]
+
 
 class NewArrivalProductViewSet(CachedReadOnlyMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = NewProductSerializer
-    permission_classes = [AllowAny]
     permission_classes = [AllowAny]
     # authentication_classes = []
     http_method_names = ['get']
