@@ -279,21 +279,48 @@
         <div class="container-custom">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <div class="lookbook-images">
-                        <div class="lookbook-img-main">
-                            <img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=800" alt="Lookbook Main" class="img-fluid rounded-4 shadow-lg">
+                    <div class="lookbook-images-enhanced">
+                        <!-- Main Image with Frame -->
+                        <div class="lookbook-img-main-wrap">
+                            <div class="lookbook-frame-accent"></div>
+                            <img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=800" alt="Lookbook Main" class="lookbook-main-img">
                         </div>
-                        <div class="lookbook-img-sub">
-                            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" alt="Lookbook Sub" class="img-fluid rounded-4 shadow-lg">
+                        <!-- Sub Image - Overlapping -->
+                        <div class="lookbook-img-sub-wrap">
+                            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" alt="Lookbook Sub" class="lookbook-sub-img">
+                            <!-- Floating Badge -->
+                            <div class="lookbook-floating-badge">
+                                <span class="badge-year">2026</span>
+                                <span class="badge-label">Collection</span>
+                            </div>
                         </div>
+                        <!-- Decorative Elements -->
+                        <div class="lookbook-dots-pattern"></div>
                     </div>
                 </div>
                 <div class="col-lg-5 offset-lg-1">
-                    <div class="lookbook-content">
-                        <h6 class="section-subtitle text-primary">COLLECTION 2026</h6>
-                        <h2 class="section-title mb-4">The Art of Modern Elegance</h2>
-                        <p class="text-muted mb-5">Discover our latest lookbook featuring minimalist designs and premium textures. Each piece is crafted to bring a touch of sophistication to your everyday wardrobe.</p>
-                        <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5">Explore Collection</a>
+                    <div class="lookbook-content-animated">
+                        <h6 class="section-subtitle text-primary lookbook-animate" data-animate="fadeInUp" data-delay="0">COLLECTION 2026</h6>
+                        <h2 class="section-title mb-4 lookbook-animate" data-animate="fadeInUp" data-delay="100">The Art of Modern Elegance</h2>
+                        <p class="text-muted mb-4 lookbook-animate" data-animate="fadeInUp" data-delay="200">Discover our latest lookbook featuring minimalist designs and premium textures. Each piece is crafted to bring a touch of sophistication to your everyday wardrobe.</p>
+                        
+                        <!-- Feature Highlights -->
+                        <div class="lookbook-features lookbook-animate" data-animate="fadeInUp" data-delay="300">
+                            <div class="lookbook-feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Premium Quality Fabrics</span>
+                            </div>
+                            <div class="lookbook-feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Minimalist Modern Designs</span>
+                            </div>
+                            <div class="lookbook-feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Ethically Sourced Materials</span>
+                            </div>
+                        </div>
+                        
+                        <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5 lookbook-animate lookbook-cta-btn" data-animate="fadeInUp" data-delay="400">Explore Collection</a>
                     </div>
                 </div>
             </div>
@@ -3489,20 +3516,221 @@
            NEW SECTIONS STYLES
            ------------------------------------------- */
 
-        /* Lookbook Section */
-        .lookbook-images {
-            position: relative;
-            padding: 50px 0;
+/* Lookbook Section - Enhanced */
+        .lookbook-section {
+            background: #fafafa;
+            overflow: hidden;
         }
-        .lookbook-img-sub {
-            position: absolute;
-            bottom: -30px;
-            right: -30px;
-            width: 60%;
+
+        .lookbook-images-enhanced {
+            position: relative;
+            padding: 60px 40px 60px 0;
+        }
+
+        /* Main Image Wrapper */
+        .lookbook-img-main-wrap {
+            position: relative;
             z-index: 2;
         }
-        .lookbook-content {
+
+        .lookbook-main-img {
+            width: 85%;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lookbook-img-main-wrap:hover .lookbook-main-img {
+            transform: scale(1.02);
+        }
+
+        /* Accent Frame */
+        .lookbook-frame-accent {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 70%;
+            height: 70%;
+            border: 3px solid var(--accent-color);
+            border-radius: 20px;
+            z-index: 1;
+            opacity: 0.4;
+            transition: all 0.5s ease;
+        }
+
+        .lookbook-img-main-wrap:hover .lookbook-frame-accent {
+            top: -25px;
+            left: -25px;
+            opacity: 0.7;
+        }
+
+        /* Sub Image Wrapper */
+        .lookbook-img-sub-wrap {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 55%;
+            z-index: 3;
+        }
+
+        .lookbook-sub-img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            border: 5px solid #fff;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lookbook-img-sub-wrap:hover .lookbook-sub-img {
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        /* Floating Badge */
+        .lookbook-floating-badge {
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: var(--accent-color);
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(255, 78, 80, 0.35);
+            z-index: 4;
+            animation: floatBadge 3s ease-in-out infinite;
+        }
+
+        .lookbook-floating-badge .badge-year {
+            display: block;
+            font-size: 24px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .lookbook-floating-badge .badge-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Dots Pattern */
+        .lookbook-dots-pattern {
+            position: absolute;
+            top: 40px;
+            right: 30%;
+            width: 80px;
+            height: 80px;
+            background-image: radial-gradient(circle, rgba(0,0,0,0.08) 2px, transparent 2px);
+            background-size: 12px 12px;
+            z-index: 1;
+        }
+
+        /* Lookbook Content - Animated */
+        .lookbook-content-animated {
             padding: 40px 0;
+        }
+
+        /* Animation Classes */
+        .lookbook-animate {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lookbook-animate.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Feature Items */
+        .lookbook-features {
+            margin-bottom: 30px;
+        }
+
+        .lookbook-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 15px;
+            color: #555;
+        }
+
+        .lookbook-feature-item i {
+            color: var(--accent-color);
+            font-size: 16px;
+        }
+
+        /* CTA Button Hover Effect */
+        .lookbook-cta-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lookbook-cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .lookbook-cta-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .lookbook-images-enhanced {
+                padding: 40px 60px 80px 20px;
+                margin-bottom: 40px;
+            }
+
+            .lookbook-main-img {
+                width: 90%;
+            }
+
+            .lookbook-img-sub-wrap {
+                width: 60%;
+                right: 20px;
+            }
+
+            .lookbook-floating-badge {
+                right: -10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .lookbook-images-enhanced {
+                padding: 30px 40px 70px 10px;
+            }
+            
+            .lookbook-frame-accent {
+                display: none;
+            }
+
+            .lookbook-dots-pattern {
+                display: none;
+            }
+
+            .lookbook-floating-badge {
+                padding: 12px 16px;
+            }
+
+            .lookbook-floating-badge .badge-year {
+                font-size: 20px;
+            }
         }
 
         /* Brand Story Section */
@@ -4025,6 +4253,36 @@
             });
         }
 
+        // Lookbook Section Scroll Animations
+        function initLookbookAnimations() {
+            const lookbookSection = document.querySelector('.lookbook-section');
+            if (!lookbookSection) return;
+
+            const animateElements = lookbookSection.querySelectorAll('.lookbook-animate');
+            
+            const observerOptions = {
+                threshold: 0.2,
+                rootMargin: "0px 0px -100px 0px"
+            };
+
+            const lookbookObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Get all animate elements and trigger with staggered delays
+                        animateElements.forEach(el => {
+                            const delay = parseInt(el.dataset.delay) || 0;
+                            setTimeout(() => {
+                                el.classList.add('animated');
+                            }, delay);
+                        });
+                        lookbookObserver.disconnect();
+                    }
+                });
+            }, observerOptions);
+
+            lookbookObserver.observe(lookbookSection);
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // loadHeroSlider();
@@ -4037,6 +4295,9 @@
 
             // Premium Section Effects
             initPremiumEffects();
+
+            // Lookbook Animations
+            initLookbookAnimations();
         });
     </script>
 {% endblock %}
