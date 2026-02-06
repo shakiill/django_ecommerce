@@ -67,6 +67,14 @@ class ContactViewSet(viewsets.ModelViewSet):
         return super().get_authenticators()
     
     def create(self, request, *args, **kwargs):
+        # Honeypot check
+        if request.data.get('website'):
+            # Silently ignore if it's a bot (return success to fool them)
+            return Response(
+                {"message": "Thank you for contacting us! We will get back to you soon."},
+                status=status.HTTP_201_CREATED
+            )
+            
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

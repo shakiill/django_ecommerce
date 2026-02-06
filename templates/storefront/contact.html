@@ -63,6 +63,10 @@
         background: #444;
         color: #fff;
     }
+    .hp-field {
+        display: none !important;
+        visibility: hidden !important;
+    }
 </style>
 {% endblock %}
 
@@ -120,6 +124,11 @@
                     </div>
                     
                     <form id="contactForm">
+                        <!-- Honeypot field -->
+                        <div class="hp-field">
+                            <input type="text" name="website" tabindex="-1" autocomplete="off">
+                        </div>
+                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Full Name *</label>
