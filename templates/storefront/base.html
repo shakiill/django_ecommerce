@@ -351,6 +351,10 @@
                         <a href="#">Terms of Service</a>
                         <span class="divider"></span>
                         <a href="#">Cookie Policy</a>
+                        <span class="divider"></span>
+                        <a href="javascript:void(0)" onclick="clearCache()" class="text-danger fw-bold">
+                            <i class="fas fa-broom me-1"></i> Clean Cache
+                        </a>
                     </div>
                 </div>
             </div>
@@ -715,6 +719,17 @@
                 });
             } catch (error) {
                 console.error('Failed to update wishlist count:', error);
+            }
+        }
+
+        function clearCache() {
+            if (confirm('Are you sure you want to clear the site cache? This will log you out of guest sessions and reset local data.')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                showToast('Cache cleared! Reloading...', 'success');
+                setTimeout(() => {
+                    window.location.reload(true);
+                }, 1000);
             }
         }
 
