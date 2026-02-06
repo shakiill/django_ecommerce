@@ -27,9 +27,33 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product_image = serializers.SerializerMethodField()
+    product_slug = serializers.SerializerMethodField()
+    variant_name = serializers.SerializerMethodField()
+
     class Meta:
         model = OrderItem
-        fields = ["product_name", "sku", "unit_price", "quantity", "line_total"]
+        fields = ["product_name", "product_slug", "product_image", "variant_name", "sku", "unit_price", "quantity", "line_total"]
+
+    def get_variant_name(self, obj):
+        if obj.variant:
+            # Join attribute values like "Red, XL"
+            return ", ".join([v.value for v in obj.variant.attributes.all()])
+        return ""
+
+    def get_product_image(self, obj):
+        if obj.variant and obj.variant.product.images.exists():
+            image = obj.variant.product.images.first().image
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(image.url)
+            return image.url
+        return None
+
+    def get_product_slug(self, obj):
+        if obj.variant:
+            return obj.variant.product.slug
+        return ""
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -37,14 +61,19 @@ class OrderSerializer(serializers.ModelSerializer):
     shipping_address = AddressSerializer(read_only=True)
     billing_address = AddressSerializer(read_only=True)
 
+    items_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Order
         fields = [
             "id", "order_number", "status", "payment_status", "currency",
             "subtotal_amount", "discount_amount", "shipping_amount", "tax_amount", "total_amount",
-            "coupon_code", "created_at", "items", "shipping_address", "billing_address",
+            "coupon_code", "created_at", "items", "items_count", "shipping_address", "billing_address",
             "shipping_method", "shipping_method_name"
         ]
+
+    def get_items_count(self, obj):
+        return obj.items.count()
 
 
 class OrderCreateSerializer(serializers.Serializer):
@@ -86,10 +115,36 @@ class OrderViewSet(viewsets.ViewSet):
     def list(self, request):
         user, guest_token = _resolve_owner(request)
         if user:
-            qs = Order.objects.filter(user=user).order_by("-created_at")
+            qs = Order.objects.filter(user=user)
         else:
-            qs = Order.objects.filter(guest_token=guest_token).order_by("-created_at")
-        return Response(OrderSerializer(qs, many=True).data)
+            qs = Order.objects.filter(guest_token=guest_token)
+
+        # Filtering logic
+        status_filter = request.query_params.get('status')
+        date_from = request.query_params.get('created_at__gte')
+        date_to = request.query_params.get('created_at__lte')
+
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if date_from:
+            qs = qs.filter(created_at__date__gte=date_from)
+        if date_to:
+            qs = qs.filter(created_at__date__lte=date_to)
+
+        qs = qs.select_related('shipping_address', 'billing_address').prefetch_related('items', 'items__variant', 'items__variant__product', 'items__variant__product__images').order_by("-created_at")
+        
+        # Add pagination support for list view
+        from rest_framework.pagination import PageNumberPagination
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        paginator.page_size_query_param = 'page_size'
+        page = paginator.paginate_queryset(qs, request)
+        if page is not None:
+            serializer = OrderSerializer(page, many=True, context={'request': request})
+            return paginator.get_paginated_response(serializer.data)
+
+        serializer = OrderSerializer(qs, many=True, context={'request': request})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         user, guest_token = _resolve_owner(request)
@@ -100,7 +155,7 @@ class OrderViewSet(viewsets.ViewSet):
             order = qs.filter(guest_token=guest_token, pk=pk).first()
         if not order:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response(OrderSerializer(order).data)
+        return Response(OrderSerializer(order, context={'request': request}).data)
 
     def create(self, request):
         # keep_guest=True so we can optionally use a guest cart while authenticated

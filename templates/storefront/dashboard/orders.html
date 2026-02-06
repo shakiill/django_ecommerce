@@ -193,8 +193,8 @@
             
             const data = await apiFetch(`/orders/?${params}`);
             
-            if (data && data.length > 0) {
-                container.innerHTML = data.map(order => createPremiumOrderCard(order)).join('');
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = data.results.map(order => createPremiumOrderCard(order)).join('');
                 updatePagination(data);
             } else {
                 container.innerHTML = `
