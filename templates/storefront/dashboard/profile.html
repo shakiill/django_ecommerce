@@ -239,9 +239,18 @@
             // Set profile image
             if (data.photo) {
                 profilePreview.src = data.photo;
-                // Also update sidebar avatar if it exists
-                const sidebarAvatarImg = document.querySelector('#sidebar-avatar img');
-                if (sidebarAvatarImg) sidebarAvatarImg.src = data.photo;
+                
+                // Update sidebar avatar
+                const sidebarAvatar = document.getElementById('sidebar-avatar');
+                if (sidebarAvatar) {
+                    let img = sidebarAvatar.querySelector('img');
+                    if (!img) {
+                        // If no img tag exists (first letter showing), replace content with img
+                        sidebarAvatar.innerHTML = `<img src="${data.photo}" alt="User" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                    } else {
+                        img.src = data.photo;
+                    }
+                }
             }
             
             // Sync text with sidebar
