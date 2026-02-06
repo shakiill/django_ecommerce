@@ -567,7 +567,7 @@ a {
 .footer {
     background: var(--black);
     color: var(--gray-500);
-    padding: 80px 0 40px;
+    padding: 60px 0 40px;
 }
 
 .footer-heading {
@@ -1053,4 +1053,149 @@ a {
 .back-to-top:hover {
     background: var(--black);
     transform: translateY(-5px);
+}
+
+/* --- Global Confidence Section (Integrated with Footer) --- */
+.confidence-footer-merge {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 40px;
+    margin-bottom: 60px;
+}
+
+.confidence-badge-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.c-badge-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.c-badge-item i {
+    font-size: 28px;
+    color: var(--accent-color);
+    opacity: 0.9;
+}
+
+.c-badge-text h6 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+    color: #fff;
+}
+
+.c-badge-text span {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    display: block;
+}
+
+.confidence-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.payment-side {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.side-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.payment-strip-minimal {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.payment-strip-minimal img,
+.payment-strip-minimal i {
+    height: 22px;
+    font-size: 22px;
+    filter: grayscale(1) brightness(200%);
+    opacity: 0.3;
+    transition: all 0.3s;
+}
+
+.payment-strip-minimal .nagad-white {
+    filter: brightness(0) invert(1);
+}
+
+.payment-strip-minimal img:hover,
+.payment-strip-minimal i:hover {
+    filter: none;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.stats-side {
+    display: flex;
+    gap: 50px;
+}
+
+.stat-luxury {
+    text-align: right;
+}
+
+.stat-luxury strong {
+    display: block;
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+}
+
+.stat-luxury small {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 991px) {
+    .confidence-badge-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .confidence-footer-row {
+        flex-direction: column;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .payment-side {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .stats-side {
+        justify-content: center;
+        width: 100%;
+        gap: 30px;
+    }
+
+    .stat-luxury {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .confidence-badge-grid {
+        grid-template-columns: 1fr;
+    }
 }
