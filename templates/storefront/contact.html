@@ -1,0 +1,192 @@
+{% extends 'storefront/base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - UOMO{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-container {
+        padding: 80px 0;
+    }
+    .contact-info {
+        background: #f8f9fa;
+        padding: 40px;
+        border-radius: 8px;
+        height: 100%;
+    }
+    .contact-form-wrapper {
+        padding: 40px;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+    .info-item {
+        margin-bottom: 30px;
+        display: flex;
+        align-items: flex-start;
+    }
+    .info-item i {
+        font-size: 24px;
+        color: #222;
+        margin-right: 20px;
+        margin-top: 5px;
+    }
+    .info-item h5 {
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+    .info-item p {
+        color: #777;
+        margin-bottom: 0;
+    }
+    .section-title {
+        margin-bottom: 30px;
+    }
+    .section-title h2 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .form-control:focus {
+        border-color: #222;
+        box-shadow: none;
+    }
+    .btn-submit {
+        background: #222;
+        color: #fff;
+        padding: 12px 30px;
+        border-radius: 4px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-submit:hover {
+        background: #444;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-container">
+    <div class="footer-container">
+        <div class="row g-4">
+            <!-- Contact Info -->
+            <div class="col-lg-4">
+                <div class="contact-info">
+                    <div class="section-title">
+                        <h2>Get Content</h2>
+                        <p>Have a question or just want to say hi? We'd love to hear from you.</p>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-location-dot"></i>
+                        <div>
+                            <h5>Headquarters</h5>
+                            <p>123 Fashion Street, Suite 456<br>New York, NY 10001</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h5>Phone</h5>
+                            <p>+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h5>Email</h5>
+                            <p>hello@uomo.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h5>Working Hours</h5>
+                            <p>Mon - Fri: 9am - 6pm<br>Sat: 10am - 4pm</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="contact-form-wrapper">
+                    <div class="section-title">
+                        <h2>Send us a Message</h2>
+                    </div>
+                    
+                    <form id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="+1234567890">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Subject *</label>
+                                <input type="text" name="subject" class="form-control" placeholder="Inquiry about..." required>
+                            </div>
+                            <div class="col-12 mb-4">
+                                <label class="form-label">Message *</label>
+                                <textarea name="message" class="form-control" rows="5" placeholder="How can we help you?" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-submit" id="submitBtn">
+                                    <span class="spinner-border spinner-border-sm d-none" id="loader"></span>
+                                    Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const btn = document.getElementById('submitBtn');
+    const loader = document.getElementById('loader');
+    
+    // Disable button and show loader
+    btn.disabled = true;
+    loader.classList.remove('d-none');
+    
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    try {
+        const response = await apiFetch('/contacts/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        
+        showToast('Message sent successfully! We will contact you soon.', 'success');
+        form.reset();
+    } catch (error) {
+        console.error('Contact Error:', error);
+        showToast(error.message || 'Failed to send message. Please try again.', 'danger');
+    } finally {
+        btn.disabled = false;
+        loader.classList.add('d-none');
+    }
+});
+</script>
+{% endblock %}

@@ -60,6 +60,7 @@ router.register(r'order_trucking', TruckingOrderViewSet, basename='public_order_
 
 # API URLs for normal users
 router.register(r'public-main-slider', cms_views.MainSliderViewSet, basename='public-main-slider')
+router.register(r'contacts', cms_views.ContactViewSet, basename='public_contact')
 
 urlpatterns = [
     # Public docs endpoint (share this link)

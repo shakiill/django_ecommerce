@@ -305,6 +305,16 @@
                         </div>
 
 
+                        <!--begin:Menu item - Contacts-->
+                        <div class="menu-item">
+                            <a class="menu-link {% if request.resolver_match.url_name == 'contact_list' %}active{% endif %}"
+                               href="{% url 'cms:contact_list' %}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Contact Submissions</span>
+                            </a>
+                        </div>
+
+
                     </div>
                     <!--end:Menu sub-->
                 </div>

@@ -1,11 +1,26 @@
 from rest_framework import serializers
 
-from apps.cms.models import MainSlider, MenuSection, MenuGroup, MenuItem
+from apps.cms.models import MainSlider, MenuSection, MenuGroup, MenuItem, Contact
 
 
 class MainSliderSerializer(serializers.ModelSerializer):
     class Meta:
         model = MainSlider
+        fields = '__all__'
+
+
+class ContactSerializer(serializers.ModelSerializer):
+    """Serializer for contact form submissions."""
+    class Meta:
+        model = Contact
+        fields = ['id', 'name', 'email', 'phone', 'subject', 'message', 'status', 'created_at']
+        read_only_fields = ['id', 'status', 'created_at']
+
+
+class ContactListSerializer(serializers.ModelSerializer):
+    """Serializer for staff to view contact submissions."""
+    class Meta:
+        model = Contact
         fields = '__all__'
 
 

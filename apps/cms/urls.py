@@ -1,10 +1,12 @@
 from django.urls import path
 from . import slider as slider_views
 from . import menu as menu_views
+from . import contact as contact_views
 
 app_name = "cms"
 
 urlpatterns = [
+    path("contacts/", contact_views.contact_list, name="contact_list"),
     path("sliders/", slider_views.slider_list, name="slider_list"),
     path("sliders/create/", slider_views.slider_create, name="slider_create"),
     path("sliders/<int:pk>/edit/", slider_views.slider_edit, name="slider_edit"),

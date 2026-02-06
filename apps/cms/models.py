@@ -122,3 +122,31 @@ class HomeSection(models.Model):
 
     def __str__(self):
         return self.get_section_type_display()
+
+
+class Contact(models.Model):
+    """Model to store contact form submissions."""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('read', 'Read'),
+        ('replied', 'Replied'),
+        ('closed', 'Closed'),
+    ]
+
+    name = models.CharField(max_length=150)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    staff_notes = models.TextField(blank=True, null=True, help_text="Internal notes for staff members")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Contact Submission'
+        verbose_name_plural = 'Contact Submissions'
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MainSlider, MenuSection, MenuGroup, MenuItem, HomeSection
+from .models import MainSlider, MenuSection, MenuGroup, MenuItem, HomeSection, Contact
 
 
 @admin.register(MainSlider)
@@ -56,3 +56,29 @@ class MenuItemAdmin(admin.ModelAdmin):
     list_filter = ("group__section", "group", "is_active")
     search_fields = ("name", "title", "href", "group__name", "group__section__slug")
     ordering = ("group", "order")
+
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ("name", "email", "subject", "status", "created_at")
+    list_filter = ("status", "created_at")
+    search_fields = ("name", "email", "subject", "message")
+    readonly_fields = ("name", "email", "phone", "subject", "message", "created_at", "updated_at")
+    list_editable = ("status",)
+    ordering = ("-created_at",)
+    
+    fieldsets = (
+        ("Contact Information", {
+            "fields": ("name", "email", "phone")
+        }),
+        ("Message", {
+            "fields": ("subject", "message")
+        }),
+        ("Status & Notes", {
+            "fields": ("status", "staff_notes")
+        }),
+        ("Timestamps", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",)
+        }),
+    )

@@ -109,3 +109,10 @@ class CustomerRegisterView(TemplateView):
     Customer registration page.
     """
     template_name = 'storefront/register.html'
+
+
+class ContactView(TemplateView):
+    """
+    Public contact page.
+    """
+    template_name = 'storefront/contact.html'

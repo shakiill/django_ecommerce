@@ -1,0 +1,149 @@
+{% extends 'includes/main_layout.html' %}
+{% load static %}
+
+{% block title %} Contact Submissions | Admin {% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                        Contact Submissions
+                    </h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a href="/" class="text-muted text-hover-primary">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">CMS</li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Contacts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table align-middle table-row-dashed fs-6 gy-5">
+                                <thead>
+                                <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                                    <th>Date</th>
+                                    <th>Name</th>
+                                    <th>Email / Phone</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody class="fw-semibold text-gray-600">
+                                {% for c in contacts %}
+                                    <tr>
+                                        <td>{{ c.created_at|date:"M d, Y H:i" }}</td>
+                                        <td>{{ c.name }}</td>
+                                        <td>
+                                            {{ c.email }}<br>
+                                            <small class="text-muted">{{ c.phone|default:"" }}</small>
+                                        </td>
+                                        <td>{{ c.subject }}</td>
+                                        <td>
+                                            {% if c.status == 'pending' %}
+                                                <span class="badge badge-light-warning">Pending</span>
+                                            {% elif c.status == 'read' %}
+                                                <span class="badge badge-light-primary">Read</span>
+                                            {% elif c.status == 'replied' %}
+                                                <span class="badge badge-light-success">Replied</span>
+                                            {% else %}
+                                                <span class="badge badge-light-info">{{ c.status|title }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-light-primary" data-bs-toggle="modal" data-bs-target="#modal-view-{{ c.id }}">View</button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- View Modal -->
+                                    <div class="modal fade" id="modal-view-{{ c.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Contact Submission Detail</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <label class="fw-bold">From:</label>
+                                                            <p>{{ c.name }}</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="fw-bold">Date:</label>
+                                                            <p>{{ c.created_at|date:"F d, Y H:i" }}</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="fw-bold">Email:</label>
+                                                            <p>{{ c.email }}</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="fw-bold">Phone:</label>
+                                                            <p>{{ c.phone|default:"N/A" }}</p>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label class="fw-bold">Subject:</label>
+                                                            <p>{{ c.subject }}</p>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label class="fw-bold">Message:</label>
+                                                            <div class="p-4 bg-light rounded">
+                                                                {{ c.message|linebreaks }}
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+                                                        <form action="#" method="post">
+                                                            {% csrf_token %}
+                                                            <div class="col-12 mt-3">
+                                                                <label class="form-label fw-bold">Internal Staff Notes</label>
+                                                                <textarea name="staff_notes" class="form-control" rows="3">{{ c.staff_notes|default:"" }}</textarea>
+                                                            </div>
+                                                            <div class="col-md-4 mt-3">
+                                                                <label class="form-label fw-bold">Status</label>
+                                                                <select name="status" class="form-select">
+                                                                    <option value="pending" {% if c.status == 'pending' %}selected{% endif %}>Pending</option>
+                                                                    <option value="read" {% if c.status == 'read' %}selected{% endif %}>Read</option>
+                                                                    <option value="replied" {% if c.status == 'replied' %}selected{% endif %}>Replied</option>
+                                                                    <option value="closed" {% if c.status == 'closed' %}selected{% endif %}>Closed</option>
+                                                                </select>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary" onclick="alert('Feature coming soon: Saving notes and status via this modal.')">Save (Wait...)</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End View Modal -->
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-5">No contact submissions yet.</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

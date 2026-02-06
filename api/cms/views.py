@@ -1,11 +1,11 @@
-from rest_framework import viewsets, views
-from rest_framework.permissions import AllowAny
+from rest_framework import viewsets, views, status
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from django.core.cache import cache
 from django.conf import settings
 
-from api.cms.serializers import MainSliderSerializer, build_mega_menu_structure
-from apps.cms.models import MainSlider, MenuSection, MEGA_MENU_CACHE_KEY
+from api.cms.serializers import MainSliderSerializer, ContactSerializer, ContactListSerializer, build_mega_menu_structure
+from apps.cms.models import MainSlider, MenuSection, Contact, MEGA_MENU_CACHE_KEY
 
 
 class MainSliderViewSet(viewsets.ModelViewSet):
@@ -40,3 +40,37 @@ class MegaMenuView(views.APIView):
             .order_by('order', 'id')
         )
         return build_mega_menu_structure(sections)
+
+
+class ContactViewSet(viewsets.ModelViewSet):
+    """ViewSet for contact form submissions.
+    
+    - Public users can POST to submit contact forms
+    - Staff users can view all submissions
+    """
+    queryset = Contact.objects.all()
+    pagination_class = None
+    
+    def get_serializer_class(self):
+        if getattr(self, 'action', None) in ['list', 'retrieve']:
+            return ContactListSerializer
+        return ContactSerializer
+    
+    def get_permissions(self):
+        if getattr(self, 'action', None) == 'create':
+            return [AllowAny()]
+        return [IsAdminUser()]
+    
+    def get_authenticators(self):
+        if getattr(self, 'action', None) == 'create':
+            return []
+        return super().get_authenticators()
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(
+            {"message": "Thank you for contacting us! We will get back to you soon."},
+            status=status.HTTP_201_CREATED
+        )
