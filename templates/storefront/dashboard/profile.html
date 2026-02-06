@@ -7,108 +7,137 @@
 <style>
     .profile-card {
         background: #fff;
-        border-radius: 20px;
+        border-radius: 24px;
         padding: 40px;
         box-shadow: var(--dash-shadow);
         border: var(--dash-border);
     }
 
     .form-section-title {
-        font-weight: 800;
+        font-weight: 880;
         font-size: 1.25rem;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         padding-bottom: 15px;
         border-bottom: 2px solid rgba(255, 78, 80, 0.1);
         display: inline-block;
+        color: var(--theme-black);
     }
 
-    .profile-form .form-label-premium {
+    .premium-label {
         font-weight: 700;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
         color: var(--gray-500);
         margin-bottom: 10px;
+        display: block;
     }
 
-    .profile-form .form-control-premium {
-        height: 55px;
-        border-radius: 12px;
-        border: 2px solid var(--gray-200);
-        padding: 0 20px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        background-color: #fcfcfc;
+    .premium-input {
+        height: 60px;
+        border-radius: 16px !important;
+        border: 2px solid #f0f0f0 !important;
+        padding: 0 25px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        background-color: #fcfcfc !important;
     }
 
-    .profile-form .form-control-premium:focus {
-        background-color: #fff;
-        border-color: var(--dash-primary);
-        box-shadow: 0 0 0 4px rgba(255, 78, 80, 0.05);
+    .premium-input:focus {
+        background-color: #fff !important;
+        border-color: var(--dash-primary) !important;
+        box-shadow: 0 10px 25px rgba(255, 78, 80, 0.08) !important;
+        transform: translateY(-2px);
     }
 
-    .profile-form .form-control-premium[readonly] {
-        background-color: #f8f9fa;
-        color: var(--gray-500);
+    .premium-input[readonly] {
+        background-color: #f8f9fa !important;
+        border-color: #eee !important;
+        color: #999 !important;
         cursor: not-allowed;
     }
 
-    .update-profile-btn {
-        background: var(--theme-black);
-        color: white;
-        padding: 16px 40px;
-        border-radius: 30px;
-        font-weight: 800;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
-        border: none;
-        margin-top: 20px;
+    .textarea-premium {
+        height: auto !important;
+        padding: 20px 25px !important;
+        min-height: 120px;
     }
 
-    .update-profile-btn:hover {
+    .save-profile-btn {
+        background: var(--theme-black);
+        color: white;
+        padding: 18px 45px;
+        border-radius: 50px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: none;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .save-profile-btn:hover {
         background: var(--dash-primary);
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(255, 78, 80, 0.2);
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(255, 78, 80, 0.25);
+        color: #fff;
+    }
+
+    .save-profile-btn:active {
+        transform: translateY(-1px);
     }
 </style>
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="dashboard-header-premium mb-4">
-    <h2>Account Details</h2>
-    <p>Update your personal information and email address.</p>
+<div class="dashboard-header-premium mb-4 animate-fade-in">
+    <h2 class="fw-900">Account Settings</h2>
+    <p class="text-muted">Manage your identity and how others see you on UOMO.</p>
 </div>
 
-<div class="profile-card animate-fade-in">
-    <h4 class="form-section-title">Personal Information</h4>
+<div class="profile-card animate-fade-in" style="animation-delay: 0.1s;">
+    <h4 class="form-section-title">Personal Details</h4>
     
-    <form id="profile-form" class="profile-form">
+    <form id="profile-form">
         <div class="row">
-            <div class="col-md-12 mb-4">
-                <label class="form-label-premium">Username</label>
-                <input type="text" class="form-control form-control-premium" id="username" readonly>
-                <small class="text-muted">Username cannot be changed.</small>
-            </div>
-            
-            <div class="col-md-12 mb-4">
-                <label class="form-label-premium">Email Address</label>
-                <input type="email" class="form-control form-control-premium" id="email" placeholder="Enter your email">
+            <div class="col-md-6 mb-4">
+                <label class="premium-label">Phone Number (Username)</label>
+                <input type="text" class="form-control premium-input" id="username" readonly>
             </div>
             
             <div class="col-md-6 mb-4">
-                <label class="form-label-premium">First Name</label>
-                <input type="text" class="form-control form-control-premium" id="first_name" placeholder="John">
+                <label class="premium-label">Email Address</label>
+                <input type="email" class="form-control premium-input" id="email" name="email" placeholder="yourname@example.com">
+            </div>
+            
+            <div class="col-12 mb-4">
+                <label class="premium-label">Full Name</label>
+                <input type="text" class="form-control premium-input" id="name" name="name" placeholder="Enter your full name" required>
             </div>
             
             <div class="col-md-6 mb-4">
-                <label class="form-label-premium">Last Name</label>
-                <input type="text" class="form-control form-control-premium" id="last_name" placeholder="Doe">
+                <label class="premium-label">Occupation</label>
+                <input type="text" class="form-control premium-input" id="occupation" name="occupation" placeholder="e.g. Software Engineer">
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <label class="premium-label">Date of Birth</label>
+                <input type="date" class="form-control premium-input" id="dob" name="dob">
+            </div>
+
+            <div class="col-12 mb-4">
+                <label class="premium-label">Bio (Short Description)</label>
+                <textarea class="form-control premium-input textarea-premium" id="bio" name="bio" placeholder="Tell us a bit about yourself..."></textarea>
+            </div>
+
+            <div class="col-12 mb-4">
+                <label class="premium-label">Permanent Address</label>
+                <textarea class="form-control premium-input textarea-premium" id="address" name="address" placeholder="Enter your full address"></textarea>
             </div>
         </div>
         
-        <div class="text-end">
-            <button type="submit" class="update-profile-btn">
+        <div class="mt-4 pt-4 border-top">
+            <button type="submit" class="save-profile-btn" id="save-btn">
                 SAVE CHANGES
             </button>
         </div>
@@ -120,47 +149,59 @@
 <script>
     async function loadProfile() {
         try {
-            const data = await apiFetch('/auth/user/');
-            document.getElementById('username').value = data.username || '';
-            document.getElementById('email').value = data.email || '';
-            document.getElementById('first_name').value = data.first_name || '';
-            document.getElementById('last_name').value = data.last_name || '';
+            // Updated to use the correct profile-update endpoint which now supports GET
+            const data = await apiFetch('/profile-update/');
             
-            // Update sidebar too if needed
-            if (document.getElementById('sidebar-name')) {
-                document.getElementById('sidebar-name').textContent = data.username;
-            }
-            if (document.getElementById('sidebar-email')) {
-                document.getElementById('sidebar-email').textContent = data.email;
-            }
+            // Map data to fields
+            document.getElementById('username').value = data.username || data.phone || '';
+            document.getElementById('email').value = data.email || '';
+            document.getElementById('name').value = data.name || '';
+            document.getElementById('occupation').value = data.occupation || '';
+            document.getElementById('dob').value = data.dob || '';
+            document.getElementById('bio').value = data.bio || '';
+            document.getElementById('address').value = data.address || '';
+            
+            // Sync with sidebar
+            const sidebarName = document.getElementById('sidebar-name');
+            const sidebarEmail = document.getElementById('sidebar-email');
+            if (sidebarName) sidebarName.textContent = data.name || data.username;
+            if (sidebarEmail) sidebarEmail.textContent = data.email;
+            
         } catch (error) {
             console.error('Failed to load profile:', error);
-            showToast('Failed to load profile', 'danger');
+            showToast('Failed to load profile data', 'danger');
         }
     }
     
     document.getElementById('profile-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn = e.target.querySelector('button');
+        const btn = document.getElementById('save-btn');
         const originalText = btn.textContent;
-        btn.textContent = 'SAVING...';
+        
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> SAVING...';
         btn.disabled = true;
         
+        // Collect form data
+        const formData = {
+            email: document.getElementById('email').value,
+            name: document.getElementById('name').value,
+            occupation: document.getElementById('occupation').value,
+            dob: document.getElementById('dob').value || null,
+            bio: document.getElementById('bio').value,
+            address: document.getElementById('address').value
+        };
+        
         try {
-            await apiFetch('/auth/user/', {
+            await apiFetch('/profile-update/', {
                 method: 'PATCH',
-                body: JSON.stringify({
-                    email: document.getElementById('email').value,
-                    first_name: document.getElementById('first_name').value,
-                    last_name: document.getElementById('last_name').value
-                })
+                body: JSON.stringify(formData)
             });
             
             showToast('Profile updated successfully!', 'success');
-            loadProfile(); // Refresh
+            loadProfile(); // Refresh sidebar and fields
         } catch (error) {
             console.error('Failed to update profile:', error);
-            showToast('Failed to update profile', 'danger');
+            showToast('Error: ' + error.message, 'danger');
         } finally {
             btn.textContent = originalText;
             btn.disabled = false;

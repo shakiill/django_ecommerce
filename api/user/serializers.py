@@ -61,10 +61,11 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'name', 'f_name', 'm_name', 'occupation', 'email', 'photo', 'cover_photo', 'signature',
+            'username', 'name', 'f_name', 'm_name', 'occupation', 'email', 'photo', 'cover_photo', 'signature',
             'nid', 'dob', 'address', 'bio',
         ]
         extra_kwargs = {
+            'username': {'read_only': True},
             'email': {'required': False},
             'photo': {'required': False},
             'cover_photo': {'required': False},

@@ -107,9 +107,11 @@ class TokenValidView(APIView):
         return Response(False)
 
 
-class ProfileUpdateView(generics.UpdateAPIView):
+class ProfileUpdateView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
-    authentication_classes = [TokenAuthentication]
+    # Support both session auth for dashboard and token for other apps
+    from rest_framework.authentication import SessionAuthentication
+    authentication_classes = [TokenAuthentication, SessionAuthentication] 
     serializer_class = ProfileUpdateSerializer
 
     def get_object(self):
