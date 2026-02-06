@@ -150,9 +150,9 @@
                         <a href="/products/${item.product_slug}/" class="product-name-link">${item.product_name}</a>
                         ${item.variant_name ? `<div class="small text-muted mt-1">Variant: ${item.variant_name}</div>` : ''}
                     </td>
-                    <td class="text-center fw-bold">৳${parseFloat(item.price).toFixed(2)}</td>
+                    <td class="text-center fw-bold">৳${parseFloat(item.unit_price || 0).toFixed(2)}</td>
                     <td class="text-center fw-bold">x${item.quantity}</td>
-                    <td class="text-end fw-800">৳${(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
+                    <td class="text-end fw-800">৳${parseFloat(item.line_total || 0).toFixed(2)}</td>
                 </tr>
             `).join('');
 
@@ -208,23 +208,34 @@
                                 <h4 class="fw-800 text-uppercase mb-4" style="font-size: 1rem; letter-spacing: 1px;">Summary</h4>
                                 <div class="summary-row">
                                     <span>Subtotal</span>
-                                    <span>৳${parseFloat(order.total_amount).toFixed(2)}</span>
+                                    <span>৳${parseFloat(order.subtotal_amount || 0).toFixed(2)}</span>
                                 </div>
                                 <div class="summary-row">
                                     <span>Shipping</span>
-                                    <span>৳0.00</span>
+                                    <span>৳${parseFloat(order.shipping_amount || 0).toFixed(2)}</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Discount</span>
+                                    <span>-৳${parseFloat(order.discount_amount || 0).toFixed(2)}</span>
                                 </div>
                                 <div class="summary-row total">
                                     <span>TOTAL</span>
-                                    <span>৳${parseFloat(order.total_amount).toFixed(2)}</span>
+                                    <span>৳${parseFloat(order.total_amount || 0).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
                              <div class="order-summary-card h-100">
                                 <h4 class="fw-800 text-uppercase mb-4" style="font-size: 1rem; letter-spacing: 1px;">Shipping Address</h4>
-                                <p class="mb-1 fw-bold">${order.shipping_address_name || user.username}</p>
-                                <p class="mb-0 text-muted">${order.shipping_address || 'Address details not stored with order.'}</p>
+                                ${order.shipping_address ? `
+                                    <p class="mb-1 fw-bold">${order.shipping_address.full_name}</p>
+                                    <p class="mb-1">${order.shipping_address.phone}</p>
+                                    <p class="mb-0 text-muted">
+                                        ${order.shipping_address.line1}, ${order.shipping_address.line2 ? order.shipping_address.line2 + ', ' : ''}<br>
+                                        ${order.shipping_address.city}, ${order.shipping_address.state}, ${order.shipping_address.postal_code}<br>
+                                        ${order.shipping_address.country}
+                                    </p>
+                                ` : '<p class="text-muted">No shipping address recorded.</p>'}
                             </div>
                         </div>
                     </div>
