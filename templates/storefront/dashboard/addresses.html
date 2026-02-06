@@ -23,6 +23,7 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        height: 100%;
     }
 
     .premium-address-card:hover {
@@ -167,38 +168,66 @@
         transform: rotate(90deg);
     }
 
-    /* Modal Tweaks */
-    .modal-xl-custom {
-        max-width: 800px;
+    .add-address-btn {
+        background: var(--theme-black);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
+    .add-address-btn:hover {
+        background: var(--dash-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Modal Styling */
     .modal-content-premium {
         border-radius: 28px;
         overflow: hidden;
         border: none;
-        box-shadow: 0 25px 80px rgba(0,0,0,0.2);
+        box-shadow: 0 25px 100px rgba(0,0,0,0.3);
     }
 
-    .form-floating > label {
-        font-weight: 600;
-        font-size: 0.9rem;
+    .sh-label {
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: var(--gray-500);
+        margin-bottom: 8px;
+        display: block;
     }
 
-    .form-control:focus {
-        box-shadow: 0 0 0 4px rgba(255, 78, 80, 0.1);
-        border-color: var(--dash-primary);
+    .premium-input {
+        border-radius: 12px !important;
+        border: 1px solid rgba(0,0,0,0.1) !important;
+        padding: 12px 15px !important;
+        font-size: 0.95rem !important;
+    }
+
+    .premium-input:focus {
+        border-color: var(--dash-primary) !important;
+        box-shadow: 0 0 0 4px rgba(255, 78, 80, 0.1) !important;
+        outline: none;
     }
 </style>
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="dashboard-header-premium mb-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h2 class="fw-900 mb-1">Addresses</h2>
-            <p class="text-muted">Manage your delivery points for a smoother shopping experience.</p>
-        </div>
+<div class="dashboard-header-premium d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-900 mb-1">Addresses</h2>
+        <p class="text-muted mb-0">Manage your shipping and billing locations.</p>
     </div>
+    <button class="add-address-btn" onclick="openAddModal()">
+        <i class="fas fa-plus"></i> ADD NEW ADDRESS
+    </button>
 </div>
 
 <div id="addresses-container">
@@ -208,102 +237,102 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Address Modal -->
-<div class="modal fade" id="addressModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-xl-custom">
+{% block dash_extra_js %}
+<!-- Moving Modal HTML here outside the animated dashboard content to prevent backdrop overlay issues -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content modal-content-premium">
             <form id="address-form">
                 <input type="hidden" name="id" id="address_id">
                 <div class="modal-header border-0 p-4 pb-0">
                     <h4 class="fw-900 mb-0" id="modalTitle">Add New Address</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control rounded-4" name="title" id="addr_title" placeholder="Home, Office...">
-                                <label>Address Label (e.g. Home)</label>
+                        <div class="col-md-5">
+                            <div class="form-group mb-3">
+                                <label class="sh-label">Address Label</label>
+                                <input type="text" class="form-control premium-input" name="title" id="addr_title" placeholder="e.g. Home, Office">
                             </div>
                         </div>
-                        <div class="col-md-8">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control rounded-4" name="full_name" id="addr_full_name" placeholder="Full Name" required>
-                                <label>Recipient's Full Name</label>
+                        <div class="col-md-7">
+                            <div class="form-group mb-3">
+                                <label class="sh-label">Full Name</label>
+                                <input type="text" class="form-control premium-input" name="full_name" id="addr_full_name" placeholder="Recipient's Name" required>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="email" class="form-control rounded-4" name="email" id="addr_email" placeholder="Email (Optional)">
-                                <label>Contact Email (Optional)</label>
+                            <div class="form-group mb-3">
+                                <label class="sh-label">Email Address</label>
+                                <input type="email" class="form-control premium-input" name="email" id="addr_email" placeholder="email@example.com">
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control rounded-4" name="phone" id="addr_phone" placeholder="Phone Number" required>
-                                <label>Phone Number</label>
+                            <div class="form-group mb-3">
+                                <label class="sh-label">Phone Number</label>
+                                <input type="text" class="form-control premium-input" name="phone" id="addr_phone" placeholder="01XXX-XXXXXX" required>
                             </div>
                         </div>
 
                         <div class="col-12">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control rounded-4" name="line1" id="addr_line1" placeholder="Address Line 1" required>
-                                <label>Address Line 1 (Street/House/Plot)</label>
+                            <div class="form-group mb-3">
+                                <label class="sh-label">Address Line 1</label>
+                                <input type="text" class="form-control premium-input" name="line1" id="addr_line1" placeholder="Street, House, Plot" required>
                             </div>
                         </div>
                         <div class="col-12">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control rounded-4" name="line2" id="addr_line2" placeholder="Address Line 2 (Optional)">
-                                <label>Address Line 2 (Apartment/Suite/Area)</label>
+                            <div class="form-group mb-3">
+                                <label class="sh-label">Address Line 2 (Optional)</label>
+                                <input type="text" class="form-control premium-input" name="line2" id="addr_line2" placeholder="Apartment, Suite, Area">
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control rounded-4" name="city" id="addr_city" placeholder="City" required>
-                                <label>City</label>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label class="sh-label">City</label>
+                                <input type="text" class="form-control premium-input" name="city" id="addr_city" placeholder="City" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control rounded-4" name="state" id="addr_state" placeholder="State/Province">
-                                <label>State / Province</label>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label class="sh-label">State</label>
+                                <input type="text" class="form-control premium-input" name="state" id="addr_state" placeholder="State">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label class="sh-label">Postal Code</label>
+                                <input type="text" class="form-control premium-input" name="postal_code" id="addr_postal_code" placeholder="Zip" required>
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control rounded-4" name="postal_code" id="addr_postal_code" placeholder="Postal Code" required>
-                                <label>Postal Code</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <select class="form-select rounded-4" name="country" id="addr_country" required>
+                        <div class="col-12">
+                            <div class="form-group mb-3">
+                                <label class="sh-label">Country</label>
+                                <select class="form-select premium-input" name="country" id="addr_country" required>
                                     <option value="BD">Bangladesh</option>
                                     <option value="US">United States</option>
                                     <option value="UK">United Kingdom</option>
                                     <option value="CA">Canada</option>
                                     <option value="IN">India</option>
                                 </select>
-                                <label>Country</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">CANCEL</button>
                     <button type="submit" class="btn btn-dark rounded-pill px-5 fw-bold" id="saveBtn">SAVE ADDRESS</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block dash_extra_js %}
 <script>
     const addressModal = new bootstrap.Modal(document.getElementById('addressModal'));
     const addressForm = document.getElementById('address-form');
