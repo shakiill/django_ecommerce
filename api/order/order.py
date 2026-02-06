@@ -23,7 +23,7 @@ def _resolve_owner(request, keep_guest=False):
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = ["id", "full_name", "email", "phone", "line1", "line2", "city", "state", "postal_code", "country"]
+        fields = ["id", "title", "full_name", "email", "phone", "line1", "line2", "city", "state", "postal_code", "country"]
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

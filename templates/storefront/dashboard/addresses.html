@@ -7,155 +7,297 @@
 <style>
     .address-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 25px;
         margin-top: 30px;
     }
 
     .premium-address-card {
         background: #fff;
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: var(--dash-shadow);
-        border: var(--dash-border);
-        transition: all 0.3s ease;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         position: relative;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
     }
 
     .premium-address-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 45px rgba(0,0,0,0.06);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
         border-color: rgba(255, 78, 80, 0.2);
     }
 
-    .address-type-icon {
-        width: 45px;
-        height: 45px;
+    .address-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
         background: rgba(255, 78, 80, 0.1);
         color: var(--dash-primary);
-        border-radius: 12px;
+        padding: 5px 15px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .address-icon-circle {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        margin-bottom: 20px;
+        font-size: 20px;
+        color: var(--theme-black);
+        margin-bottom: 25px;
+        box-shadow: inset 0 2px 5px rgba(255,255,255,1), 0 5px 15px rgba(0,0,0,0.05);
     }
 
-    .address-line {
-        font-weight: 700;
-        font-size: 1.1rem;
+    .address-name {
+        font-weight: 800;
+        font-size: 1.25rem;
         color: var(--theme-black);
         margin-bottom: 8px;
     }
 
-    .address-city {
+    .address-details {
+        flex: 1;
+    }
+
+    .address-detail-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
         color: var(--gray-600);
         font-size: 0.95rem;
-        margin-bottom: 20px;
+        align-items: flex-start;
+    }
+
+    .address-detail-item i {
+        margin-top: 4px;
+        font-size: 0.9rem;
+        opacity: 0.7;
+        width: 15px;
     }
 
     .address-actions {
         display: flex;
-        gap: 15px;
-        border-top: 1px solid rgba(0,0,0,0.05);
-        padding-top: 20px;
+        gap: 12px;
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px dashed rgba(0,0,0,0.1);
     }
 
-    .add-address-btn {
-        background: var(--theme-black);
-        color: white;
-        padding: 15px 30px;
+    .address-btn {
+        flex: 1;
+        padding: 10px;
         border-radius: 12px;
-        font-weight: 700;
-        transition: all 0.3s ease;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .add-address-btn:hover {
-        background: var(--dash-primary);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(255, 78, 80, 0.2);
-    }
-
-    /* Modal Styling */
-    .modal-content-premium {
-        border-radius: 24px;
-        border: none;
-        box-shadow: 0 25px 80px rgba(0,0,0,0.15);
-    }
-
-    .modal-header-premium {
-        border-bottom: none;
-        padding: 30px 30px 10px;
-    }
-
-    .modal-body-premium {
-        padding: 10px 30px 30px;
-    }
-
-    .form-label-premium {
         font-weight: 700;
         font-size: 0.85rem;
         text-transform: uppercase;
-        color: var(--gray-500);
-        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: none;
+    }
+
+    .btn-edit {
+        background: rgba(0,0,0,0.03);
+        color: var(--theme-black);
+    }
+
+    .btn-edit:hover {
+        background: var(--theme-black);
+        color: #fff;
+    }
+
+    .btn-delete {
+        background: rgba(255, 78, 80, 0.05);
+        color: #ff4e50;
+    }
+
+    .btn-delete:hover {
+        background: #ff4e50;
+        color: #fff;
+    }
+
+    .add-address-card {
+        border: 2px dashed rgba(0,0,0,0.1);
+        background: transparent;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        min-height: 320px;
+        border-radius: 24px;
+        transition: all 0.3s;
+    }
+
+    .add-address-card:hover {
+        border-color: var(--dash-primary);
+        background: rgba(255, 78, 80, 0.02);
+    }
+
+    .add-icon-plus {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--theme-black);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+
+    .add-address-card:hover .add-icon-plus {
+        background: var(--dash-primary);
+        transform: rotate(90deg);
+    }
+
+    /* Modal Tweaks */
+    .modal-xl-custom {
+        max-width: 800px;
+    }
+
+    .modal-content-premium {
+        border-radius: 28px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 25px 80px rgba(0,0,0,0.2);
+    }
+
+    .form-floating > label {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 4px rgba(255, 78, 80, 0.1);
+        border-color: var(--dash-primary);
     }
 </style>
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="dashboard-header-premium d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-    <div>
-        <h2>Addresses</h2>
-        <p>Manage your shipping and billing addresses for a faster checkout.</p>
+<div class="dashboard-header-premium mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-900 mb-1">Addresses</h2>
+            <p class="text-muted">Manage your delivery points for a smoother shopping experience.</p>
+        </div>
     </div>
-    <button class="add-address-btn" data-bs-toggle="modal" data-bs-target="#addressModal">
-        <i class="fas fa-plus"></i> ADD NEW ADDRESS
-    </button>
 </div>
 
 <div id="addresses-container">
     <div class="text-center py-5">
-        <div class="spinner-border text-primary"></div>
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
 </div>
 
 <!-- Address Modal -->
 <div class="modal fade" id="addressModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-xl-custom">
         <div class="modal-content modal-content-premium">
-            <div class="modal-header modal-header-premium">
-                <h4 class="fw-800 text-uppercase mb-0">Add New Address</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body modal-body-premium">
-                <form id="address-form" class="modern-form">
-                    <div class="mb-4">
-                        <label class="form-label-premium">Address Line 1</label>
-                        <input type="text" class="form-control form-control-premium" name="address_line1" placeholder="e.g. 123 Street Name" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label-premium">City</label>
-                            <input type="text" class="form-control form-control-premium" name="city" placeholder="e.g. London" required>
+            <form id="address-form">
+                <input type="hidden" name="id" id="address_id">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h4 class="fw-900 mb-0" id="modalTitle">Add New Address</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" name="title" id="addr_title" placeholder="Home, Office...">
+                                <label>Address Label (e.g. Home)</label>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label-premium">Postal Code</label>
-                            <input type="text" class="form-control form-control-premium" name="postal_code" placeholder="e.g. 1000" required>
+                        <div class="col-md-8">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" name="full_name" id="addr_full_name" placeholder="Full Name" required>
+                                <label>Recipient's Full Name</label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control rounded-4" name="email" id="addr_email" placeholder="Email (Optional)">
+                                <label>Contact Email (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" name="phone" id="addr_phone" placeholder="Phone Number" required>
+                                <label>Phone Number</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" name="line1" id="addr_line1" placeholder="Address Line 1" required>
+                                <label>Address Line 1 (Street/House/Plot)</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" name="line2" id="addr_line2" placeholder="Address Line 2 (Optional)">
+                                <label>Address Line 2 (Apartment/Suite/Area)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" name="city" id="addr_city" placeholder="City" required>
+                                <label>City</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" name="state" id="addr_state" placeholder="State/Province">
+                                <label>State / Province</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" name="postal_code" id="addr_postal_code" placeholder="Postal Code" required>
+                                <label>Postal Code</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select rounded-4" name="country" id="addr_country" required>
+                                    <option value="BD">Bangladesh</option>
+                                    <option value="US">United States</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="IN">India</option>
+                                </select>
+                                <label>Country</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="mt-2">
-                        <button type="submit" class="btn btn-dark w-100 py-3 fw-bold rounded-pill">SAVE ADDRESS</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-dark rounded-pill px-5 fw-bold" id="saveBtn">SAVE ADDRESS</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -163,64 +305,133 @@
 
 {% block dash_extra_js %}
 <script>
+    const addressModal = new bootstrap.Modal(document.getElementById('addressModal'));
+    const addressForm = document.getElementById('address-form');
+
     async function loadAddresses() {
         const container = document.getElementById('addresses-container');
         
         try {
             const data = await apiFetch('/addresses/');
-            const addresses = data.results || (Array.isArray(data) ? data : []);
+            const addresses = Array.isArray(data) ? data : (data.results || []);
             
+            let html = `<div class="address-grid">`;
+            
+            // Add Address Card
+            html += `
+                <div class="add-address-card animate-fade-in" onclick="openAddModal()">
+                    <div class="add-icon-plus">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <span class="fw-800 text-uppercase" style="letter-spacing: 1px;">Add New Address</span>
+                </div>
+            `;
+
             if (addresses.length > 0) {
-                container.innerHTML = `<div class="address-grid">` + addresses.map(addr => `
+                html += addresses.map(addr => `
                     <div class="premium-address-card animate-fade-in">
-                        <div>
-                            <div class="address-type-icon">
+                        ${addr.title ? `<div class="address-badge">${addr.title}</div>` : ''}
+                        <div class="address-icon-circle">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <h4 class="address-name">${addr.full_name || 'No Name'}</h4>
+                        
+                        <div class="address-details">
+                            <div class="address-detail-item">
                                 <i class="fas fa-map-marker-alt"></i>
+                                <span>${addr.line1 || 'No address'}${addr.line2 ? ', ' + addr.line2 : ''}<br>
+                                ${addr.city || ''}, ${addr.postal_code || ''}, ${addr.country || ''}</span>
                             </div>
-                            <h5 class="address-line">${addr.address_line1}</h5>
-                            <p class="address-city">${addr.city}, ${addr.postal_code}</p>
+                            <div class="address-detail-item">
+                                <i class="fas fa-phone"></i>
+                                <span>${addr.phone || 'N/A'}</span>
+                            </div>
+                            ${addr.email ? `
+                            <div class="address-detail-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>${addr.email}</span>
+                            </div>` : ''}
                         </div>
+
                         <div class="address-actions">
-                            <button class="btn btn-sm btn-outline-dark px-3 rounded-pill" onclick="editAddress(${addr.id})">Edit</button>
-                            <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" onclick="deleteAddress(${addr.id})">Delete</button>
+                            <button class="address-btn btn-edit" onclick="openEditModal(${addr.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="address-btn btn-delete" onclick="deleteAddress(${addr.id})">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
                         </div>
                     </div>
-                `).join('') + `</div>`;
-            } else {
-                container.innerHTML = `
-                    <div class="text-center py-5 bg-white rounded-4 border border-dashed mt-4 animate-fade-in">
-                        <i class="fas fa-map-marked-alt fa-3x text-muted mb-3" style="opacity: 0.3"></i>
-                        <h5>No addresses saved</h5>
-                        <p class="text-muted">Add an address to make your checkout process faster.</p>
-                    </div>
-                `;
+                `).join('');
             }
+            
+            html += `</div>`;
+            container.innerHTML = html;
+
         } catch (error) {
             console.error('Failed to load addresses:', error);
-            container.innerHTML = `<div class="alert alert-danger rounded-4 mt-4">Failed to load addresses.</div>`;
+            container.innerHTML = `<div class="alert alert-danger rounded-4 mt-4">Failed to load addresses. Please try again.</div>`;
         }
     }
-    
-    // Address Form Handling
-    document.getElementById('address-form').addEventListener('submit', async (e) => {
+
+    function openAddModal() {
+        addressForm.reset();
+        document.getElementById('address_id').value = '';
+        document.getElementById('modalTitle').innerText = 'Add New Address';
+        document.getElementById('saveBtn').innerText = 'SAVE ADDRESS';
+        addressModal.show();
+    }
+
+    async function openEditModal(id) {
+        try {
+            document.getElementById('modalTitle').innerText = 'Edit Address';
+            document.getElementById('saveBtn').innerText = 'UPDATE ADDRESS';
+            
+            // Fetch address details
+            const addr = await apiFetch(`/addresses/${id}/`);
+            
+            // Populate form
+            document.getElementById('address_id').value = addr.id;
+            document.getElementById('addr_title').value = addr.title || '';
+            document.getElementById('addr_full_name').value = addr.full_name || '';
+            document.getElementById('addr_email').value = addr.email || '';
+            document.getElementById('addr_phone').value = addr.phone || '';
+            document.getElementById('addr_line1').value = addr.line1 || '';
+            document.getElementById('addr_line2').value = addr.line2 || '';
+            document.getElementById('addr_city').value = addr.city || '';
+            document.getElementById('addr_state').value = addr.state || '';
+            document.getElementById('addr_postal_code').value = addr.postal_code || '';
+            document.getElementById('addr_country').value = addr.country || 'BD';
+            
+            addressModal.show();
+        } catch (error) {
+            showToast('Failed to load address details', 'danger');
+        }
+    }
+
+    addressForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const id = document.getElementById('address_id').value;
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
         
+        // Remove empty ID for creation
+        if (!id) delete data.id;
+
         try {
-            await apiFetch('/addresses/', {
-                method: 'POST',
+            const endpoint = id ? `/addresses/${id}/` : '/addresses/';
+            const method = id ? 'PUT' : 'POST';
+            
+            await apiFetch(endpoint, {
+                method: method,
                 body: JSON.stringify(data)
             });
             
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
-            modal.hide();
-            e.target.reset();
-            showToast('Address added successfully', 'success');
+            addressModal.hide();
+            showToast(id ? 'Address updated' : 'Address added', 'success');
             loadAddresses();
         } catch (error) {
-            console.error('Failed to add address:', error);
-            showToast('Failed to add address: ' + error.message, 'danger');
+            showToast('Error: ' + error.message, 'danger');
         }
     });
 
@@ -229,17 +440,11 @@
         
         try {
             await apiFetch(`/addresses/${id}/`, { method: 'DELETE' });
-            showToast('Address deleted successfully', 'success');
+            showToast('Address deleted', 'success');
             loadAddresses();
         } catch (error) {
-            console.error('Failed to delete address:', error);
             showToast('Failed to delete address', 'danger');
         }
-    };
-    
-    window.editAddress = function(id) {
-        // Implementation for edit if needed
-        showToast('Edit functionality coming soon!', 'info');
     };
 
     document.addEventListener('DOMContentLoaded', loadAddresses);
