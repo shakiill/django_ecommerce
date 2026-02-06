@@ -25,6 +25,55 @@
         color: var(--theme-black);
     }
 
+    /* Profile Image Header */
+    .profile-image-header {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 40px;
+        padding: 25px;
+        background: #fcfcfc;
+        border-radius: 20px;
+        border: 1px dashed #e0e0e0;
+    }
+
+    .profile-image-preview-wrapper {
+        position: relative;
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile-image-preview {
+        width: 100%;
+        height: 100%;
+        border-radius: 30px;
+        object-fit: cover;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        background: #fff;
+    }
+
+    .image-upload-badge {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        width: 40px;
+        height: 40px;
+        background: var(--dash-primary);
+        color: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 3px solid #fff;
+        transition: all 0.3s;
+    }
+
+    .image-upload-badge:hover {
+        transform: scale(1.1);
+        background: var(--theme-black);
+    }
+
     .premium-label {
         font-weight: 700;
         font-size: 0.8rem;
@@ -92,13 +141,28 @@
 {% block dashboard_content %}
 <div class="dashboard-header-premium mb-4 animate-fade-in">
     <h2 class="fw-900">Account Settings</h2>
-    <p class="text-muted">Manage your identity and how others see you on UOMO.</p>
+    <p class="text-muted">Manage your identity and profile photo.</p>
 </div>
 
 <div class="profile-card animate-fade-in" style="animation-delay: 0.1s;">
-    <h4 class="form-section-title">Personal Details</h4>
-    
     <form id="profile-form">
+        <!-- New Profile Image Section -->
+        <h4 class="form-section-title">Profile Photo</h4>
+        <div class="profile-image-header animate-fade-in">
+            <div class="profile-image-preview-wrapper">
+                <img src="{% static 'assets/images/placeholder-avatar.png' %}" id="profile-preview" class="profile-image-preview" alt="Avatar">
+                <label for="photo-input" class="image-upload-badge">
+                    <i class="fas fa-camera"></i>
+                </label>
+                <input type="file" id="photo-input" name="photo" accept="image/*" style="display: none;">
+            </div>
+            <div>
+                <h5 class="fw-800 mb-1">Your Avatar</h5>
+                <p class="text-muted small mb-0">Click the camera icon to upload a new photo.<br>Optimal size: 400x400px (JPG, PNG)</p>
+            </div>
+        </div>
+
+        <h4 class="form-section-title">Personal Details</h4>
         <div class="row">
             <div class="col-md-6 mb-4">
                 <label class="premium-label">Phone Number (Username)</label>
@@ -147,13 +211,24 @@
 
 {% block dash_extra_js %}
 <script>
+    const photoInput = document.getElementById('photo-input');
+    const profilePreview = document.getElementById('profile-preview');
+
+    // Handle Image Preview
+    photoInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => profilePreview.src = e.target.result;
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
     async function loadProfile() {
         try {
-            // Updated to use the correct profile-update endpoint which now supports GET
             const data = await apiFetch('/profile-update/');
             
             // Map data to fields
-            document.getElementById('username').value = data.username || data.phone || '';
+            document.getElementById('username').value = data.username || '';
             document.getElementById('email').value = data.email || '';
             document.getElementById('name').value = data.name || '';
             document.getElementById('occupation').value = data.occupation || '';
@@ -161,7 +236,15 @@
             document.getElementById('bio').value = data.bio || '';
             document.getElementById('address').value = data.address || '';
             
-            // Sync with sidebar
+            // Set profile image
+            if (data.photo) {
+                profilePreview.src = data.photo;
+                // Also update sidebar avatar if it exists
+                const sidebarAvatarImg = document.querySelector('#sidebar-avatar img');
+                if (sidebarAvatarImg) sidebarAvatarImg.src = data.photo;
+            }
+            
+            // Sync text with sidebar
             const sidebarName = document.getElementById('sidebar-name');
             const sidebarEmail = document.getElementById('sidebar-email');
             if (sidebarName) sidebarName.textContent = data.name || data.username;
@@ -181,24 +264,36 @@
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> SAVING...';
         btn.disabled = true;
         
-        // Collect form data
-        const formData = {
-            email: document.getElementById('email').value,
-            name: document.getElementById('name').value,
-            occupation: document.getElementById('occupation').value,
-            dob: document.getElementById('dob').value || null,
-            bio: document.getElementById('bio').value,
-            address: document.getElementById('address').value
-        };
+        // We use FormData for file uploads
+        const formData = new FormData();
+        formData.append('email', document.getElementById('email').value);
+        formData.append('name', document.getElementById('name').value);
+        formData.append('occupation', document.getElementById('occupation').value);
+        formData.append('dob', document.getElementById('dob').value || '');
+        formData.append('bio', document.getElementById('bio').value);
+        formData.append('address', document.getElementById('address').value);
+        
+        if (photoInput.files[0]) {
+            formData.append('photo', photoInput.files[0]);
+        }
         
         try {
-            await apiFetch('/profile-update/', {
+            // Manual fetch for FormData because apiFetch currently expects JSON stringify
+            const response = await fetch(`${API_BASE_URL}/profile-update/`, {
                 method: 'PATCH',
-                body: JSON.stringify(formData)
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                },
+                body: formData
             });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to update profile');
+            }
             
             showToast('Profile updated successfully!', 'success');
-            loadProfile(); // Refresh sidebar and fields
+            loadProfile(); // Refresh
         } catch (error) {
             console.error('Failed to update profile:', error);
             showToast('Error: ' + error.message, 'danger');
