@@ -10,6 +10,7 @@ class SiteSettingForm(forms.ModelForm):
         fields = [
             'business_name', 'logo', 'favicon', 'address', 'email', 'phone', 'working_hours',
             'facebook_url', 'twitter_url', 'instagram_url', 'youtube_url',
+            'primary_color', 'secondary_color', 'accent_color',
             'footer_text', 'meta_title', 'meta_description'
         ]
         widgets = {
@@ -27,6 +28,9 @@ class SiteSettingForm(forms.ModelForm):
             'meta_title': forms.TextInput(attrs={'class': 'form-control'}),
             'logo': forms.FileInput(attrs={'class': 'form-control'}),
             'favicon': forms.FileInput(attrs={'class': 'form-control'}),
+            'primary_color': forms.TextInput(attrs={'type': 'color', 'class': 'form-control form-control-color w-100'}),
+            'secondary_color': forms.TextInput(attrs={'type': 'color', 'class': 'form-control form-control-color w-100'}),
+            'accent_color': forms.TextInput(attrs={'type': 'color', 'class': 'form-control form-control-color w-100'}),
         }
 
 @user_passes_test(lambda u: u.is_staff)

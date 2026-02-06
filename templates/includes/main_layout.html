@@ -7,7 +7,11 @@
     <title> {% block title %}  {% endblock %} </title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="shortcut icon" href="{% static 'assets/images/mini-logo.svg' %}"/>
+    {% if site_settings.favicon %}
+        <link rel="shortcut icon" href="{{ site_settings.favicon.url }}"/>
+    {% else %}
+        <link rel="shortcut icon" href="{% static 'assets/images/mini-logo.svg' %}"/>
+    {% endif %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700"/>
     <link href="{% static 'assets/plugins/global/plugins.bundle.css' %}" rel="stylesheet" type="text/css"/>
     <link href="{% static 'assets/css/style.bundle.css' %}" rel="stylesheet" type="text/css"/>
@@ -58,15 +62,17 @@
                  data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
                 <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
                     <a href="{% url 'dashboard:home' %}">
-                        <img alt="Logo" src="{% static 'assets/images/logo.png' %}"
-                             class="h-50px app-sidebar-logo-default"/>
-                        <img alt="Logo" src="{% static 'assets/images/motive.png' %}"
-                             class="h-30px app-sidebar-logo-minimize"/>
+                        {% if site_settings.logo %}
+                            <img alt="Logo" src="{{ site_settings.logo.url }}" class="h-50px app-sidebar-logo-default"/>
+                        {% else %}
+                            <img alt="Logo" src="{% static 'assets/images/logo.png' %}" class="h-50px app-sidebar-logo-default"/>
+                        {% endif %}
 
-                        {#                        <img alt="Logo" src="{% static 'assets/images/default-light.svg' %}"#}
-                        {#                             class="h-25px app-sidebar-logo-default"/>#}
-                        {#                        <img alt="Logo" src="{% static 'assets/images/mini-logo.svg' %}"#}
-                        {#                             class="h-20px app-sidebar-logo-minimize"/>#}
+                        {% if site_settings.favicon %}
+                            <img alt="Logo" src="{{ site_settings.favicon.url }}" class="h-30px app-sidebar-logo-minimize"/>
+                        {% else %}
+                            <img alt="Logo" src="{% static 'assets/images/motive.png' %}" class="h-30px app-sidebar-logo-minimize"/>
+                        {% endif %}
                     </a>
                     <div id="kt_app_sidebar_toggle"
                          class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary h-30px w-30px position-absolute top-50 start-100 translate-middle rotate"

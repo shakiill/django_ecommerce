@@ -21,7 +21,11 @@
         <!--begin::Mobile logo-->
         <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
             <a href="/" class="d-lg-none">
-                <img alt="Logo" src="{% static 'assets/images/mini-logo.svg' %}" class="h-30px"/>
+                {% if site_settings.favicon %}
+                    <img alt="Logo" src="{{ site_settings.favicon.url }}" class="h-30px"/>
+                {% else %}
+                    <img alt="Logo" src="{% static 'assets/images/mini-logo.svg' %}" class="h-30px"/>
+                {% endif %}
             </a>
         </div>
         <!--end::Mobile logo-->

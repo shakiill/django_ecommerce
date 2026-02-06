@@ -187,9 +187,15 @@
 </head>
 <body>
   <main class="card">
-      <img src="{% static 'assets/images/logo-10.png' %}" style="width: 200px" alt="">
+      <div class="text-center mb-5">
+          {% if site_settings.logo %}
+              <img src="{{ site_settings.logo.url }}" style="max-height: 60px; max-width: 200px; width: auto;" alt="{{ site_settings.business_name }}">
+          {% else %}
+              <img src="{% static 'assets/images/logo-10.png' %}" style="width: 200px" alt="Logo">
+          {% endif %}
+      </div>
     {% block content %}{% endblock %}
-    <div class="foot">&copy; {{ now|date:"Y" }} AMPEDUP. All rights reserved.</div>
+    <div class="foot">&copy; {% now "Y" %} {{ site_settings.business_name|default:"ECOM" }}. All rights reserved.</div>
   </main>
   {% block extra_js %}{% endblock %}
 </body>

@@ -168,6 +168,11 @@ class SiteSetting(models.Model):
     instagram_url = models.URLField(blank=True, null=True)
     youtube_url = models.URLField(blank=True, null=True)
 
+    # Theme colors
+    primary_color = models.CharField(max_length=20, default="#ff4e50", help_text="Primary theme color")
+    secondary_color = models.CharField(max_length=20, default="#111111", help_text="Secondary theme color")
+    accent_color = models.CharField(max_length=20, default="#f9d423", help_text="Accent color (e.g. for badges)")
+
     # Meta / SEO
     footer_text = models.TextField(blank=True, null=True)
     meta_title = models.CharField(max_length=200, blank=True, null=True)
