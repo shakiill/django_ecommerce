@@ -96,3 +96,29 @@ def invalidate_mega_menu_cache():
 @receiver(post_delete, sender=MenuItem)
 def _mega_menu_changed(sender, **kwargs):  # pragma: no cover - simple signal
     invalidate_mega_menu_cache()
+
+
+class HomeSection(models.Model):
+    SECTION_CHOICES = [
+        ('hero', 'Hero Slider'),
+        ('flash_sale', 'Flash Sale'),
+        ('categories', 'Featured Categories'),
+        ('new_arrivals', 'New Arrivals'),
+        ('popular', 'Popular Products'),
+        ('testimonials', 'Testimonials'),
+        ('payment_trust', 'Payment & Trust'),
+        ('features', 'Features'),
+        ('lookbook', 'Lookbook Collection'),
+        ('brand_story', 'Brand Story Video'),
+        ('instagram', 'Instagram Feed'),
+    ]
+    section_type = models.CharField(max_length=50, choices=SECTION_CHOICES, unique=True)
+    title = models.CharField(max_length=200, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return self.get_section_type_display()

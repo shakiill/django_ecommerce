@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MainSlider, MenuSection, MenuGroup, MenuItem
+from .models import MainSlider, MenuSection, MenuGroup, MenuItem, HomeSection
 
 
 @admin.register(MainSlider)
@@ -8,6 +8,15 @@ class MainSliderAdmin(admin.ModelAdmin):
     list_filter = ("is_active",)
     search_fields = ("title", "description")
     ordering = ("serial",)
+
+
+@admin.register(HomeSection)
+class HomeSectionAdmin(admin.ModelAdmin):
+    list_display = ("section_type", "title", "is_active", "order")
+    list_editable = ("is_active", "order")
+    list_filter = ("is_active", "section_type")
+    search_fields = ("title", "section_type")
+    ordering = ("order",)
 
 
 class MenuItemInline(admin.TabularInline):

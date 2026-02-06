@@ -5,12 +5,24 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
 
+from apps.cms.models import HomeSection
+
+
 class StorefrontHomeView(TemplateView):
     """
     Homepage with hero slider, featured products, new arrivals.
     All data loaded via AJAX from APIs.
     """
     template_name = 'storefront/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Fetch active home sections
+        sections = HomeSection.objects.filter(is_active=True).order_by('order')
+        # Convert to a dictionary for easy access in template: {section_type: True}
+        # This allows for {% if home_sections.flash_sale %} style checks
+        context['home_sections'] = {s.section_type: True for s in sections}
+        return context
 
 
 class ProductListView(TemplateView):

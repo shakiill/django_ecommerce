@@ -4,6 +4,7 @@
 
 {% block content %}
     <!-- Hero Slider -->
+    {% if home_sections.hero %}
     <section class="hero-slider hero-slider-animated">
         <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
             <div class="carousel-indicators">
@@ -127,8 +128,10 @@
             <span class="scroll-text">Scroll Down</span>
         </div>
     </section>
+    {% endif %}
 
     <!-- FLASH SALE Section -->
+    {% if home_sections.flash_sale %}
     <section class="promo-banner-section flash-sale-animated">
         <div class="container-custom">
             <div class="promo-banner-content flash-sale-bd">
@@ -209,8 +212,10 @@
             </div>
         </div>
     </section>
+    {% endif %}
 
     <!-- Featured Categories -->
+    {% if home_sections.categories %}
     <section class="categories-section">
         <div class="container-custom">
             <div class="categories-grid">
@@ -266,8 +271,38 @@
             </div>
         </div>
     </section>
+    {% endif %}
+
+    <!-- LOOKBOOK Section -->
+    {% if home_sections.lookbook %}
+    <section class="lookbook-section section-padding">
+        <div class="container-custom">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="lookbook-images">
+                        <div class="lookbook-img-main">
+                            <img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=800" alt="Lookbook Main" class="img-fluid rounded-4 shadow-lg">
+                        </div>
+                        <div class="lookbook-img-sub">
+                            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" alt="Lookbook Sub" class="img-fluid rounded-4 shadow-lg">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 offset-lg-1">
+                    <div class="lookbook-content">
+                        <h6 class="section-subtitle text-primary">COLLECTION 2026</h6>
+                        <h2 class="section-title mb-4">The Art of Modern Elegance</h2>
+                        <p class="text-muted mb-5">Discover our latest lookbook featuring minimalist designs and premium textures. Each piece is crafted to bring a touch of sophistication to your everyday wardrobe.</p>
+                        <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5">Explore Collection</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
     <!-- New Arrivals Section -->
+    {% if home_sections.new_arrivals %}
     <section class="new-arrivals-section section-padding">
         <div class="container-custom">
             <div class="d-flex justify-content-between align-items-end mb-3">
@@ -289,8 +324,10 @@
             </div>
         </div>
     </section>
+    {% endif %}
 
     <!-- Popular Products Section -->
+    {% if home_sections.popular %}
     <section class="popular-products-section section-padding">
         <div class="container-custom">
             <div class="section-header text-center mb-3">
@@ -308,8 +345,86 @@
             </div>
         </div>
     </section>
+    {% endif %}
+
+    <!-- BRAND STORY Section -->
+    {% if home_sections.brand_story %}
+    <section class="brand-story-section section-padding position-relative overflow-hidden">
+        <div class="brand-story-bg-wrapper">
+            <div class="brand-story-bg" style="background-image: url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1600');"></div>
+            <div class="brand-story-overlay"></div>
+        </div>
+        
+        <div class="container-custom position-relative z-index-2 py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <div class="brand-story-content text-white">
+                        <div class="story-badge mb-3 animate-fade-in-left">
+                            <span class="badge-dot"></span>
+                            <span class="badge-text">ESTABLISHED 2010</span>
+                        </div>
+                        <h2 class="display-3 fw-900 mb-4 animate-fade-in-left" style="transition-delay: 0.2s;">We Design for <span class="text-accent underline-draw">Expression</span></h2>
+                        <p class="lead mb-5 animate-fade-in-left" style="max-width: 550px; transition-delay: 0.4s;">Our journey began in a small studio with one goal: to redefine wardrobe essentials through a minimalist lens and premium craftsmanship.</p>
+                        
+                        <div class="row g-4 animate-fade-in-up" style="transition-delay: 0.6s;">
+                            <div class="col-6 col-sm-4">
+                                <div class="glass-stat">
+                                    <h3 class="stat-number">15+</h3>
+                                    <p class="stat-text">Years of Excellence</p>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <div class="glass-stat">
+                                    <h3 class="stat-number">100%</h3>
+                                    <p class="stat-text">Ethical Sourcing</p>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-4 d-none d-sm-block">
+                                <div class="glass-stat">
+                                    <h3 class="stat-number">50k+</h3>
+                                    <p class="stat-text">Active Community</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 offset-lg-1">
+                    <div class="story-video-wrapper animate-fade-in-right">
+                        <div class="video-container rounded-4 shadow-2xl overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800" alt="Video Preview" class="img-fluid w-100">
+                            <div class="play-btn-wrapper">
+                                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="btn-play-ripple">
+                                    <i class="fas fa-play"></i>
+                                    <span class="ripple ripple-1"></span>
+                                    <span class="ripple ripple-2"></span>
+                                    <span class="ripple ripple-3"></span>
+                                </a>
+                                <span class="play-text">WATCH FILM</span>
+                            </div>
+                        </div>
+                        <!-- Floating element -->
+                        <div class="story-floating-card animate-bounce-y">
+                            <div class="card-icon"><i class="fas fa-award"></i></div>
+                            <div class="card-info">
+                                <h6>Award Winning</h6>
+                                <small>Best Fashion Design 2025</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Decoration elements -->
+        <div class="story-ornaments">
+            <span class="ornament ornament-1"></span>
+            <span class="ornament ornament-2"></span>
+        </div>
+    </section>
+    {% endif %}
 
     <!-- TESTIMONIALS Section -->
+    {% if home_sections.testimonials %}
     <section class="testimonials-section bg-soft">
         <div class="container-custom">
             <div class="section-header text-center mb-4">
@@ -374,8 +489,60 @@
             </div>
         </div>
     </section>
+    {% endif %}
+
+    <!-- INSTAGRAM Section -->
+    {% if home_sections.instagram %}
+    <section class="instagram-section section-padding">
+        <div class="container-custom">
+            <div class="section-header text-center mb-5">
+                <h6 class="section-subtitle">FOLLOW US @UOMO</h6>
+                <h2 class="section-title">Shop Our Instagram</h2>
+            </div>
+            <div class="instagram-grid">
+                <div class="insta-item">
+                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400" alt="Insta 1">
+                    <div class="insta-overlay">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+                <div class="insta-item">
+                    <img src="https://images.unsplash.com/photo-1539109132314-d49c02d722?w=400" alt="Insta 2">
+                    <div class="insta-overlay">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+                 <div class="insta-item">
+                    <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400" alt="Insta 3">
+                    <div class="insta-overlay">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+                 <div class="insta-item">
+                    <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400" alt="Insta 4">
+                    <div class="insta-overlay">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+                 <div class="insta-item">
+                    <img src="https://images.unsplash.com/photo-1529139513066-f203b14e59c0?w=400" alt="Insta 5">
+                    <div class="insta-overlay">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+                 <div class="insta-item">
+                    <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400" alt="Insta 6">
+                    <div class="insta-overlay">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
     <!-- PAYMENT & TRUST SECTION -->
+    {% if home_sections.payment_trust %}
     <section class="payment-trust-section">
         <div class="container-custom">
             <div class="payment-trust-grid">
@@ -413,8 +580,10 @@
             </div>
         </div>
     </section>
+    {% endif %}
 
     <!-- Features Section -->
+    {% if home_sections.features %}
     <section class="features-section section-padding">
         <div class="container-custom">
             <div class="row g-3">
@@ -449,6 +618,8 @@
             </div>
         </div>
     </section>
+    {% endif %}
+
 
     <!-- WhatsApp Floating Button -->
     <a href="https://wa.me/8801XXXXXXXXX?text=Hello, I want to place an order from UOMO" class="whatsapp-float" target="_blank">
@@ -3342,6 +3513,284 @@
         .rating i {
             font-size: 16px;
         }
+
+        /* Utility Z-Indexes */
+        .z-index-1 { z-index: 1; }
+        .z-index-2 { z-index: 2; }
+        .z-index-5 { z-index: 5; }
+        .z-index-10 { z-index: 10; }
+
+        /* -------------------------------------------
+           NEW SECTIONS STYLES
+           ------------------------------------------- */
+
+        /* Lookbook Section */
+        .lookbook-images {
+            position: relative;
+            padding: 50px 0;
+        }
+        .lookbook-img-sub {
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 60%;
+            z-index: 2;
+        }
+        .lookbook-content {
+            padding: 40px 0;
+        }
+
+        /* Brand Story Section */
+        .brand-story-section {
+            padding: 100px 0;
+            background: #000;
+            position: relative;
+        }
+        .brand-story-bg-wrapper {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .brand-story-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: brightness(0.7);
+            transform: scale(1.05); /* Avoid edges when zooming */
+        }
+        .brand-story-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(0,0,0,0.85) 0%, 
+                rgba(0,0,0,0.6) 50%, 
+                rgba(0,0,0,0.3) 100%);
+            z-index: 1;
+        }
+        .story-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .badge-dot {
+            width: 8px; height: 8px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+        .badge-text { font-size: 11px; font-weight: 700; letter-spacing: 2px; }
+        
+        .underline-draw {
+            position: relative;
+            display: inline-block;
+        }
+        .underline-draw::after {
+            content: '';
+            position: absolute;
+            bottom: 5px; left: 0; width: 100%; height: 8px;
+            background: var(--accent-color);
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .glass-stat {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-stat:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+        .stat-number { font-size: 32px; font-weight: 900; margin-bottom: 5px; color: var(--accent-color); }
+        .stat-text { font-size: 12px; opacity: 0.7; margin: 0; font-weight: 600; text-transform: uppercase; }
+
+        .story-video-wrapper { position: relative; padding: 20px; }
+        .video-container { position: relative; cursor: pointer; }
+        .video-container img { transition: transform 0.7s ease; }
+        .video-container:hover img { transform: scale(1.05); }
+
+        .play-btn-wrapper {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 5;
+        }
+        .btn-play-ripple {
+            width: 90px; height: 90px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center; justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 15px;
+            position: relative;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        .btn-play-ripple:hover { transform: scale(1.1); color: white; }
+        
+        .play-text { font-size: 11px; font-weight: 900; letter-spacing: 3px; color: white; }
+
+        .ripple {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: ripple-effect 2s infinite;
+        }
+        .ripple-2 { animation-delay: 0.6s; }
+        .ripple-3 { animation-delay: 1.2s; }
+
+        @keyframes ripple-effect {
+            0% { width: 100%; height: 100%; opacity: 0.8; }
+            100% { width: 250%; height: 250%; opacity: 0; }
+        }
+
+        .story-floating-card {
+            position: absolute;
+            bottom: -10px; left: -30px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            z-index: 6;
+        }
+        .card-icon {
+            width: 45px; height: 45px;
+            background: #fdf2f2;
+            color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .card-info h6 { margin: 0; font-weight: 800; color: #1a1a1a; }
+        .card-info small { color: #64748b; font-weight: 600; }
+
+        /* Animations */
+        @keyframes bounce-y {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .animate-bounce-y { animation: bounce-y 4s ease-in-out infinite; }
+
+        /* Reveal Animations */
+        .animate-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .animate-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .animate-fade-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .animate-fade-in-left.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .animate-fade-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .animate-fade-in-right.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .animate-fade-in-up {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .animate-fade-in-up.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Instagram Section */
+        .instagram-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+        .insta-item {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1;
+            border-radius: 12px;
+        }
+        .insta-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .insta-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .insta-item:hover img {
+            transform: scale(1.1);
+        }
+        .insta-item:hover .insta-overlay {
+            opacity: 1;
+        }
+
+
+        @media (max-width: 991px) {
+            .instagram-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .lookbook-img-sub {
+                right: 0;
+                bottom: 0px;
+            }
+            .brand-story-section {
+                background-attachment: scroll;
+            }
+        }
+        @media (max-width: 575px) {
+            .instagram-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 {% endblock %}
 
@@ -3583,6 +4032,34 @@
             setInterval(updateCountdown, 1000);
         }
 
+        // Premium Effects for Lookbook/Story
+        function initPremiumEffects() {
+            // Initialize Boostrap Tooltips for hotspots
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Intersection Observer for Reveal Animations
+            const revealOptions = {
+                threshold: 0.05,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, revealOptions);
+
+            document.querySelectorAll('.animate-reveal, .animate-fade-in-left, .animate-fade-in-right, .animate-fade-in-up').forEach(el => {
+                revealObserver.observe(el);
+            });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // loadHeroSlider();
@@ -3592,6 +4069,9 @@
             
             // Flash Sale Countdown
             initFlashCountdown();
+
+            // Premium Section Effects
+            initPremiumEffects();
         });
     </script>
 {% endblock %}
