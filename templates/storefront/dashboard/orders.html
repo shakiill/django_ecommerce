@@ -1,243 +1,176 @@
-{% extends 'storefront/base.html' %}
+{% extends 'storefront/dashboard/dashboard_base.html' %}
+{% load static %}
 
-{% block title %}My Orders - ShopHub{% endblock %}
+{% block title %}My Orders - UOMO{% endblock %}
 
-{% block content %}
-<div class="customer-dashboard py-5">
-    <div class="container">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-lg-3 col-md-4 mb-4">
-                <div class="dashboard-sidebar">
-                    <div class="user-info mb-4">
-                        <div class="user-avatar">
-                            <i class="fas fa-user-circle fa-4x text-primary"></i>
-                        </div>
-                        <h5 class="mt-3 mb-0" id="user-name">Loading...</h5>
-                        <p class="text-muted small" id="user-email">Loading...</p>
-                    </div>
-                    
-                    <nav class="dashboard-nav">
-                        <a href="{% url 'customer_dashboard' %}" class="nav-item">
-                            <i class="fas fa-th-large me-2"></i> Dashboard
-                        </a>
-                        <a href="{% url 'order_history' %}" class="nav-item active">
-                            <i class="fas fa-shopping-bag me-2"></i> Orders
-                        </a>
-                        <a href="{% url 'addresses' %}" class="nav-item">
-                            <i class="fas fa-map-marker-alt me-2"></i> Addresses
-                        </a>
-                        <a href="{% url 'profile' %}" class="nav-item">
-                            <i class="fas fa-user me-2"></i> Profile
-                        </a>
-                        <a href="#" class="nav-item" id="logout-btn">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
-                    </nav>
-                </div>
-            </div>
-            
-            <!-- Main Content -->
-            <div class="col-lg-9 col-md-8">
-                <div class="dashboard-header mb-4">
-                    <h2>Order History</h2>
-                    <p class="text-muted">View and track all your orders</p>
-                </div>
-                
-                <!-- Filters -->
-                <div class="orders-filters mb-4">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <select class="form-select" id="status-filter">
-                                <option value="">All Statuses</option>
-                                <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="shipped">Shipped</option>
-                                <option value="delivered">Delivered</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <input type="date" class="form-control" id="date-from" placeholder="From Date">
-                        </div>
-                        <div class="col-md-4">
-                            <input type="date" class="form-control" id="date-to" placeholder="To Date">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Orders List -->
-                <div class="orders-container" id="orders-container">
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-primary"></div>
-                    </div>
-                </div>
-                
-                <!-- Pagination -->
-                <div class="pagination-container mt-4" id="pagination-container"></div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_css %}
+{% block dash_extra_css %}
 <style>
-    .dashboard-sidebar {
-        background: white;
-        padding: 2rem;
+    /* Order Filters Styling */
+    .filter-panel {
+        background: #fff;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: var(--dash-shadow);
+        border: var(--dash-border);
+        margin-bottom: 30px;
+    }
+
+    .form-select-premium, .form-control-premium {
+        height: 50px;
         border-radius: 12px;
-        border: 1px solid var(--border-color);
-        position: sticky;
-        top: 100px;
+        border: 2px solid var(--gray-200);
+        padding: 0 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
-    
-    .user-info {
-        text-align: center;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--border-color);
+
+    .form-select-premium:focus, .form-control-premium:focus {
+        border-color: var(--dash-primary);
+        box-shadow: 0 0 0 4px rgba(255, 78, 80, 0.05);
     }
-    
-    .dashboard-nav {
-        display: flex;
-        flex-direction: column;
+
+    /* Order Card Styling */
+    .premium-order-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: var(--dash-shadow);
+        border: var(--dash-border);
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+        position: relative;
     }
-    
-    .dashboard-nav .nav-item {
-        padding: 0.75rem 1rem;
-        color: var(--text-primary);
-        text-decoration: none;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
+
+    .premium-order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.06);
     }
-    
-    .dashboard-nav .nav-item:hover {
-        background: var(--light-color);
-        color: var(--primary-color);
-    }
-    
-    .dashboard-nav .nav-item.active {
-        background: var(--primary-color);
-        color: white;
-    }
-    
-    .dashboard-header {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .orders-filters {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .order-card {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        margin-bottom: 1.5rem;
-        transition: all 0.3s;
-    }
-    
-    .order-card:hover {
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
-    
-    .order-card-header {
+
+    .order-header-premium {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid var(--border-color);
-        margin-bottom: 1rem;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        margin-bottom: 20px;
     }
-    
-    .order-number {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--primary-color);
+
+    .order-id-badge {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--theme-black);
     }
-    
-    .order-status {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        font-weight: 600;
+
+    .status-badge-lg {
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 800;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
-    
-    .order-status.pending {
-        background: #fef3c7;
-        color: #92400e;
-    }
-    
-    .order-status.processing {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-    
-    .order-status.shipped {
-        background: #e0e7ff;
-        color: #3730a3;
-    }
-    
-    .order-status.delivered {
-        background: #d1fae5;
-        color: #065f46;
-    }
-    
-    .order-status.cancelled {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-    
-    .order-info {
+
+    .order-content-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
     }
-    
-    .info-item {
+
+    .grid-info-item {
         display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: var(--text-secondary);
+        flex-direction: column;
     }
-    
-    .info-item i {
-        color: var(--primary-color);
-    }
-    
-    .order-total {
-        font-size: 1.5rem;
+
+    .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--gray-500);
         font-weight: 700;
-        color: var(--primary-color);
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
     }
-    
-    .order-actions {
+
+    .info-value {
+        font-weight: 700;
+        color: var(--theme-black);
+        font-size: 1rem;
+    }
+
+    .price-big {
+        color: var(--dash-primary);
+        font-size: 1.25rem;
+        font-weight: 800;
+    }
+
+    .order-actions-premium {
         display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
+        gap: 12px;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .btn-action {
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .empty-orders-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: var(--dash-shadow);
     }
 </style>
 {% endblock %}
 
-{% block extra_js %}
+{% block dashboard_content %}
+<div class="dashboard-header-premium mb-4">
+    <h2>Order History</h2>
+    <p>Track your orders, manage returns, and download invoices.</p>
+</div>
+
+<!-- Filters -->
+<div class="filter-panel animate-fade-in" style="animation-delay: 0.2s;">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="info-label">Status Filter</label>
+            <select class="form-select form-select-premium" id="status-filter">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="info-label">From Date</label>
+            <input type="date" class="form-control form-control-premium" id="date-from">
+        </div>
+        <div class="col-md-4">
+            <label class="info-label">To Date</label>
+            <input type="date" class="form-control form-control-premium" id="date-to">
+        </div>
+    </div>
+</div>
+
+<!-- Orders List -->
+<div id="orders-container">
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+    </div>
+</div>
+
+<!-- Pagination -->
+<div id="pagination-container" class="mt-4"></div>
+{% endblock %}
+
+{% block dash_extra_js %}
 <script>
-    // Check authentication
-    if (!isAuthenticated()) {
-        window.location.href = '/user/login/?next=/my-account/orders/';
-    }
-    
     let currentPage = 1;
     let filters = {
         status: '',
@@ -245,21 +178,10 @@
         dateTo: ''
     };
     
-    // Load user profile
-    async function loadUserProfile() {
-        try {
-            const data = await apiFetch('/auth/user/');
-            document.getElementById('user-name').textContent = data.username || 'User';
-            document.getElementById('user-email').textContent = data.email || '';
-        } catch (error) {
-            console.error('Failed to load profile:', error);
-        }
-    }
-    
     // Load orders
     async function loadOrders() {
         const container = document.getElementById('orders-container');
-        showLoading(container);
+        container.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>`;
         
         try {
             const params = new URLSearchParams();
@@ -272,67 +194,75 @@
             const data = await apiFetch(`/orders/?${params}`);
             
             if (data.results && data.results.length > 0) {
-                container.innerHTML = data.results.map(order => createOrderCard(order)).join('');
+                container.innerHTML = data.results.map(order => createPremiumOrderCard(order)).join('');
                 updatePagination(data);
             } else {
                 container.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
-                        <h4>No orders found</h4>
-                        <p class="text-muted">You haven't placed any orders yet</p>
-                        <a href="/shop/" class="btn btn-primary mt-3">Start Shopping</a>
+                    <div class="empty-orders-state animate-fade-in">
+                        <div class="mb-4">
+                            <i class="fas fa-shopping-bag fa-4x" style="color: rgba(255, 78, 80, 0.1)"></i>
+                        </div>
+                        <h3>No orders found</h3>
+                        <p class="text-muted mb-4">Looks like you haven't placed any orders yet or no orders match your filters.</p>
+                        <a href="/shop/" class="btn btn-dark px-5 py-3 rounded-pill fw-bold">START SHOPPING</a>
                     </div>
                 `;
                 document.getElementById('pagination-container').innerHTML = '';
             }
         } catch (error) {
             console.error('Failed to load orders:', error);
-            showError('Failed to load orders. Please try again.', container);
+            container.innerHTML = `<div class="alert alert-danger rounded-4 mt-4">Failed to load orders. Please try again.</div>`;
         }
     }
     
-    // Create order card HTML
-    function createOrderCard(order) {
+    // Create premium order card HTML
+    function createPremiumOrderCard(order) {
         const orderDate = new Date(order.created_at).toLocaleDateString('en-US', {
             year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+            month: 'long', day: 'numeric'
         });
         
+        // Status classes
+        const statusClass = `status-badge-${order.status || 'pending'}`;
+        
         return `
-            <div class="order-card">
-                <div class="order-card-header">
-                    <div class="order-number">Order #${order.order_number || order.id}</div>
-                    <div class="order-status ${order.status}">${order.status}</div>
+            <div class="premium-order-card animate-fade-in">
+                <div class="order-header-premium">
+                    <div class="order-id-badge">Order #${order.order_number || order.id}</div>
+                    <div class="status-badge-lg status-badge ${order.status}">${order.status}</div>
                 </div>
                 
-                <div class="order-info">
-                    <div class="info-item">
-                        <i class="fas fa-calendar"></i>
-                        <span>${orderDate}</span>
+                <div class="order-content-grid">
+                    <div class="grid-info-item">
+                        <span class="info-label">Placed On</span>
+                        <span class="info-value">${orderDate}</span>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-box"></i>
-                        <span>${order.items_count || 0} Items</span>
+                    <div class="grid-info-item">
+                        <span class="info-label">Items</span>
+                        <span class="info-value">${order.items_count || 1} Products</span>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-coins"></i>
-                        <span class="order-total">৳${order.total_amount || '0.00'}</span>
+                    <div class="grid-info-item">
+                        <span class="info-label">Total Amount</span>
+                        <span class="info-value price-big">৳${order.total_amount || '0.00'}</span>
+                    </div>
+                    <div class="grid-info-item">
+                        <span class="info-label">Payment</span>
+                        <span class="info-value">${order.payment_status || 'Unpaid'}</span>
                     </div>
                 </div>
                 
-                <div class="order-actions">
-                    <a href="/my-account/orders/${order.id}/" class="btn btn-primary">
-                        <i class="fas fa-eye me-2"></i>View Details
+                <div class="order-actions-premium">
+                    <a href="/my-account/orders/${order.id}/" class="btn btn-dark btn-action">
+                        VIEW DETAILS
                     </a>
                     ${order.status === 'delivered' ? `
-                        <button class="btn btn-outline-primary">
-                            <i class="fas fa-redo me-2"></i>Reorder
+                        <button class="btn btn-outline-dark btn-action">
+                            BUY AGAIN
                         </button>
                     ` : ''}
                     ${order.status === 'pending' ? `
-                        <button class="btn btn-outline-danger" onclick="cancelOrder(${order.id})">
-                            <i class="fas fa-times me-2"></i>Cancel
+                        <button class="btn btn-outline-danger btn-action" onclick="cancelOrder(${order.id})">
+                            CANCEL ORDER
                         </button>
                     ` : ''}
                 </div>
@@ -343,18 +273,16 @@
     // Update pagination
     function updatePagination(data) {
         const container = document.getElementById('pagination-container');
-        
         if (!data.next && !data.previous) {
             container.innerHTML = '';
             return;
         }
         
         const totalPages = Math.ceil(data.count / 10);
-        
         let html = '<ul class="pagination justify-content-center">';
         
         if (data.previous) {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Previous</a></li>`;
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Prev</a></li>`;
         }
         
         for (let i = 1; i <= totalPages; i++) {
@@ -373,60 +301,34 @@
         container.innerHTML = html;
     }
     
-    // Change page
     window.changePage = function(page) {
         currentPage = page;
         loadOrders();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     
-    // Cancel order
     window.cancelOrder = async function(orderId) {
         if (!confirm('Are you sure you want to cancel this order?')) return;
-        
         try {
             await apiFetch(`/orders/${orderId}/`, {
                 method: 'PATCH',
                 body: JSON.stringify({ status: 'cancelled' })
             });
-            
-            alert('Order cancelled successfully');
+            showToast('Order cancelled successfully', 'success');
             loadOrders();
         } catch (error) {
             console.error('Failed to cancel order:', error);
-            alert('Failed to cancel order. Please try again.');
+            showToast('Failed to cancel order', 'danger');
         }
     };
     
     // Filter handlers
-    document.getElementById('status-filter').addEventListener('change', (e) => {
-        filters.status = e.target.value;
-        currentPage = 1;
-        loadOrders();
-    });
-    
-    document.getElementById('date-from').addEventListener('change', (e) => {
-        filters.dateFrom = e.target.value;
-        currentPage = 1;
-        loadOrders();
-    });
-    
-    document.getElementById('date-to').addEventListener('change', (e) => {
-        filters.dateTo = e.target.value;
-        currentPage = 1;
-        loadOrders();
-    });
-    
-    // Logout handler
-    document.getElementById('logout-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        removeAuthToken();
-        window.location.href = '/';
-    });
+    document.getElementById('status-filter').addEventListener('change', (e) => { filters.status = e.target.value; currentPage = 1; loadOrders(); });
+    document.getElementById('date-from').addEventListener('change', (e) => { filters.dateFrom = e.target.value; currentPage = 1; loadOrders(); });
+    document.getElementById('date-to').addEventListener('change', (e) => { filters.dateTo = e.target.value; currentPage = 1; loadOrders(); });
     
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-        loadUserProfile();
         loadOrders();
     });
 </script>

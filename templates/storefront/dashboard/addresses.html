@@ -1,93 +1,247 @@
-{% extends 'storefront/base.html' %}
+{% extends 'storefront/dashboard/dashboard_base.html' %}
+{% load static %}
 
-{% block title %}My Addresses - ShopHub{% endblock %}
+{% block title %}My Addresses - UOMO{% endblock %}
 
-{% block content %}
-<div class="container py-5">
-    <h2 class="mb-4">My Addresses</h2>
-    
-    <div class="mb-3">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addressModal">
-            <i class="fas fa-plus me-2"></i>Add New Address
-        </button>
+{% block dash_extra_css %}
+<style>
+    .address-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .premium-address-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: var(--dash-shadow);
+        border: var(--dash-border);
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .premium-address-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.06);
+        border-color: rgba(255, 78, 80, 0.2);
+    }
+
+    .address-type-icon {
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 78, 80, 0.1);
+        color: var(--dash-primary);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    .address-line {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--theme-black);
+        margin-bottom: 8px;
+    }
+
+    .address-city {
+        color: var(--gray-600);
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    .address-actions {
+        display: flex;
+        gap: 15px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        padding-top: 20px;
+    }
+
+    .add-address-btn {
+        background: var(--theme-black);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .add-address-btn:hover {
+        background: var(--dash-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(255, 78, 80, 0.2);
+    }
+
+    /* Modal Styling */
+    .modal-content-premium {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+    }
+
+    .modal-header-premium {
+        border-bottom: none;
+        padding: 30px 30px 10px;
+    }
+
+    .modal-body-premium {
+        padding: 10px 30px 30px;
+    }
+
+    .form-label-premium {
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        color: var(--gray-500);
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header-premium d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h2>Addresses</h2>
+        <p>Manage your shipping and billing addresses for a faster checkout.</p>
     </div>
-    
-    <div id="addresses-container">
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary"></div>
-        </div>
+    <button class="add-address-btn" data-bs-toggle="modal" data-bs-target="#addressModal">
+        <i class="fas fa-plus"></i> ADD NEW ADDRESS
+    </button>
+</div>
+
+<div id="addresses-container">
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
     </div>
 </div>
 
 <!-- Address Modal -->
 <div class="modal fade" id="addressModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Address</h5>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-premium">
+            <div class="modal-header modal-header-premium">
+                <h4 class="fw-800 text-uppercase mb-0">Add New Address</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="address-form">
-                    <div class="mb-3">
-                        <label class="form-label">Address Line 1</label>
-                        <input type="text" class="form-control" name="address_line1" required>
+            <div class="modal-body modal-body-premium">
+                <form id="address-form" class="modern-form">
+                    <div class="mb-4">
+                        <label class="form-label-premium">Address Line 1</label>
+                        <input type="text" class="form-control form-control-premium" name="address_line1" placeholder="e.g. 123 Street Name" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">City</label>
-                        <input type="text" class="form-control" name="city" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label-premium">City</label>
+                            <input type="text" class="form-control form-control-premium" name="city" placeholder="e.g. London" required>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label-premium">Postal Code</label>
+                            <input type="text" class="form-control form-control-premium" name="postal_code" placeholder="e.g. 1000" required>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Postal Code</label>
-                        <input type="text" class="form-control" name="postal_code" required>
+                    <div class="mt-2">
+                        <button type="submit" class="btn btn-dark w-100 py-3 fw-bold rounded-pill">SAVE ADDRESS</button>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Address</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block dash_extra_js %}
 <script>
-    if (!isAuthenticated()) {
-        window.location.href = '/user/login/?next=/my-account/addresses/';
-    }
-    
     async function loadAddresses() {
         const container = document.getElementById('addresses-container');
         
         try {
             const data = await apiFetch('/addresses/');
+            const addresses = data.results || (Array.isArray(data) ? data : []);
             
-            if (data.results && data.results.length > 0) {
-                container.innerHTML = data.results.map(addr => `
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5>${addr.address_line1}</h5>
-                            <p>${addr.city}, ${addr.postal_code}</p>
-                            <button class="btn btn-sm btn-danger" onclick="deleteAddress(${addr.id})">Delete</button>
+            if (addresses.length > 0) {
+                container.innerHTML = `<div class="address-grid">` + addresses.map(addr => `
+                    <div class="premium-address-card animate-fade-in">
+                        <div>
+                            <div class="address-type-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <h5 class="address-line">${addr.address_line1}</h5>
+                            <p class="address-city">${addr.city}, ${addr.postal_code}</p>
+                        </div>
+                        <div class="address-actions">
+                            <button class="btn btn-sm btn-outline-dark px-3 rounded-pill" onclick="editAddress(${addr.id})">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" onclick="deleteAddress(${addr.id})">Delete</button>
                         </div>
                     </div>
-                `).join('');
+                `).join('') + `</div>`;
             } else {
-                container.innerHTML = '<p class="text-muted">No addresses saved</p>';
+                container.innerHTML = `
+                    <div class="text-center py-5 bg-white rounded-4 border border-dashed mt-4 animate-fade-in">
+                        <i class="fas fa-map-marked-alt fa-3x text-muted mb-3" style="opacity: 0.3"></i>
+                        <h5>No addresses saved</h5>
+                        <p class="text-muted">Add an address to make your checkout process faster.</p>
+                    </div>
+                `;
             }
         } catch (error) {
-            showError('Failed to load addresses', container);
+            console.error('Failed to load addresses:', error);
+            container.innerHTML = `<div class="alert alert-danger rounded-4 mt-4">Failed to load addresses.</div>`;
         }
     }
     
+    // Address Form Handling
+    document.getElementById('address-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        
+        try {
+            await apiFetch('/addresses/', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
+            modal.hide();
+            e.target.reset();
+            showToast('Address added successfully', 'success');
+            loadAddresses();
+        } catch (error) {
+            console.error('Failed to add address:', error);
+            showToast('Failed to add address: ' + error.message, 'danger');
+        }
+    });
+
     window.deleteAddress = async function(id) {
-        if (!confirm('Delete this address?')) return;
+        if (!confirm('Are you sure you want to delete this address?')) return;
         
         try {
             await apiFetch(`/addresses/${id}/`, { method: 'DELETE' });
+            showToast('Address deleted successfully', 'success');
             loadAddresses();
         } catch (error) {
-            alert('Failed to delete address');
+            console.error('Failed to delete address:', error);
+            showToast('Failed to delete address', 'danger');
         }
     };
     
+    window.editAddress = function(id) {
+        // Implementation for edit if needed
+        showToast('Edit functionality coming soon!', 'info');
+    };
+
     document.addEventListener('DOMContentLoaded', loadAddresses);
 </script>
 {% endblock %}

@@ -1,0 +1,238 @@
+{% extends 'storefront/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --dash-primary: var(--accent-color);
+        --dash-bg: #f8f9fa;
+        --dash-card-bg: #ffffff;
+        --dash-sidebar-w: 280px;
+        --dash-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --dash-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        --dash-border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .dashboard-wrapper {
+        background-color: var(--dash-bg);
+        min-height: 80vh;
+        padding: 60px 0;
+    }
+
+    /* Sidebar Styling */
+    .dashboard-sidebar {
+        background: var(--dash-card-bg);
+        border-radius: 20px;
+        padding: 30px 20px;
+        box-shadow: var(--dash-shadow);
+        border: var(--dash-border);
+        position: sticky;
+        top: 100px;
+    }
+
+    .user-profile-section {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .avatar-wrapper {
+        position: relative;
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 15px;
+    }
+
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--dash-primary), #ff8e53);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+        font-weight: 700;
+        box-shadow: 0 10px 20px rgba(255, 78, 80, 0.2);
+    }
+
+    .user-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--theme-black);
+    }
+
+    .user-email {
+        font-size: 0.85rem;
+        color: var(--gray-600);
+    }
+
+    .dashboard-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .menu-link {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 14px 20px;
+        color: var(--gray-700);
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        transition: var(--dash-transition);
+        position: relative;
+    }
+
+    .menu-link i {
+        font-size: 18px;
+        color: var(--gray-500);
+        transition: var(--dash-transition);
+        width: 24px;
+        text-align: center;
+    }
+
+    .menu-link:hover {
+        background: rgba(255, 78, 80, 0.05);
+        color: var(--dash-primary);
+    }
+
+    .menu-link:hover i {
+        color: var(--dash-primary);
+        transform: translateX(3px);
+    }
+
+    .menu-link.active {
+        background: var(--dash-primary);
+        color: white;
+        box-shadow: 0 10px 20px rgba(255, 78, 80, 0.2);
+    }
+
+    .menu-link.active i {
+        color: white;
+    }
+
+    /* Content Styling */
+    .dashboard-content {
+        padding-left: 15px;
+    }
+
+    .dashboard-header-premium {
+        margin-bottom: 30px;
+    }
+
+    .dashboard-header-premium h2 {
+        font-weight: 800;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .dashboard-header-premium p {
+        color: var(--gray-600);
+        font-size: 1.05rem;
+    }
+
+    /* Common Card Styles */
+    .dash-card {
+        background: var(--dash-card-bg);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: var(--dash-shadow);
+        border: var(--dash-border);
+        margin-bottom: 30px;
+        transition: var(--dash-transition);
+    }
+
+    .dash-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+        animation: fadeInUp 0.5s ease forwards;
+    }
+
+    @media (max-width: 991px) {
+        .dashboard-sidebar {
+            position: static;
+            margin-bottom: 40px;
+        }
+        .dashboard-content {
+            padding-left: 0;
+        }
+    }
+</style>
+{% block dash_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="dashboard-sidebar animate-fade-in">
+                    <div class="user-profile-section">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-img" id="sidebar-avatar">
+                                {{ user.username.0|upper }}
+                            </div>
+                        </div>
+                        <h5 class="user-name" id="sidebar-name">{{ user.name|default:user.username }}</h5>
+                        <p class="user-email" id="sidebar-email">{{ user.email }}</p>
+                    </div>
+
+                    <nav class="dashboard-menu">
+                        <a href="{% url 'customer_dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'customer_dashboard' %}active{% endif %}">
+                            <i class="fas fa-th-large"></i> Dashboard
+                        </a>
+                        <a href="{% url 'order_history' %}" class="menu-link {% if request.resolver_match.url_name == 'order_history' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}">
+                            <i class="fas fa-shopping-bag"></i> My Orders
+                        </a>
+                        <a href="{% url 'addresses' %}" class="menu-link {% if request.resolver_match.url_name == 'addresses' %}active{% endif %}">
+                            <i class="fas fa-map-marker-alt"></i> Addresses
+                        </a>
+                        <a href="{% url 'profile' %}" class="menu-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                            <i class="fas fa-user-circle"></i> Profile
+                        </a>
+                        <a href="{% url 'staff_logout' %}" class="menu-link text-danger mt-4">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="dashboard-content animate-fade-in" style="animation-delay: 0.1s;">
+                    {% block dashboard_content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Shared dashboard initialization
+        console.log('Dashboard Base Initialized');
+    });
+</script>
+{% block dash_extra_js %}{% endblock %}
+{% endblock %}

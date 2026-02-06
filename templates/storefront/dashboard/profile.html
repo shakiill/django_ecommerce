@@ -1,45 +1,123 @@
-{% extends 'storefront/base.html' %}
+{% extends 'storefront/dashboard/dashboard_base.html' %}
+{% load static %}
 
-{% block title %}My Profile - ShopHub{% endblock %}
+{% block title %}My Profile - UOMO{% endblock %}
 
-{% block content %}
-<div class="container py-5">
-    <h2 class="mb-4">My Profile</h2>
-    
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <form id="profile-form">
-                        <div class="mb-3">
-                            <label class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first_name">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last_name">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Update Profile</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+{% block dash_extra_css %}
+<style>
+    .profile-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: var(--dash-shadow);
+        border: var(--dash-border);
+    }
+
+    .form-section-title {
+        font-weight: 800;
+        font-size: 1.25rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(255, 78, 80, 0.1);
+        display: inline-block;
+    }
+
+    .profile-form .form-label-premium {
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        color: var(--gray-500);
+        margin-bottom: 10px;
+    }
+
+    .profile-form .form-control-premium {
+        height: 55px;
+        border-radius: 12px;
+        border: 2px solid var(--gray-200);
+        padding: 0 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background-color: #fcfcfc;
+    }
+
+    .profile-form .form-control-premium:focus {
+        background-color: #fff;
+        border-color: var(--dash-primary);
+        box-shadow: 0 0 0 4px rgba(255, 78, 80, 0.05);
+    }
+
+    .profile-form .form-control-premium[readonly] {
+        background-color: #f8f9fa;
+        color: var(--gray-500);
+        cursor: not-allowed;
+    }
+
+    .update-profile-btn {
+        background: var(--theme-black);
+        color: white;
+        padding: 16px 40px;
+        border-radius: 30px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        border: none;
+        margin-top: 20px;
+    }
+
+    .update-profile-btn:hover {
+        background: var(--dash-primary);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(255, 78, 80, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-header-premium mb-4">
+    <h2>Account Details</h2>
+    <p>Update your personal information and email address.</p>
 </div>
 
-<script>
-    if (!isAuthenticated()) {
-        window.location.href = '/user/login/?next=/my-account/profile/';
-    }
+<div class="profile-card animate-fade-in">
+    <h4 class="form-section-title">Personal Information</h4>
     
+    <form id="profile-form" class="profile-form">
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <label class="form-label-premium">Username</label>
+                <input type="text" class="form-control form-control-premium" id="username" readonly>
+                <small class="text-muted">Username cannot be changed.</small>
+            </div>
+            
+            <div class="col-md-12 mb-4">
+                <label class="form-label-premium">Email Address</label>
+                <input type="email" class="form-control form-control-premium" id="email" placeholder="Enter your email">
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <label class="form-label-premium">First Name</label>
+                <input type="text" class="form-control form-control-premium" id="first_name" placeholder="John">
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <label class="form-label-premium">Last Name</label>
+                <input type="text" class="form-control form-control-premium" id="last_name" placeholder="Doe">
+            </div>
+        </div>
+        
+        <div class="text-end">
+            <button type="submit" class="update-profile-btn">
+                SAVE CHANGES
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block dash_extra_js %}
+<script>
     async function loadProfile() {
         try {
             const data = await apiFetch('/auth/user/');
@@ -47,13 +125,26 @@
             document.getElementById('email').value = data.email || '';
             document.getElementById('first_name').value = data.first_name || '';
             document.getElementById('last_name').value = data.last_name || '';
+            
+            // Update sidebar too if needed
+            if (document.getElementById('sidebar-name')) {
+                document.getElementById('sidebar-name').textContent = data.username;
+            }
+            if (document.getElementById('sidebar-email')) {
+                document.getElementById('sidebar-email').textContent = data.email;
+            }
         } catch (error) {
-            alert('Failed to load profile');
+            console.error('Failed to load profile:', error);
+            showToast('Failed to load profile', 'danger');
         }
     }
     
     document.getElementById('profile-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const btn = e.target.querySelector('button');
+        const originalText = btn.textContent;
+        btn.textContent = 'SAVING...';
+        btn.disabled = true;
         
         try {
             await apiFetch('/auth/user/', {
@@ -65,9 +156,14 @@
                 })
             });
             
-            alert('Profile updated successfully!');
+            showToast('Profile updated successfully!', 'success');
+            loadProfile(); // Refresh
         } catch (error) {
-            alert('Failed to update profile');
+            console.error('Failed to update profile:', error);
+            showToast('Failed to update profile', 'danger');
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
         }
     });
     
