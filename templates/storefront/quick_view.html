@@ -62,8 +62,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Description -->
-                            <div class="qv-description" id="qv-description">Description...</div>
+                           
                             
                             <!-- Divider -->
                             <div class="qv-divider"></div>
@@ -105,6 +104,8 @@
                                     <span>View Full Details</span>
                                 </a>
                             </div>
+                             <!-- Description -->
+                            <div class="qv-description" id="qv-description">Description...</div>
                             
                             <!-- Trust Badges -->
                             <div class="qv-trust-badges">
@@ -778,6 +779,13 @@
             } else {
                  // No variants/attributes
                  updateModalPrice(data.price, null);
+            }
+            
+            // Handle Wishlist Button
+            const wishBtn = document.getElementById('qv-wishlist');
+            if (wishBtn) {
+                updateWishlistBtnState(wishBtn, data.is_in_wishlist);
+                wishBtn.onclick = () => toggleWishlist(data.id, wishBtn);
             }
             
         } catch (error) {

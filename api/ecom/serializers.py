@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.ecom.models import Product, ProductImage, ProductVariant
+from apps.ecom.models import Product, ProductImage, ProductVariant, Wishlist
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -43,14 +43,24 @@ class ProductListSerializer(serializers.ModelSerializer):
     on_sale = serializers.SerializerMethodField()
     thumbnail = serializers.ImageField(read_only=True)
     unit_name = serializers.CharField(source='unit.name', read_only=True)
+    is_in_wishlist = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'slug', 'short_description', 'category', 'category_name', 'brand', 'brand_name',
             'product_type', 'is_featured', 'thumbnail', 'thumbnail_hover', 'unit', 'unit_name', 'price',
-            'old_price', 'on_sale', 'default_variant', 'is_active'
+            'old_price', 'on_sale', 'default_variant', 'is_active', 'is_in_wishlist'
         ]
+
+    def get_is_in_wishlist(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            # Check if product is in user's wishlist
+            # Note: For high traffic, consider prefetching or annotation in ViewSet
+            from apps.ecom.models import Wishlist
+            return Wishlist.objects.filter(user=request.user, product=obj).exists()
+        return False
 
     def get_price(self, obj):
         if obj.default_variant and obj.default_variant.is_on_sale:
@@ -81,6 +91,8 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
     attributes_list = serializers.SerializerMethodField()
 
     variant_list = serializers.SerializerMethodField()
+    
+    is_in_wishlist = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -92,6 +104,14 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
 
     def get_brand_name(self, obj):
         return obj.brand.name if obj.brand else None
+
+    def get_is_in_wishlist(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            # Check if product is in user's wishlist
+            from apps.ecom.models import Wishlist
+            return Wishlist.objects.filter(user=request.user, product=obj).exists()
+        return False
 
     def get_attributes_list(self, obj):
         # Gather all attribute values used by this product's variants
@@ -126,3 +146,22 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
         variants = ProductVariant.objects.filter(product=obj).prefetch_related('attributes')
         data = ProductVariantSerializer(variants, many=True, context=self.context).data
         return data
+
+
+class WishlistSerializer(serializers.ModelSerializer):
+    product_details = ProductListSerializer(source='product', read_only=True)
+
+    class Meta:
+        model = Wishlist
+        fields = ['id', 'user', 'product', 'product_details', 'created_at']
+        extra_kwargs = {
+            'user': {'read_only': True},
+            'product': {'required': True},
+        }
+    
+    def create(self, validated_data):
+        user = self.context['request'].user
+        product = validated_data['product']
+        wishlist_item, created = Wishlist.objects.get_or_create(user=user, product=product)
+        return wishlist_item
+

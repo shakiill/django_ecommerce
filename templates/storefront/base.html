@@ -134,7 +134,7 @@
                     </div>
                 </div>
                 
-                <a href="#" class="header-icon d-none d-sm-block">
+                <a href="{% url 'wishlist' %}" class="header-icon d-none d-sm-block">
                     <i class="far fa-heart"></i>
                 </a>
                 
@@ -179,7 +179,7 @@
         <div class="mobile-nav-icons">
             <a href="{% url 'shop' %}">Search</a>
             <a href="{% if user.is_authenticated %}{% url 'customer_dashboard' %}{% else %}{% url 'staff_login' %}{% endif %}">Account</a>
-            <a href="#">Wishlist</a>
+            <a href="{% url 'wishlist' %}">Wishlist</a>
             <a href="{% url 'cart' %}">Cart</a>
         </div>
     </div>
@@ -602,6 +602,84 @@
                 closeMobileMenu();
             }
         });
+
+        // Wishlist Functionality
+        async function toggleWishlist(productId, btnElement = null) {
+            if (!isAuthenticated()) {
+                window.location.href = "{% url 'staff_login' %}?next=" + window.location.pathname;
+                return false;
+            }
+
+            // Show loading state if button provided
+            let originalContent = '';
+            if (btnElement) {
+                originalContent = btnElement.innerHTML;
+                btnElement.disabled = true; 
+                // Don't change content deeply to avoid losing verified structure, just wait.
+                // Or maybe small spinner?
+            }
+
+            try {
+                // Check status first to decide action
+                const checkRes = await apiFetch(`/wishlist/check/${productId}/`);
+                const wasInWishlist = checkRes.is_in_wishlist;
+                
+                let newState = false;
+                
+                if (wasInWishlist) {
+                    // Remove
+                    await apiFetch('/wishlist/remove_by_product/', {
+                        method: 'POST',
+                        body: JSON.stringify({ product_id: productId })
+                    });
+                    showToast('Removed from wishlist', 'info');
+                    newState = false;
+                } else {
+                    // Add
+                    await apiFetch('/wishlist/', {
+                        method: 'POST',
+                        body: JSON.stringify({ product: productId })
+                    });
+                    showToast('Added to wishlist', 'success');
+                    newState = true;
+                }
+                
+                if (btnElement) {
+                     updateWishlistBtnState(btnElement, newState);
+                     btnElement.disabled = false;
+                }
+                
+                return newState;
+            } catch (error) {
+                console.error("Wishlist toggle error", error);
+                showToast('Failed to update wishlist', 'danger');
+                if (btnElement) btnElement.disabled = false;
+                return null;
+            }
+        }
+
+        function updateWishlistBtnState(btn, isSaved) {
+            // Handles both button with span and icon-only links
+            const icon = btn.querySelector('i');
+            if (!icon) return;
+            
+            if (isSaved) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-danger');
+                const span = btn.querySelector('span');
+                if (span && span.textContent.includes('Wishlist')) {
+                     span.textContent = 'Saved to Wishlist';
+                }
+            } else {
+                icon.classList.remove('fas', 'text-danger');
+                icon.classList.add('far');
+                const span = btn.querySelector('span');
+                if (span && span.textContent.includes('Wishlist')) {
+                     span.textContent = 'Add to Wishlist';
+                }
+            }
+        }
+
     </script>
     
     {% block extra_js %}{% endblock %}

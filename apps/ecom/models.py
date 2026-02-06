@@ -9,6 +9,7 @@ from django.utils.text import slugify
 
 from apps.helpers.models import UserTimestampMixin
 from apps.master.models import Category, Brand, Tag, AttributeValue, Tax, Unit
+from django.conf import settings
 
 
 class Product(UserTimestampMixin):
@@ -262,3 +263,17 @@ def productvariant_attributes_changed(sender, instance, action, pk_set, **kwargs
                 # Use queryset update to avoid recursion into save()
                 type(instance).objects.filter(pk=instance.pk).update(variant_name=gen)
                 instance.variant_name = gen
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='wishlisted_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name}"
+

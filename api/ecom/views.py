@@ -3,12 +3,14 @@ from django.core.cache import cache
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework import status
 
 from api.ecom.new_arrival import NewProductSerializer
-from api.ecom.serializers import ProductListSerializer, ProductDetailsSerializer
-from apps.ecom.models import Product
+from api.ecom.serializers import ProductListSerializer, ProductDetailsSerializer, WishlistSerializer
+from apps.ecom.models import Product, Wishlist
 from apps.master.models import Category, Brand
 
 
@@ -159,3 +161,31 @@ class NewArrivalProductViewSet(CachedReadOnlyMixin, viewsets.ReadOnlyModelViewSe
 
     def get_queryset(self):
         return Product.objects.filter(is_active=True, is_featured=True).order_by('-created_at')
+
+
+class WishlistViewSet(viewsets.ModelViewSet):
+    serializer_class = WishlistSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'delete']
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['get'], url_path='check/(?P<product_id>[^/]+)')
+    def check_product(self, request, product_id=None):
+        """Check if a product is in the user's wishlist."""
+        exists = Wishlist.objects.filter(user=request.user, product_id=product_id).exists()
+        return Response({'is_in_wishlist': exists})
+    
+    @action(detail=False, methods=['post'], url_path='remove_by_product')
+    def remove_by_product(self, request):
+        """Remove item from wishlist using product_id."""
+        product_id = request.data.get('product_id')
+        if not product_id:
+            return Response({'error': 'Product ID required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        deleted, _ = Wishlist.objects.filter(user=request.user, product_id=product_id).delete()
+        if deleted:
+            return Response({'status': 'removed'}, status=status.HTTP_200_OK)
+        return Response({'error': 'Not found in wishlist'}, status=status.HTTP_404_NOT_FOUND)
+

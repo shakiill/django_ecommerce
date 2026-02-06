@@ -116,3 +116,12 @@ class ContactView(TemplateView):
     Public contact page.
     """
     template_name = 'storefront/contact.html'
+
+
+class WishlistView(LoginRequiredMixin, TemplateView):
+    """
+    Customer wishlist page.
+    """
+    template_name = 'storefront/wishlist.html'
+    login_url = '/user/login/'
+

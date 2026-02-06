@@ -44,6 +44,7 @@ class NewProductSerializer(serializers.ModelSerializer):
     thumbnail = serializers.ImageField(read_only=True)
     thumbnail_hover = serializers.ImageField(read_only=True)
     unit_name = serializers.CharField(source='unit.name', read_only=True)
+    is_in_wishlist = serializers.SerializerMethodField()
 
     attributes_list = serializers.SerializerMethodField()
 
@@ -59,6 +60,14 @@ class NewProductSerializer(serializers.ModelSerializer):
 
     def get_brand_name(self, obj):
         return obj.brand.name if obj.brand else None
+
+    def get_is_in_wishlist(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            from apps.ecom.models import Wishlist
+            return Wishlist.objects.filter(user=request.user, product=obj).exists()
+        return False
+
 
     def get_attributes_list(self, obj):
         # Gather all attribute values used by this product's variants

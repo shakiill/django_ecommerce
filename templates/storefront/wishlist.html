@@ -1,0 +1,146 @@
+{% extends 'storefront/base.html' %}
+
+{% block title %}My Wishlist - ECOM{% endblock %}
+
+{% block content %}
+<div class="wishlist-page py-5 mt-5">
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="fw-bold mb-0">My Wishlist</h2>
+            <span class="text-muted fw-medium" id="wishlist-count">0 items</span>
+        </div>
+        
+        <div id="wishlist-container" class="row g-4">
+             <!-- Items will be loaded here -->
+             <div class="text-center py-5 w-100">
+                <div class="spinner-border text-dark"></div>
+                <p class="mt-3 text-muted">Loading your wishlist...</p>
+             </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    if (!isAuthenticated()) {
+        window.location.href = '/user/login/?next=/wishlist/';
+    }
+
+    async function loadWishlist() {
+        const container = document.getElementById('wishlist-container');
+        const countEl = document.getElementById('wishlist-count');
+        
+        try {
+            const data = await apiFetch('/wishlist/');
+            // Handle both paginated and non-paginated responses
+            const items = Array.isArray(data) ? data : (data.results || []);
+
+            countEl.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+            
+            if (items.length > 0) {
+                container.innerHTML = items.map(item => {
+                    const product = item.product_details;
+                    // Handle missing fields gracefully
+                    const thumbnail = product.thumbnail || product.thumbnail_hover || '/static/assets/images/placeholder.jpg';
+                    
+                    return `
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative group">
+                            <button class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle shadow-sm z-3"
+                                    onclick="removeItemFromWishlist(${item.id})" title="Remove">
+                                <i class="fas fa-times text-danger"></i>
+                            </button>
+                            
+                            <a href="/shop/${product.slug}/" class="position-relative d-block overflow-hidden bg-light" style="padding-top: 100%;">
+                                <img src="${thumbnail}" 
+                                     class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover transition-transform duration-500 hover-scale"
+                                     alt="${product.name}">
+                            </a>
+                            
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="mb-2">
+                                    <span class="badge bg-light text-dark mb-2">${product.category_name || 'General'}</span>
+                                    <h5 class="card-title fw-bold mb-1">
+                                        <a href="/shop/${product.slug}/" class="text-decoration-none text-dark stretched-link-z">${product.name}</a>
+                                    </h5>
+                                </div>
+                                
+                                <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                                    <div class="price fw-bold text-primary">
+                                        ৳${product.price}
+                                        ${product.old_price ? `<span class="text-muted text-decoration-line-through ms-2 small">৳${product.old_price}</span>` : ''}
+                                    </div>
+                                    <button class="btn btn-sm btn-dark rounded-pill px-3" onclick="addToCartFromWishlist(${product.default_variant}, this)">
+                                        <i class="fas fa-shopping-bag me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } else {
+                container.innerHTML = `
+                    <div class="text-center py-5 w-100">
+                        <div class="mb-4">
+                            <i class="far fa-heart fa-4x text-light" style="color: #eee !important;"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Your wishlist is empty</h4>
+                        <p class="text-muted mb-4">Start saving your favorite items now!</p>
+                        <a href="/shop/" class="btn btn-dark px-5 py-3 fw-bold rounded-pill">Explore Shop</a>
+                    </div>
+                `;
+            }
+
+        } catch (error) {
+            console.error('Failed to load wishlist:', error);
+            container.innerHTML = '<div class="alert alert-danger w-100">Failed to load wishlist. Please try again.</div>';
+        }
+    }
+
+    async function removeItemFromWishlist(id) {
+        if(!confirm('Remove this item?')) return;
+        try {
+            await apiFetch(`/wishlist/${id}/`, { method: 'DELETE' });
+            loadWishlist();
+            showToast('Item removed', 'success');
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to remove item', 'danger');
+        }
+    }
+    
+    async function addToCartFromWishlist(variantId, btn) {
+        if (!variantId) {
+            showToast('Product unavailable', 'danger');
+            return;
+        }
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        btn.disabled = true;
+        
+        try {
+            const success = await addToCart(variantId, 1);
+            if (success) {
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-dark');
+                setTimeout(() => {
+                     btn.innerHTML = '<i class="fas fa-shopping-bag me-1"></i> Add';
+                     btn.classList.remove('btn-success');
+                     btn.classList.add('btn-dark');
+                     btn.disabled = false;
+                }, 2000);
+            } else {
+                 btn.innerHTML = '<i class="fas fa-shopping-bag me-1"></i> Add';
+                 btn.disabled = false;
+            }
+        } catch(e) {
+            btn.innerHTML = '<i class="fas fa-shopping-bag me-1"></i> Add';
+            btn.disabled = false;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadWishlist);
+</script>
+{% endblock %}

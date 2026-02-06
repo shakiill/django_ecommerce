@@ -201,7 +201,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 25
+    'PAGE_SIZE': 24
 }
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

@@ -21,6 +21,7 @@ from apps.ecom.storefront_views import (
     AddressManagementView,
     ProfileView,
     ContactView,
+    WishlistView,
 )
 from apps.user.registration import CustomerRegistrationView, OtpVerificationView
 
@@ -32,6 +33,7 @@ urlpatterns = [
     path('register/verify/', OtpVerificationView.as_view(), name='verify_otp'),
     path('shop/', StorefrontProductListView.as_view(), name='shop'),
     path('shop/<slug:slug>/', ProductDetailView.as_view(), name='product_detail'),
+    path('wishlist/', WishlistView.as_view(), name='wishlist'),
     path('cart/', CartView.as_view(), name='cart'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),
     

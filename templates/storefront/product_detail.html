@@ -126,8 +126,8 @@
 
                     <!-- Secondary Actions -->
                     <div class="qv-secondary-actions mb-5 pb-4 border-bottom">
-                        <button class="qv-action-btn">
-                            <i class="far fa-heart"></i> Add to Wishlist
+                        <button class="qv-action-btn" id="detail-wishlist-btn" onclick="if(detailProduct) toggleWishlist(detailProduct.id, this)">
+                            <i class="far fa-heart"></i> <span>Add to Wishlist</span>
                         </button>
                         <button class="qv-action-btn">
                             <i class="fas fa-share-alt"></i> Share Product
@@ -542,6 +542,15 @@
                 }
             } else {
                  updateDetailUIPrice(data.price, null);
+            }
+            
+            // Check Wishlist Status
+            if (isAuthenticated()) {
+                 try {
+                     const wRes = await apiFetch(`/wishlist/check/${data.id}/`);
+                     const wBtn = document.getElementById('detail-wishlist-btn');
+                     if (wBtn) updateWishlistBtnState(wBtn, wRes.is_in_wishlist);
+                 } catch(e) { console.warn('Wishlist check failed', e); }
             }
             
         } catch (error) {

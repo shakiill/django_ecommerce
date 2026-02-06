@@ -1228,6 +1228,8 @@
         if (product.is_new) badges += '<span class="badge-item badge-new">New</span>';
         if (product.is_featured && !product.on_sale) badges += '<span class="badge-item badge-featured">Featured</span>';
         
+        const wishlistIconClass = product.is_in_wishlist ? 'fas fa-heart text-danger' : 'far fa-heart';
+        
         return `
             <article class="product-card-shop">
                 <div class="product-image">
@@ -1240,7 +1242,9 @@
                         <button class="action-btn btn-cart" onclick="showQuickView('${product.slug}')">
                             <i class="fas fa-shopping-bag"></i> Quick View
                         </button>
-                        <button class="action-btn" title="Wishlist"><i class="far fa-heart"></i></button>
+                        <button class="action-btn" title="Wishlist" onclick="toggleWishlist(${product.id}, this)">
+                            <i class="${wishlistIconClass}"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="product-info">
