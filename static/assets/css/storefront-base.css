@@ -564,65 +564,187 @@ a {
 
 /* --- Footer --- */
 
+/* --- Footer --- */
+
 .footer {
     background: var(--black);
     color: var(--gray-500);
-    padding: 60px 0 40px;
+    padding: 60px 0 30px;
 }
 
-.footer-heading {
+.footer-main-content {
+    margin-bottom: 50px;
+}
+
+/* Brand Section */
+.footer-brand-section {
+    max-width: 280px;
+}
+
+.footer-logo {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.footer-tagline {
     font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 25px;
+}
+
+.footer-social {
+    display: flex;
+    gap: 12px;
+}
+
+/* Footer Headings */
+.footer-heading {
+    font-size: 12px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     color: var(--white);
 }
 
-.footer-about {
-    font-size: 15px;
-    line-height: 1.8;
-    color: var(--gray-500);
+/* Footer Links */
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    transition: var(--transition-base);
+    display: inline-block;
+}
+
+.footer-links a:hover {
+    color: var(--accent-color);
+    transform: translateX(3px);
+}
+
+/* Social Links */
 .social-link {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--gray-400);
-    margin-right: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.4);
     border-radius: 50%;
+    transition: var(--transition-base);
 }
 
 .social-link:hover {
     background: var(--accent-color);
     color: var(--white);
     border-color: var(--accent-color);
-    transform: translateY(-5px);
+    transform: translateY(-3px);
 }
 
-.footer-links {
-    list-style: none;
-    padding: 0;
+/* Newsletter */
+.footer-newsletter-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 20px;
+    line-height: 1.6;
 }
 
-.footer-links li {
-    margin-bottom: 15px;
+.footer-newsletter-form {
+    margin-top: 20px;
 }
 
-.footer-links a:hover {
-    color: var(--accent-color);
-    padding-left: 5px;
+.newsletter-input-wrapper {
+    position: relative;
+    display: flex;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: var(--transition-base);
 }
 
+.newsletter-input-wrapper:focus-within {
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.newsletter-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 14px 18px;
+    color: var(--white);
+    font-size: 14px;
+    outline: none;
+}
+
+.newsletter-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.newsletter-btn {
+    background: var(--accent-color);
+    border: none;
+    color: var(--white);
+    padding: 0 20px;
+    cursor: pointer;
+    transition: var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.newsletter-btn:hover {
+    background: var(--white);
+    color: var(--black);
+}
+
+.newsletter-btn i {
+    font-size: 14px;
+}
+
+/* Footer Bottom */
 .footer-bottom {
-    margin-top: 60px;
+    margin-top: 50px;
     padding-top: 30px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-copyright {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.footer-tagline-sm {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.2);
+    font-weight: 500;
+}
+
+@media (max-width: 991px) {
+    .footer-brand-section {
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .footer-main-content {
+        margin-bottom: 40px;
+    }
 }
 
 /* --- Global Utilities --- */
