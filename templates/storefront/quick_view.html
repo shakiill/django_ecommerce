@@ -15,6 +15,7 @@
                             <div class="qv-image-main">
                                 <div class="qv-image-wrapper">
                                     <img id="qv-image" src="" alt="Product" class="qv-main-image">
+                                    <div id="qv-zoom-lens"></div>
                                     <div class="qv-image-loader">
                                         <div class="spinner-border text-primary" role="status">
                                             <span class="visually-hidden">Loading...</span>
@@ -229,8 +230,26 @@
 }
 
 .qv-image-wrapper:hover .qv-main-image {
-    transform: scale(1.15);
-    filter: brightness(1.02);
+    cursor: zoom-in;
+}
+
+#qv-zoom-lens {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: none;
+    display: none;
+    background-repeat: no-repeat;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2), inset 0 0 15px rgba(0,0,0,0.1);
+    pointer-events: none;
+    z-index: 1000;
+    background-color: #fff;
+}
+
+.qv-image-wrapper:hover #qv-zoom-lens {
+    display: block;
 }
 
 .qv-image-loader {
@@ -711,6 +730,10 @@
         document.getElementById('qv-image').style.opacity = '0';
         document.getElementById('qv-attributes-container').innerHTML = '';
         
+        modalEl.addEventListener('shown.bs.modal', function () {
+            initQVMagnifier();
+        }, { once: true });
+        
         modal.show();
 
         try {
@@ -761,6 +784,43 @@
             console.error('Error loading quick view:', error);
             document.getElementById('qv-title').textContent = 'Error loading product';
         }
+    }
+
+    function initQVMagnifier() {
+        const wrapper = document.querySelector('.qv-image-wrapper');
+        const img = document.getElementById('qv-image');
+        const lens = document.getElementById('qv-zoom-lens');
+        
+        if (!wrapper || !img || !lens) return;
+
+        wrapper.onmousemove = (e) => {
+            const rect = wrapper.getBoundingClientRect();
+            lens.style.display = 'block';
+            
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+            
+            if (x > rect.width) x = rect.width;
+            if (x < 0) x = 0;
+            if (y > rect.height) y = rect.height;
+            if (y < 0) y = 0;
+            
+            lens.style.left = (x - lens.offsetWidth / 2) + 'px';
+            lens.style.top = (y - lens.offsetHeight / 2) + 'px';
+            
+            const zoomLevel = 2.5;
+            lens.style.backgroundImage = `url('${img.src}')`;
+            lens.style.backgroundSize = (rect.width * zoomLevel) + "px " + (rect.height * zoomLevel) + "px";
+            
+            let posX = (x * zoomLevel) - (lens.offsetWidth / 2);
+            let posY = (y * zoomLevel) - (lens.offsetHeight / 2);
+            
+            lens.style.backgroundPosition = `-${posX}px -${posY}px`;
+        };
+        
+        wrapper.onmouseleave = () => {
+            lens.style.display = 'none';
+        };
     }
 
     function renderAttributes(attributes) {

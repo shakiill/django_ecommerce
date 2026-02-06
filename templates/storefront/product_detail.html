@@ -32,6 +32,7 @@
                             <div class="product-main-view glass-panel p-3">
                                 <div class="main-image-wrapper">
                                     <img id="main-product-image" src="" alt="Product" class="img-fluid rounded-4">
+                                    <div id="zoom-lens"></div>
                                     <div class="image-zoom-hint">
                                         <i class="fas fa-search-plus"></i> Hover to Zoom
                                     </div>
@@ -257,7 +258,26 @@
 }
 
 .main-image-wrapper:hover #main-product-image {
-    transform: scale(1.05);
+    cursor: zoom-in;
+}
+
+#zoom-lens {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: none;
+    display: none;
+    background-repeat: no-repeat;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2), inset 0 0 15px rgba(0,0,0,0.1);
+    pointer-events: none;
+    z-index: 1000;
+    background-color: #fff;
+}
+
+.main-image-wrapper:hover #zoom-lens {
+    display: block;
 }
 
 .thumbnail-item {
@@ -428,7 +448,52 @@
         if (productSlug) {
             await loadProductDetail(productSlug);
         }
+        initMagnifier();
     });
+
+    function initMagnifier() {
+        const wrapper = document.querySelector('.main-image-wrapper');
+        const img = document.getElementById('main-product-image');
+        const lens = document.getElementById('zoom-lens');
+        
+        if (!wrapper || !img || !lens) return;
+
+        wrapper.addEventListener('mousemove', (e) => {
+            const rect = wrapper.getBoundingClientRect();
+            
+            // Show lens
+            lens.style.display = 'block';
+            
+            // Calculate mouse position relative to image
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+            
+            // Prevent lens from going outside
+            if (x > rect.width) x = rect.width;
+            if (x < 0) x = 0;
+            if (y > rect.height) y = rect.height;
+            if (y < 0) y = 0;
+            
+            // Set lens position
+            lens.style.left = (x - lens.offsetWidth / 2) + 'px';
+            lens.style.top = (y - lens.offsetHeight / 2) + 'px';
+            
+            // Set zoom background
+            const zoomLevel = 2.5;
+            lens.style.backgroundImage = `url('${img.src}')`;
+            lens.style.backgroundSize = (rect.width * zoomLevel) + "px " + (rect.height * zoomLevel) + "px";
+            
+            // Calculate background position
+            let posX = (x * zoomLevel) - (lens.offsetWidth / 2);
+            let posY = (y * zoomLevel) - (lens.offsetHeight / 2);
+            
+            lens.style.backgroundPosition = `-${posX}px -${posY}px`;
+        });
+        
+        wrapper.addEventListener('mouseleave', () => {
+            lens.style.display = 'none';
+        });
+    }
 
     async function loadProductDetail(slug) {
         try {
