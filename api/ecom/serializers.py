@@ -12,10 +12,11 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductVariantSerializer(serializers.ModelSerializer):
     image_list = serializers.SerializerMethodField()
     is_default = serializers.SerializerMethodField()
+    on_sale = serializers.BooleanField(source='is_on_sale', read_only=True)
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'is_default', 'price', 'discount_price', 'is_discount', 'attributes', 'image_list']
+        fields = ['id', 'is_default', 'price', 'discount_price', 'is_discount', 'on_sale', 'attributes', 'image_list']
 
     def get_is_default(self, obj):
         return obj.product.default_variant_id == obj.id
@@ -84,6 +85,8 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     brand_name = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
+    old_price = serializers.SerializerMethodField()
+    on_sale = serializers.SerializerMethodField()
     thumbnail = serializers.ImageField(read_only=True)
     thumbnail_hover = serializers.ImageField(read_only=True)
     unit_name = serializers.CharField(source='unit.name', read_only=True)
@@ -100,7 +103,17 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
                    'max_order_quantity', 'created_by', 'updated_by']
 
     def get_price(self, obj):
+        if obj.default_variant and obj.default_variant.is_on_sale:
+            return obj.default_variant.discount_price
         return obj.get_price()
+
+    def get_old_price(self, obj):
+        if obj.default_variant and obj.default_variant.is_on_sale:
+            return obj.default_variant.price
+        return None
+
+    def get_on_sale(self, obj):
+        return obj.default_variant.is_on_sale if obj.default_variant else False
 
     def get_brand_name(self, obj):
         return obj.brand.name if obj.brand else None

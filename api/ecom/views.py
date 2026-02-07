@@ -124,9 +124,17 @@ class ProductViewSet(CachedReadOnlyMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         data = serializer.data
 
-        # If a matching variant is found, override price, thumbnail, and default_variant
+        # If a matching variant is found, override price, thumbnail, on_sale, and default_variant
         if variant:
-            data['price'] = str(variant.price)
+            if variant.is_on_sale:
+                data['price'] = str(variant.discount_price)
+                data['old_price'] = str(variant.price)
+                data['on_sale'] = True
+            else:
+                data['price'] = str(variant.price)
+                data['old_price'] = None
+                data['on_sale'] = False
+            
             if variant.image:
                 data['thumbnail'] = request.build_absolute_uri(variant.image.url)
             else:
