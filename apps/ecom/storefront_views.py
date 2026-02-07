@@ -19,10 +19,22 @@ class StorefrontHomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         # Fetch active home sections
         sections = HomeSection.objects.filter(is_active=True).order_by('order')
+        context['sections'] = sections
         # Convert to a dictionary for easy access in template: {section_type: True}
         # This allows for {% if home_sections.flash_sale %} style checks
         context['home_sections'] = {s.section_type: True for s in sections}
         return context
+
+
+class FlashSaleView(TemplateView):
+    template_name = 'storefront/flash_sale.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # We can pass any specific data for flash sale here
+        return context
+
+
 
 
 class ProductListView(TemplateView):

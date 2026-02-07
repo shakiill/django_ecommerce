@@ -130,6 +130,23 @@
                                                            value="{{ product.default_variant.price|default_if_none:'' }}">
                                                 </div>
                                             </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-medium">Discount Price (Flash Sale)</label>
+                                                    <input type="number" class="form-control" id="singleDiscountPrice"
+                                                           name="single_discount_price" step="0.01" min="0" placeholder="0.00"
+                                                           value="{{ product.default_variant.discount_price|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3 pt-9">
+                                                    <div class="form-check form-switch px-10">
+                                                        <input class="form-check-input" type="checkbox" id="singleIsDiscount"
+                                                               name="single_is_discount" {% if product.default_variant.is_discount %}checked{% endif %}>
+                                                        <label class="form-check-label fw-bold text-danger" for="singleIsDiscount">Is Flash Sale?</label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label class="form-label fw-medium">Variant Image (optional)</label>
@@ -192,9 +209,14 @@
                                              {% if not existing_variants %}style="display:none"{% endif %}>
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <h6 class="mb-0 fw-semibold">Generated Variants</h6>
-                                                <button type="button" class="btn btn-sm btn-outline-info ms-2" id="bulkPurchasePriceBtn">
-                                                    <i class="fas fa-shopping-cart me-1"></i>Set Purchase Prices
-                                                </button>
+                                                <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-sm btn-outline-info" id="bulkPurchasePriceBtn">
+                                                        <i class="fas fa-shopping-cart me-1"></i>Set Purchase Prices
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" id="bulkDiscountPriceBtn">
+                                                        <i class="fas fa-bolt me-1"></i>Set Flash Sale Prices
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div class="table-responsive">
                                                 <table class="table table-hover">
@@ -204,8 +226,11 @@
                                                         <th>Combination</th>
                                                         <th>Purchase Price</th>
                                                         <th>Price ($)</th>
+                                                        <th>Flash Sale</th>
+                                                        <th>Discount Price</th>
                                                         <th>Active</th>
                                                         <th>Default</th>
+
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -240,7 +265,19 @@
                                                                        step="0.01" min="0" value="{{ v.price }}"
                                                                        required></td>
                                                             <td>
-                                                                <div class="form-check form-switch">
+                                                                <div class="form-check form-switch d-flex justify-content-center">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                           name="variants[{{ forloop.counter0 }}][is_discount]"
+                                                                           {% if v.is_discount %}checked{% endif %}>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="form-control form-control-sm"
+                                                                       name="variants[{{ forloop.counter0 }}][discount_price]"
+                                                                       step="0.01" min="0" value="{{ v.discount_price }}">
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-check form-switch d-flex justify-content-center">
                                                                     <input class="form-check-input" type="checkbox"
                                                                            name="variants[{{ forloop.counter0 }}][is_active]"
                                                                            {% if v.is_active %}checked{% endif %}>
@@ -297,6 +334,33 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="applyBulkPurchasePrice">Apply to All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Discount Price Modal -->
+    <div class="modal fade" id="bulkDiscountPriceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Set Flash Sale Price for All Variants</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" id="bulkIsDiscountEnable" checked>
+                        <label class="form-check-label fw-bold" for="bulkIsDiscountEnable">Enable Flash Sale for all?</label>
+                    </div>
+                    <div class="mb-3" id="bulkDiscountValueWrapper">
+                        <label class="form-label">Discount Price</label>
+                        <input type="number" class="form-control" id="bulkDiscountPriceValue" step="0.01"
+                               placeholder="Enter discount price for all variants">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="applyBulkDiscountPrice">Apply to All</button>
                 </div>
             </div>
         </div>
@@ -419,7 +483,15 @@
           <td><input type="number" class="form-control form-control-sm variant-purchase-price" name="variants[${index}][purchase_price]" step="0.01" min="0"></td>
           <td><input type="number" class="form-control form-control-sm variant-price" name="variants[${index}][price]" step="0.01" min="0" required></td>
           <td>
-            <div class="form-check form-switch">
+            <div class="form-check form-switch d-flex justify-content-center">
+              <input class="form-check-input" type="checkbox" name="variants[${index}][is_discount]">
+            </div>
+          </td>
+          <td>
+            <input type="number" class="form-control form-control-sm" name="variants[${index}][discount_price]" step="0.01" min="0">
+          </td>
+          <td>
+            <div class="form-check form-switch d-flex justify-content-center">
               <input class="form-check-input" type="checkbox" name="variants[${index}][is_active]" checked>
             </div>
           </td>
@@ -527,6 +599,33 @@
                 }
             });
 
+            // NEW: Bulk discount price update
+            $('#bulkDiscountPriceBtn').click(function () {
+                $('#bulkDiscountPriceModal').modal('show');
+            });
+
+            $('#applyBulkDiscountPrice').click(function () {
+                const isDiscount = $('#bulkIsDiscountEnable').is(':checked');
+                const discountPrice = $('#bulkDiscountPriceValue').val();
+
+                $('#variantsTableBody tr').each(function () {
+                    $(this).find('input[name*="[is_discount]"]').prop('checked', isDiscount);
+                    if (discountPrice) {
+                        $(this).find('input[name*="[discount_price]"]').val(discountPrice);
+                    }
+                });
+                $('#bulkDiscountPriceModal').modal('hide');
+            });
+
+            // Dynamic visibility for bulk discount value
+            $('#bulkIsDiscountEnable').change(function() {
+                if($(this).is(':checked')) {
+                    $('#bulkDiscountValueWrapper').slideDown();
+                } else {
+                    $('#bulkDiscountValueWrapper').slideUp();
+                }
+            });
+
             // --- Price Calculation Logic ---
             function calculatePrice($row) {
                 const purchasePrice = parseFloat($row.find('.variant-purchase-price').val()) || 0;
@@ -589,6 +688,7 @@
 
             // Simple validation on submit
             $('#variantForm').on('submit', function (e) {
+                const $submitBtn = $(this).find('button[type="submit"]');
                 reindexVariantRows();
                 let errors = [];
 
@@ -623,6 +723,9 @@
                 if (errors.length) {
                     e.preventDefault();
                     alert('Please fix the following errors:\n' + errors.join('\n'));
+                } else {
+                    // Disable button to prevent double-click / database locking
+                    $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
                 }
             });
         });

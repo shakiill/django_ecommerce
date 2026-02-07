@@ -52,7 +52,9 @@ router.register(r'attributes', master_views.AttributeViewSet, basename='public_a
 router.register(r'products', ecom_views.ProductViewSet, basename='public_product')
 router.register(r'popular-products', ecom_views.PopularProductViewSet, basename='public_popular_product')
 router.register(r'new-arrival-products', ecom_views.NewArrivalProductViewSet, basename='public_new_arrival_product')
+router.register(r'flash-sale-products', ecom_views.FlashSaleProductViewSet, basename='public_flash_sale_product')
 router.register(r'wishlist', ecom_views.WishlistViewSet, basename='wishlist')
+
 
 router.register(r'cart', CartViewSet, basename='public_cart')
 router.register(r'addresses', AddressViewSet, basename='public_address')

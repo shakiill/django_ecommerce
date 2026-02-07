@@ -154,6 +154,9 @@ DATABASES = {
     'default': dj_database_url.parse(config('DATABASE_URL', default='sqlite:///db.sqlite3'))
 }
 
+if 'sqlite' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['OPTIONS'] = {'timeout': 20}
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {

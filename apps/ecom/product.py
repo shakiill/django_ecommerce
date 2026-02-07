@@ -1,6 +1,7 @@
 # views.py
 
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -59,9 +60,12 @@ def product_list_ajax(request):
 
     data = []
     for product in qs:
+        is_flash_sale = product.default_variant and product.default_variant.is_discount
+        flash_badge = ' <span class="badge bg-danger">Flash Sale</span>' if is_flash_sale else ''
+        
         data.append({
             'thumbnail': f'<img src="{product.thumbnail.url if product.thumbnail else ""}" style="height:40px;width:auto;">' if product.thumbnail else '',
-            'name': product.name,
+            'name': f'{product.name}{flash_badge}',
             'category': product.category.name if product.category else '',
             'brand': product.brand.name if product.brand else '',
             'total_stock': product.get_total_stock() if product.track_inventory else '∞',
@@ -262,6 +266,7 @@ class ProductStep1EditView(View):
         return redirect('product_variants_step', product_id=product.id)
 
 
+
 class ProductVariantWarehouseView(View):
     """
     Step 2: Manage Variants
@@ -289,6 +294,8 @@ class ProductVariantWarehouseView(View):
                 'second_attr_id': second_attr_id,
                 'combination': combo,
                 'is_default': (product.default_variant_id == v.id),
+                'is_discount': v.is_discount,
+                'discount_price': v.discount_price,
             })
 
         # NEW: determine which attributes and values were used across existing variants
@@ -316,11 +323,13 @@ class ProductVariantWarehouseView(View):
         }
         return render(request, 'product/variants.html', context)
 
+    @transaction.atomic
     def post(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
 
         has_variants = to_bool(request.POST.get('has_variants'))
         errors = []
+
 
         # Update product-level tax/margin settings
         product.profit_margin = request.POST.get('profit_margin', product.profit_margin)
@@ -338,6 +347,8 @@ class ProductVariantWarehouseView(View):
             single_purchase_price = request.POST.get('single_purchase_price')
             single_is_active = True
             single_image = request.FILES.get('single_image')
+            single_is_discount = to_bool(request.POST.get('single_is_discount'))
+            single_discount_price = request.POST.get('single_discount_price')
 
             # Validate
             try:
@@ -350,6 +361,11 @@ class ProductVariantWarehouseView(View):
                 single_purchase_price_val = float(single_purchase_price) if single_purchase_price is not None and single_purchase_price != '' else None
             except (TypeError, ValueError):
                 single_purchase_price_val = None
+
+            try:
+                single_discount_price_val = float(single_discount_price) if single_discount_price is not None and single_discount_price != '' else None
+            except (TypeError, ValueError):
+                single_discount_price_val = None
 
             if not single_sku or single_price_val is None:
                 errors.append('SKU and Price are required for the single product.')
@@ -367,6 +383,8 @@ class ProductVariantWarehouseView(View):
                 variant.price = single_price_val
                 variant.purchase_price = single_purchase_price_val
                 variant.is_active = single_is_active
+                variant.is_discount = single_is_discount
+                variant.discount_price = single_discount_price_val
                 if single_image:
                     variant.image = single_image
                 variant.attributes.clear()  # ensure no variation attributes for single mode
@@ -379,6 +397,8 @@ class ProductVariantWarehouseView(View):
                     price=single_price_val,
                     purchase_price=single_purchase_price_val,
                     is_active=single_is_active,
+                    is_discount=single_is_discount,
+                    discount_price=single_discount_price_val,
                     image=single_image
                 )
                 # ensure no attributes for single mode
@@ -448,6 +468,13 @@ class ProductVariantWarehouseView(View):
                     purchase_price = None
 
                 is_variant_active = to_bool(request.POST.get(f'variants[{index}][is_active]'))
+                is_discount = to_bool(request.POST.get(f'variants[{index}][is_discount]'))
+                discount_price_raw = request.POST.get(f'variants[{index}][discount_price]')
+                try:
+                    discount_price = float(discount_price_raw) if discount_price_raw is not None and discount_price_raw != '' else None
+                except (TypeError, ValueError):
+                    discount_price = None
+
                 first_attr_id = request.POST.get(f'variants[{index}][first_attr_id]')
                 second_attr_id = request.POST.get(f'variants[{index}][second_attr_id]')
                 # variant_image = request.FILES.get(f'variants[{index}][image]')  # removed
@@ -458,6 +485,8 @@ class ProductVariantWarehouseView(View):
                     variant.price = price
                     variant.purchase_price = purchase_price
                     variant.is_active = is_variant_active
+                    variant.is_discount = is_discount
+                    variant.discount_price = discount_price
                     # if variant_image:
                     #     variant.image = variant_image  # removed
                     variant.attributes.clear()
@@ -468,6 +497,8 @@ class ProductVariantWarehouseView(View):
                         price=price,
                         purchase_price=purchase_price,
                         is_active=is_variant_active,
+                        is_discount=is_discount,
+                        discount_price=discount_price,
                         # image=variant_image  # removed
                     )
 

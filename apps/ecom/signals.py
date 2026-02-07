@@ -1,8 +1,19 @@
 from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 from django.core.cache import cache
+from django.db.backends.signals import connection_created
 
 from apps.ecom.models import Product, ProductVariant, ProductImage
+
+
+# Signal to configure SQLite for better concurrency
+@receiver(connection_created)
+def configure_sqlite(sender, connection, **kwargs):
+    if connection.vendor == 'sqlite':
+        with connection.cursor() as cursor:
+            cursor.execute('PRAGMA journal_mode=WAL;')
+            cursor.execute('PRAGMA synchronous=NORMAL;')
+            cursor.execute('PRAGMA busy_timeout=20000;')  # 20 seconds
 
 
 # Signal to create a default variant

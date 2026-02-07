@@ -176,6 +176,24 @@ class NewArrivalProductViewSet(CachedReadOnlyMixin, viewsets.ReadOnlyModelViewSe
         return Product.objects.filter(is_active=True, is_featured=True).order_by('-created_at')
 
 
+class FlashSaleProductViewSet(CachedReadOnlyMixin, viewsets.ReadOnlyModelViewSet):
+    serializer_class = ProductListSerializer
+    permission_classes = [AllowAny]
+    http_method_names = ['get']
+    lookup_field = 'slug'
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'slug', 'short_description', 'description']
+    filterset_fields = ['category', 'brand']
+
+    def get_queryset(self):
+        # Flash sale products are those with an active discount on the default variant
+        return Product.objects.filter(
+            is_active=True,
+            default_variant__is_discount=True
+        ).order_by('-id')
+
+
+
 class WishlistViewSet(viewsets.ModelViewSet):
     serializer_class = WishlistSerializer
     permission_classes = [IsAuthenticated]

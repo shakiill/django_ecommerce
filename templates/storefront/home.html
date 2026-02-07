@@ -3,8 +3,9 @@
 {% block title %}Home - ECOM{% endblock %}
 
 {% block content %}
+    {% for section in sections %}
     <!-- Hero Slider -->
-    {% if home_sections.hero %}
+    {% if section.section_type == 'hero' %}
     <section class="hero-slider hero-slider-animated">
         <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
             <div class="carousel-indicators">
@@ -131,7 +132,7 @@
     {% endif %}
 
     <!-- FLASH SALE Section -->
-    {% if home_sections.flash_sale %}
+    {% if section.section_type == 'flash_sale' %}
     <section class="promo-banner-section flash-sale-animated">
         <div class="container-custom">
             <div class="promo-banner-content flash-sale-bd">
@@ -187,10 +188,11 @@
                                 </div>
                             </div>
                             <div class="d-flex flex-wrap gap-3 align-items-center animate-fade-in-up" style="animation-delay: 0.7s;">
-                                <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary px-5 btn-flash-cta">
-                                    <span class="btn-text">Shop Now</span>
+                                <a href="{% url 'flash_sale' %}" class="btn-hero btn-hero-primary px-5 btn-flash-cta">
+                                    <span class="btn-text">View All Deals</span>
                                     <span class="btn-shine"></span>
                                 </a>
+
                                 <div class="stock-warning stock-warning-animated">
                                     <i class="fas fa-exclamation-triangle text-warning warning-shake"></i>
                                     <span class="stock-text-blink">Only 12 left!</span>
@@ -215,7 +217,7 @@
     {% endif %}
 
     <!-- Featured Categories -->
-    {% if home_sections.categories %}
+    {% if section.section_type == 'categories' %}
     <section class="categories-section">
         <div class="container-custom">
             <div class="categories-grid">
@@ -274,7 +276,7 @@
     {% endif %}
 
     <!-- LOOKBOOK Section -->
-    {% if home_sections.lookbook %}
+    {% if section.section_type == 'lookbook' %}
     <section class="lookbook-section section-padding">
         <div class="container-custom">
             <div class="row align-items-center">
@@ -329,7 +331,7 @@
     {% endif %}
 
     <!-- New Arrivals Section -->
-    {% if home_sections.new_arrivals %}
+    {% if section.section_type == 'new_arrivals' %}
     <section class="new-arrivals-section section-padding">
         <div class="container-custom">
             <div class="d-flex justify-content-between align-items-end mb-3">
@@ -354,7 +356,7 @@
     {% endif %}
 
     <!-- Popular Products Section -->
-    {% if home_sections.popular %}
+    {% if section.section_type == 'popular' %}
     <section class="popular-products-section section-padding">
         <div class="container-custom">
             <div class="section-header text-center mb-3">
@@ -375,7 +377,7 @@
     {% endif %}
 
     <!-- BRAND STORY Section -->
-    {% if home_sections.brand_story %}
+    {% if section.section_type == 'brand_story' %}
     <section class="brand-story-section section-padding position-relative overflow-hidden">
         <div class="brand-story-bg-wrapper">
             <div class="brand-story-bg" style="background-image: url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1600');"></div>
@@ -452,7 +454,7 @@
 
     <!-- TESTIMONIALS Section -->
     <!-- TESTIMONIALS Section -->
-    {% if home_sections.testimonials %}
+    {% if section.section_type == 'testimonials' %}
     <section class="testimonials-section section-padding position-relative overflow-hidden bg-white">
         <!-- Decoration -->
         <div class="testimonial-decor-circle"></div>
@@ -546,7 +548,7 @@
     {% endif %}
 
     <!-- INSTAGRAM Section -->
-    {% if home_sections.instagram %}
+    {% if section.section_type == 'instagram' %}
     <section class="instagram-section section-padding">
         <div class="container-custom">
             <div class="section-header text-center mb-5">
@@ -594,6 +596,7 @@
         </div>
     </section>
     {% endif %}
+    {% endfor %}
 
 
 
@@ -3995,6 +3998,7 @@
                 const data = await apiFetch('/new-arrival-products/?page_size=8');
                 const products = data.results || data;
                 const container = document.getElementById('new-arrivals-slider');
+                if (!container) return; // Section disabled in CMS
 
                 if (Array.isArray(products) && products.length > 0) {
                     container.innerHTML = products.map(product => createProductSlide(product)).join('');
@@ -4056,6 +4060,7 @@
                 const data = await apiFetch('/popular-products/');
                 const products = data.results || data;
                 const container = document.getElementById('popular-products-grid');
+                if (!container) return; // Section disabled in CMS
 
                 if (Array.isArray(products) && products.length > 0) {
                     container.innerHTML = products.map(product => createProductCard(product)).join('');
