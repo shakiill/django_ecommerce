@@ -1,0 +1,545 @@
+{% extends 'storefront/base.html' %}
+{% load static %}
+
+{% block title %}Flash Sale - Huge Discounts Limited Time{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --flash-bg: #0f172a;
+        --flash-primary: #ef4444;
+        --flash-secondary: #f59e0b;
+    }
+
+    .flash-sale-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        padding: 100px 0 80px;
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+
+    .hero-pattern {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+        background-size: 40px 40px;
+        z-index: 1;
+    }
+
+    .hero-glow {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px; height: 600px;
+        background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+        z-index: 2;
+        filter: blur(50px);
+    }
+
+    .flash-sale-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+    }
+
+    .flash-badge {
+        display: inline-block;
+        background: var(--flash-primary);
+        color: white;
+        padding: 8px 24px;
+        border-radius: 50px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 25px;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        animation: pulse-red 2s infinite;
+    }
+
+    @keyframes pulse-red {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+        font-weight: 950;
+        line-height: 1.1;
+        margin-bottom: 30px;
+        background: linear-gradient(to right, #fff, #cbd5e1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .discount-text {
+        color: var(--flash-primary);
+        font-size: 5rem;
+        display: block;
+        margin-top: 10px;
+        text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Full Page Countdown */
+    .flash-page-countdown {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        margin: 50px 0;
+    }
+
+    .countdown-box {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 25px 35px;
+        border-radius: 20px;
+        min-width: 140px;
+        transition: all 0.3s ease;
+    }
+
+    .countdown-box:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--flash-primary);
+        transform: translateY(-5px);
+    }
+
+    .countdown-number {
+        font-size: 42px;
+        font-weight: 900;
+        display: block;
+        color: white;
+        line-height: 1;
+    }
+
+    .countdown-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #94a3b8;
+        margin-top: 8px;
+        display: block;
+    }
+
+    /* Filters Bar */
+    .flash-filters-bar {
+        background: white;
+        padding: 20px 0;
+        border-bottom: 1px solid #f1f5f9;
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .filter-btn-group {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        scrollbar-width: none;
+    }
+
+    .filter-btn-group::-webkit-scrollbar { display: none; }
+
+    .filter-pill {
+        white-space: nowrap;
+        padding: 10px 24px;
+        border-radius: 50px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .filter-pill:hover, .filter-pill.active {
+        background: var(--flash-primary);
+        color: white;
+        border-color: var(--flash-primary);
+    }
+
+    /* Product Grid Enhancement */
+    .flash-grid-section {
+        padding: 60px 0 100px;
+        background: #f8fafc;
+    }
+
+    .flash-product-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid #e2e8f0;
+        height: 100%;
+        position: relative;
+    }
+
+    .flash-product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+        border-color: var(--flash-primary);
+    }
+
+    .flash-img-container {
+        position: relative;
+        aspect-ratio: 1;
+        overflow: hidden;
+    }
+
+    .flash-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .flash-product-card:hover .flash-img-container img {
+        transform: scale(1.1);
+    }
+
+    .sale-ribbon {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: var(--flash-primary);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 800;
+        z-index: 5;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .stock-progress {
+        margin-top: 15px;
+    }
+
+    .progress {
+        height: 6px;
+        border-radius: 10px;
+        background: #f1f5f9;
+    }
+
+    .progress-bar {
+        background: linear-gradient(to right, #ef4444, #f59e0b);
+    }
+
+    .stock-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .live-voters {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        z-index: 5;
+    }
+
+    .live-dot {
+        width: 6px; height: 6px;
+        background: #22c55e;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #22c55e;
+        animation: pulse-green 1.5s infinite;
+    }
+
+    @keyframes pulse-green {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.5); opacity: 0.5; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .product-details {
+        padding: 20px;
+    }
+
+    .price-wrap {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .current-price {
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--flash-primary);
+    }
+
+    .old-price {
+        font-size: 16px;
+        text-decoration: line-through;
+        color: #94a3b8;
+    }
+
+    .flash-buy-btn {
+        width: 100%;
+        margin-top: 20px;
+        background: #0f172a;
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 800;
+        transition: all 0.3s ease;
+    }
+
+    .flash-buy-btn:hover {
+        background: var(--flash-primary);
+        transform: scale(1.02);
+    }
+
+    @media (max-width: 768px) {
+        .hero-title { font-size: 2.8rem; }
+        .discount-text { font-size: 3rem; }
+        .flash-page-countdown { gap: 10px; flex-wrap: wrap; }
+        .countdown-box { min-width: 80px; padding: 15px; }
+        .countdown-number { font-size: 24px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="flash-sale-hero">
+    <div class="hero-pattern"></div>
+    <div class="hero-glow"></div>
+    <div class="container-custom">
+        <div class="flash-sale-content">
+            <span class="flash-badge">Exclusive Flash Sale</span>
+            <h1 class="hero-title">
+                Don't Miss Out On<br>
+                <span class="discount-text">70% OFF</span>
+            </h1>
+            <p class="lead text-slate-300 opacity-80 mb-5">Premium collection items at unbeatable prices. Only for a limited time.</p>
+
+            <div class="flash-page-countdown" id="page-countdown">
+                <div class="countdown-box">
+                    <span class="countdown-number" id="p-days">02</span>
+                    <span class="countdown-label">Days</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="p-hours">14</span>
+                    <span class="countdown-label">Hours</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="p-mins">45</span>
+                    <span class="countdown-label">Mins</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="p-secs">00</span>
+                    <span class="countdown-label">Secs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filters Bar -->
+<div class="flash-filters-bar">
+    <div class="container-custom">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="filter-btn-group" id="category-filters">
+                <button class="filter-pill active" data-category="all">All Items</button>
+                <!-- Categories will be loaded here -->
+            </div>
+            <div class="d-none d-md-block">
+                <span class="text-muted small fw-bold"><i class="fas fa-filter me-2"></i>Filter by Category</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Grid -->
+<section class="flash-grid-section">
+    <div class="container-custom">
+        <div class="row g-4" id="flash-products-container">
+            <!-- Shimmer loading state -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="flash-product-card shimmer-card" style="height: 400px; background: white; border-radius: 20px;"></div>
+            </div>
+            <!-- Repeat shimmer 7 more times -->
+        </div>
+        
+        <!-- Empty state -->
+        <div id="flash-empty" class="text-center py-5 d-none">
+            <div class="mb-4">
+                <i class="fas fa-shopping-bag fa-4x text-slate-200"></i>
+            </div>
+            <h3 class="fw-800">No Flash Sale Products</h3>
+            <p class="text-muted">Check back later for new deals!</p>
+            <a href="{% url 'shop' %}" class="btn-hero btn-hero-primary mt-3">Continue Shopping</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentCategory = 'all';
+
+    async function loadFlashProducts(category = 'all') {
+        const container = document.getElementById('flash-products-container');
+        const emptyState = document.getElementById('flash-empty');
+        
+        try {
+            let url = '/api/v1/flash-sale-products/';
+            if (category !== 'all') {
+                url += `?category=${category}`;
+            }
+            
+            const data = await apiFetch(url.replace('/api/v1', '')); // apiFetch already adds prefix
+            const products = data.results || data;
+
+            if (Array.isArray(products) && products.length > 0) {
+                emptyState.classList.add('d-none');
+                container.classList.remove('d-none');
+                container.innerHTML = products.map(product => renderFlashCard(product)).join('');
+            } else {
+                container.innerHTML = '';
+                emptyState.classList.remove('d-none');
+            }
+        } catch (error) {
+            console.error('Failed to load flash products:', error);
+            container.innerHTML = '<div class="col-12 text-center text-danger">Failed to load deals. Please try again.</div>';
+        }
+    }
+
+    function renderFlashCard(product) {
+        const img = product.thumbnail || 'https://via.placeholder.com/400';
+        const price = parseFloat(product.price).toFixed(2);
+        const oldPrice = (parseFloat(product.price) * 1.4).toFixed(2); // Mocking original price if not provided
+        const discountPercent = 70; // Hardcoded display for now or calculate
+        
+        // Random stock progress for urgency
+        const stockPercent = Math.floor(Math.random() * 40) + 10;
+        const viewers = Math.floor(Math.random() * 50) + 20;
+
+        return `
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="flash-product-card">
+                <div class="flash-img-container">
+                    <span class="sale-ribbon">-${discountPercent}%</span>
+                    <div class="live-voters">
+                        <span class="live-dot"></span>
+                        ${viewers} viewing
+                    </div>
+                    <a href="/shop/${product.slug}/">
+                        <img src="${img}" alt="${product.name}">
+                    </a>
+                </div>
+                <div class="product-details">
+                    <div class="stock-info">
+                        <span>Sold: ${100 - stockPercent}%</span>
+                        <span>Only ${stockPercent} left</span>
+                    </div>
+                    <div class="stock-progress">
+                        <div class="progress">
+                            <div class="progress-bar" style="width: ${100 - stockPercent}%"></div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="fw-800 mt-3 mb-1">
+                        <a href="/shop/${product.slug}/" class="text-dark text-decoration-none">${product.name}</a>
+                    </h5>
+                    
+                    <div class="price-wrap">
+                        <span class="current-price">৳${price}</span>
+                        <span class="old-price">৳${oldPrice}</span>
+                    </div>
+                    
+                    <button class="flash-buy-btn" onclick="addToCart('${product.default_variant || ''}', 1)">
+                        <i class="fas fa-shopping-cart me-2"></i>Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    async function loadFlashCategories() {
+        try {
+            const data = await apiFetch('/categories/');
+            const categories = data.results || data;
+            const filterContainer = document.getElementById('category-filters');
+            
+            if (Array.isArray(categories)) {
+                categories.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = 'filter-pill';
+                    btn.textContent = cat.name;
+                    btn.dataset.category = cat.id;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        loadFlashProducts(cat.id);
+                    };
+                    filterContainer.appendChild(btn);
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load categories:', error);
+        }
+    }
+
+    function initPageCountdown() {
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 1); // 24 hours for the page
+        endDate.setHours(23, 59, 59);
+
+        function update() {
+            const now = new Date().getTime();
+            const dist = endDate - now;
+            
+            if (dist < 0) return;
+
+            const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+            const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((dist % (1000 * 60)) / 1000);
+
+            document.getElementById('p-days').textContent = String(d).padStart(2, '0');
+            document.getElementById('p-hours').textContent = String(h).padStart(2, '0');
+            document.getElementById('p-mins').textContent = String(m).padStart(2, '0');
+            document.getElementById('p-secs').textContent = String(s).padStart(2, '0');
+        }
+        
+        setInterval(update, 1000);
+        update();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadFlashProducts();
+        loadFlashCategories();
+        initPageCountdown();
+        
+        // Handle "all" button click separately if needed, though already set by default
+        document.querySelector('[data-category="all"]').onclick = (e) => {
+            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            loadFlashProducts('all');
+        };
+    });
+</script>
+{% endblock %}
